@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
-export function Auth() {
+export function Auth({ onBack }: { onBack?: () => void }) {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -85,8 +85,16 @@ export function Auth() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-8"
+        className="max-w-md w-full space-y-8 relative"
       >
+        {onBack && (
+          <button 
+            onClick={onBack}
+            className="absolute -top-12 left-0 flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium"
+          >
+            ← Back to Home
+          </button>
+        )}
         <div className="text-center space-y-2">
           <div className="inline-flex p-3 bg-orange-500 rounded-2xl mb-4">
             <Rocket className="w-8 h-8 text-white" />

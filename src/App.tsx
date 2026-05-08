@@ -25,7 +25,7 @@ import { CreateProject } from './components/CreateProject';
 
 import { Auth } from './components/Auth';
 
-type View = 'landing' | 'dashboard' | 'workspace' | 'spec' | 'create_project';
+type View = 'landing' | 'auth' | 'dashboard' | 'workspace' | 'spec' | 'create_project';
 
 export default function App() {
   const [view, setView] = useState<View>('landing');
@@ -85,11 +85,13 @@ export default function App() {
       if (session?.user) {
         if (window.opener) {
           window.close();
-        } else if (view === 'landing') {
+        } else if (view === 'landing' || view === 'auth') {
           setView('dashboard');
         }
       } else if (!session?.user) {
-        setView('landing');
+        if (view !== 'landing' && view !== 'auth') {
+          setView('landing');
+        }
       }
     });
 
@@ -144,8 +146,8 @@ export default function App() {
   }
 
   // Auth Gate
-  if (!user) {
-    return <Auth />;
+  if (!user && view !== 'landing' && view !== 'auth') {
+    return <Auth onBack={() => setView('landing')} />;
   }
 
   return (
@@ -154,7 +156,7 @@ export default function App() {
         <Toaster position="top-right" theme="dark" />
         
         {/* Sidebar / Navigation */}
-        {view !== 'landing' && (
+        {view !== 'landing' && view !== 'auth' && (
           <aside className="fixed left-0 top-0 bottom-0 w-64 border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-50 flex flex-col">
             <div className="p-6 flex items-center gap-3">
               <div className="bg-orange-500 rounded-lg p-1.5">
@@ -198,7 +200,7 @@ export default function App() {
           </aside>
         )}
 
-        <main className={view === 'landing' ? "" : "pl-64"}>
+        <main className={view === 'landing' || view === 'auth' ? "" : "pl-64"}>
           <AnimatePresence mode="wait">
             {view === 'landing' && (
               <motion.div
@@ -207,7 +209,17 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
               >
-                <LandingPage onCreateProject={handleCreateProject} />
+                <LandingPage onCreateProject={handleCreateProject} onSignIn={() => setView('auth')} />
+              </motion.div>
+            )}
+            {view === 'auth' && (
+              <motion.div
+                key="auth"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <Auth onBack={() => setView('landing')} />
               </motion.div>
             )}
             {view === 'dashboard' && (
