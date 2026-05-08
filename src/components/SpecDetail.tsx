@@ -1,0 +1,337 @@
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  ChevronLeft, 
+  Sparkles, 
+  Save, 
+  Copy, 
+  MessageSquare, 
+  Eye, 
+  Code,
+  Send,
+  Loader2,
+  Terminal,
+  Download,
+  BrainCircuit,
+  History,
+  FileSearch
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import ReactMarkdown from 'react-markdown';
+import { supabase } from '../lib/supabase';
+import { generateSpec, getEmbedding } from '../lib/gemini';
+import { Project, Spec, Message } from '../types';
+import { toast } from 'sonner';
+
+interface SpecDetailProps {
+  specId: string;
+  projectId: string;
+  onBack: () => void;
+}
+
+export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
+  const [spec, setSpec] = useState<Spec | null>(null);
+  const [project, setProject] = useState<Project | null>(null);
+  const [content, setContent] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [similarSpecs, setSimilarSpecs] = useState<string[]>([]);
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchData();
+  }, [specId]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [specRes, projRes] = await Promise.all([
+        supabase.from('specs').select('*').eq('id', specId).single(),
+        supabase.from('projects').select('*').eq('id', projectId).single()
+      ]);
+
+      if (specRes.error) throw specRes.error;
+      if (projRes.error) throw projRes.error;
+
+      setSpec(specRes.data);
+      setProject(projRes.data);
+      setContent(specRes.data.content);
+      
+      // Perform vector search for similar specs
+      if (specRes.data.embedding) {
+        // In a real pgvector setup, you'd use a RPC call. 
+        // For this MVP, we'll just pull some context OR mock the vector search.
+        const { data: others } = await supabase
+          .from('specs')
+          .select('content')
+          .eq('project_id', projectId)
+          .neq('id', specId)
+          .limit(3);
+        setSimilarSpecs(others?.map(o => o.content) || []);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load spec");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // Get embedding for RAG
+      const embedding = await getEmbedding(content.substring(0, 5000));
+      
+      const { error } = await supabase.from('specs').update({
+        content,
+        embedding,
+        status: content.length > 500 ? 'completed' : 'draft'
+      }).eq('id', specId);
+
+      if (error) throw error;
+      toast.success("Spec saved and indexed");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save spec");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!input.trim() || chatLoading) return;
+    
+    const newMsg: Message = { role: 'user', content: input };
+    const updatedMessages = [...messages, newMsg];
+    setMessages(updatedMessages);
+    setInput('');
+    setChatLoading(true);
+
+    try {
+      // This is the "Interview" model. If it's the first message, we set context.
+      const response = await generateSpec(
+        updatedMessages, 
+        spec?.type || 'General',
+        project?.description || '',
+        similarSpecs
+      );
+      
+      setMessages([...updatedMessages, { role: 'assistant', content: response }]);
+      setContent(response); // Live update the spec draft
+    } catch (error) {
+      console.error(error);
+      toast.error("AI Generation failed");
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const copyPrompt = () => {
+    const prompt = `--- CURSOR/DEVIN PROMPT ---
+Context:
+Project Name: ${project?.title}
+Project Goal: ${project?.description}
+
+Specification (${spec?.type}):
+${content}
+
+Task: Implement the technical structure defined in this specification.
+Focus: ${spec?.title}
+Instructions: Strictly follow the technical decisions, folder structure, and rationale provided above.
+--- END PROMPT ---`;
+    
+    navigator.clipboard.writeText(prompt);
+    toast.success("Prompt copied to clipboard!");
+  };
+
+  if (loading) return <div>Loading spec...</div>;
+
+  return (
+    <div className="h-screen flex flex-col bg-slate-950 overflow-hidden">
+      {/* Top Header */}
+      <header className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md p-4 flex items-center justify-between z-10">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={onBack} className="p-2 hover:bg-slate-900 rounded-xl">
+            <ChevronLeft className="w-5 h-5 text-slate-400" />
+          </Button>
+          <div className="flex items-center gap-3">
+             {spec?.status === 'completed' && <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">READY</Badge>}
+             <h1 className="text-lg font-bold tracking-tight">{spec?.title}</h1>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            onClick={copyPrompt}
+            className="border-slate-800 hover:bg-slate-900 text-xs font-semibold uppercase tracking-wider gap-2 px-6"
+          >
+            <Terminal className="w-4 h-4 text-orange-500" />
+            Copy Prompt
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            disabled={saving}
+            className="bg-orange-500 hover:bg-orange-600 font-bold gap-2"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Save Spec
+          </Button>
+        </div>
+      </header>
+
+      {/* Workspace */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Editor vs Preview */}
+        <div className="flex-1 overflow-hidden flex flex-col border-r border-slate-800">
+          <Tabs defaultValue="editor" className="flex-1 flex flex-col overflow-hidden">
+            <div className="px-6 py-2 border-b border-slate-900 flex justify-between items-center bg-slate-950/50">
+              <TabsList className="bg-slate-900 h-9 p-1">
+                <TabsTrigger value="editor" className="data-[state=active]:bg-slate-800 text-xs gap-2">
+                  <Code className="w-3.5 h-3.5" /> Editor
+                </TabsTrigger>
+                <TabsTrigger value="preview" className="data-[state=active]:bg-slate-800 text-xs gap-2">
+                  <Eye className="w-3.5 h-3.5" /> Preview
+                </TabsTrigger>
+              </TabsList>
+              
+              <div className="flex items-center gap-4 text-[10px] uppercase font-bold tracking-widest text-slate-500">
+                <div className="flex items-center gap-2">
+                  <BrainCircuit className="w-3 h-3 text-emerald-500" />
+                  RAG: {similarSpecs.length} Context Docs
+                </div>
+              </div>
+            </div>
+
+            <TabsContent value="editor" className="flex-1 m-0 p-0 overflow-hidden">
+              <Textarea 
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="w-full h-full p-8 font-mono text-sm bg-transparent border-none focus-visible:ring-0 resize-none selection:bg-orange-500/20"
+                placeholder="# Describe your technical specification..."
+              />
+            </TabsContent>
+            
+            <TabsContent value="preview" className="flex-1 m-0 p-0 overflow-auto">
+              <div className="max-w-3xl mx-auto p-12 prose prose-invert prose-orange">
+                <ReactMarkdown>{content}</ReactMarkdown>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* AI Assistant Sidebar */}
+        <aside className={`${chatOpen ? 'w-96' : 'w-16'} border-l border-slate-800 bg-slate-950/50 transition-all duration-300 flex flex-col overflow-hidden`}>
+          <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/10">
+            <button 
+              onClick={() => setChatOpen(!chatOpen)}
+              className="p-2 hover:bg-slate-900 rounded-xl text-orange-500"
+            >
+              <Sparkles className="w-6 h-6" />
+            </button>
+            {chatOpen && <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Spec Generator</h2>}
+            {chatOpen && (
+              <button onClick={() => setMessages([])} className="p-2 hover:bg-slate-900 rounded-xl text-slate-500">
+                <History className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          <AnimatePresence>
+            {chatOpen && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex-1 flex flex-col overflow-hidden"
+              >
+                <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
+                  {messages.length === 0 && (
+                    <div className="text-center py-10 space-y-4">
+                      <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto">
+                        <Sparkles className="w-6 h-6 text-orange-500" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold">Start AI Interview</p>
+                        <p className="text-xs text-slate-500">I'll ask questions to help you build a bullet-proof {spec?.type} spec.</p>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="text-orange-500 font-bold"
+                        onClick={() => {
+                          setInput(`Help me build the ${spec?.type} specification for this project.`);
+                          setTimeout(handleSendMessage, 100);
+                        }}
+                      >
+                        Launch Conversation
+                      </Button>
+                    </div>
+                  )}
+                  {messages.map((m, i) => (
+                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
+                        m.role === 'user' ? 'bg-orange-600 text-white rounded-tr-none' : 'bg-slate-900 text-slate-300 rounded-tl-none border border-slate-800'
+                      }`}>
+                        {m.content}
+                      </div>
+                    </div>
+                  ))}
+                  {chatLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-slate-900 p-3 rounded-2xl border border-slate-800 animate-pulse flex items-center gap-2">
+                        <Loader2 className="w-3 h-3 animate-spin text-orange-500" />
+                        <span className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Thinking...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 border-t border-slate-800 space-y-4">
+                  <div className="flex gap-2">
+                    <Textarea 
+                      placeholder="Type your requirements..."
+                      className="min-h-[80px] bg-slate-900/50 border-slate-800 text-xs p-3 rounded-xl resize-none"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                    />
+                    <Button 
+                      size="icon" 
+                      className="h-auto aspect-square bg-orange-500 hover:bg-orange-600 self-stretch"
+                      onClick={handleSendMessage}
+                      disabled={chatLoading}
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </aside>
+      </div>
+    </div>
+  );
+}
