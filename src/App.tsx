@@ -15,15 +15,17 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from 'sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { Workspace } from './components/Workspace';
 import { SpecDetail } from './components/SpecDetail';
+import { CreateProject } from './components/CreateProject';
 
 import { Auth } from './components/Auth';
 
-type View = 'landing' | 'dashboard' | 'workspace' | 'spec';
+type View = 'landing' | 'dashboard' | 'workspace' | 'spec' | 'create_project';
 
 export default function App() {
   const [view, setView] = useState<View>('landing');
@@ -147,106 +149,126 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-orange-500/30">
-      <Toaster position="top-right" theme="dark" />
-      
-      {/* Sidebar / Navigation */}
-      {view !== 'landing' && (
-        <aside className="fixed left-0 top-0 bottom-0 w-64 border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-50 flex flex-col">
-          <div className="p-6 flex items-center gap-3">
-            <div className="bg-orange-500 rounded-lg p-1.5">
-              <Rocket className="w-5 h-5 text-white" />
+    <TooltipProvider>
+      <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-orange-500/30">
+        <Toaster position="top-right" theme="dark" />
+        
+        {/* Sidebar / Navigation */}
+        {view !== 'landing' && (
+          <aside className="fixed left-0 top-0 bottom-0 w-64 border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-50 flex flex-col">
+            <div className="p-6 flex items-center gap-3">
+              <div className="bg-orange-500 rounded-lg p-1.5">
+                <Rocket className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold tracking-tight text-xl">SpecFlow</span>
             </div>
-            <span className="font-bold tracking-tight text-xl">SpecFlow</span>
-          </div>
 
-          <nav className="flex-1 px-4 space-y-2 py-4">
-            <NavItem 
-              icon={<LayoutDashboard className="w-4 h-4" />} 
-              label="Dashboard" 
-              active={view === 'dashboard'} 
-              onClick={() => setView('dashboard')} 
-            />
-            <NavItem 
-              icon={<Plus className="w-4 h-4" />} 
-              label="New Project" 
-              onClick={() => setView('landing')} 
-            />
-          </nav>
+            <nav className="flex-1 px-4 space-y-2 py-4">
+              <NavItem 
+                icon={<LayoutDashboard className="w-4 h-4" />} 
+                label="Dashboard" 
+                active={view === 'dashboard'} 
+                onClick={() => setView('dashboard')} 
+              />
+              <NavItem 
+                icon={<Plus className="w-4 h-4" />} 
+                label="New Project" 
+                active={view === 'create_project'}
+                onClick={() => setView('create_project')} 
+              />
+            </nav>
 
-          <div className="p-4 border-t border-slate-800">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50">
-              <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold">
-                {user?.email?.[0].toUpperCase() ?? 'U'}
+            <div className="p-4 border-t border-slate-800">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50">
+                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold">
+                  {user?.email?.[0].toUpperCase() ?? 'U'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium truncate">{user?.email}</p>
+                  <p className="text-[10px] text-slate-500">Free Tier</p>
+                </div>
+                <button 
+                  onClick={handleLogout}
+                  className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate">{user?.email}</p>
-                <p className="text-[10px] text-slate-500">Free Tier</p>
-              </div>
-              <button 
-                onClick={handleLogout}
-                className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white"
+            </div>
+          </aside>
+        )}
+
+        <main className={view === 'landing' ? "" : "pl-64"}>
+          <AnimatePresence mode="wait">
+            {view === 'landing' && (
+              <motion.div
+                key="landing"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
               >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </aside>
-      )}
-
-      <main className={view === 'landing' ? "" : "pl-64"}>
-        <AnimatePresence mode="wait">
-          {view === 'landing' && (
-            <motion.div
-              key="landing"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              <LandingPage onCreateProject={handleCreateProject} />
-            </motion.div>
-          )}
-          {view === 'dashboard' && (
-            <motion.div
-              key="dashboard"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <Dashboard onSelectProject={handleSelectProject} />
-            </motion.div>
-          )}
-          {view === 'workspace' && selectedProjectId && (
-            <motion.div
-              key="workspace"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <Workspace 
-                projectId={selectedProjectId} 
-                onSelectSpec={handleSelectSpec}
-                onBack={() => setView('dashboard')}
-              />
-            </motion.div>
-          )}
-          {view === 'spec' && selectedSpecId && selectedProjectId && (
-            <motion.div
-              key="spec"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <SpecDetail 
-                specId={selectedSpecId} 
-                projectId={selectedProjectId}
-                onBack={() => setView('workspace')} 
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-    </div>
+                <LandingPage onCreateProject={handleCreateProject} />
+              </motion.div>
+            )}
+            {view === 'dashboard' && (
+              <motion.div
+                key="dashboard"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Dashboard 
+                  onSelectProject={handleSelectProject} 
+                  onCreateProject={() => setView('create_project')}
+                />
+              </motion.div>
+            )}
+            {view === 'create_project' && (
+              <motion.div
+                key="create_project"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+              >
+                <CreateProject 
+                  onBack={() => setView('dashboard')}
+                  onCreateProject={handleCreateProject}
+                  onStartIdeation={() => setView('landing')}
+                />
+              </motion.div>
+            )}
+            {view === 'workspace' && selectedProjectId && (
+              <motion.div
+                key="workspace"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Workspace 
+                  projectId={selectedProjectId} 
+                  onSelectSpec={handleSelectSpec}
+                  onBack={() => setView('dashboard')}
+                />
+              </motion.div>
+            )}
+            {view === 'spec' && selectedSpecId && selectedProjectId && (
+              <motion.div
+                key="spec"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <SpecDetail 
+                  specId={selectedSpecId} 
+                  projectId={selectedProjectId}
+                  onBack={() => setView('workspace')} 
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+      </div>
+    </TooltipProvider>
   );
 }
 

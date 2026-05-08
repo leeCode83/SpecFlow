@@ -8,11 +8,19 @@ import { supabase } from '../lib/supabase';
 import { Project } from '../types';
 import { toast } from 'sonner';
 
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 interface DashboardProps {
   onSelectProject: (id: string) => void;
+  onCreateProject: () => void;
 }
 
-export function Dashboard({ onSelectProject }: DashboardProps) {
+export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +67,7 @@ export function Dashboard({ onSelectProject }: DashboardProps) {
           <h1 className="text-3xl font-bold tracking-tight">Your Projects</h1>
           <p className="text-slate-500">Manage your product specs and ideation workspaces.</p>
         </div>
-        <Button onClick={() => window.location.reload()} variant="outline" className="gap-2 border-slate-800">
+        <Button onClick={onCreateProject} variant="outline" className="gap-2 border-slate-800">
           <Plus className="w-4 h-4" />
           New Project
         </Button>
@@ -80,7 +88,7 @@ export function Dashboard({ onSelectProject }: DashboardProps) {
             <h3 className="font-semibold text-lg">No projects yet</h3>
             <p className="text-slate-500">Start by describing your idea on the landing page.</p>
           </div>
-          <Button onClick={() => window.location.reload()} className="bg-orange-500 hover:bg-orange-600">
+          <Button onClick={onCreateProject} className="bg-orange-500 hover:bg-orange-600">
             Get Started
           </Button>
         </div>
@@ -125,15 +133,36 @@ export function Dashboard({ onSelectProject }: DashboardProps) {
                     {new Date(project.created_at).toLocaleDateString()}
                   </div>
                   <div className="flex items-center gap-2">
-                    <button 
-                      onClick={(e) => deleteProject(project.id, e)}
-                      className="p-2 hover:bg-red-500/10 text-slate-500 hover:text-red-500 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    <div className="p-2 bg-orange-500/10 text-orange-500 rounded-lg">
-                      <ExternalLink className="w-4 h-4" />
-                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button 
+                          onClick={(e) => deleteProject(project.id, e)}
+                          className="p-2 hover:bg-red-500/10 text-slate-500 hover:text-red-500 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        <p>Delete Project</p>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectProject(project.id);
+                          }}
+                          className="p-2 bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 rounded-lg transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        <p>Open Workspace</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
               </Card>
