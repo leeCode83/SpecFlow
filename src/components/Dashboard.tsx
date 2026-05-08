@@ -9,6 +9,14 @@ import { Project } from '../types';
 import { toast } from 'sonner';
 
 import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { 
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -23,6 +31,8 @@ interface DashboardProps {
 export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -45,18 +55,26 @@ export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) 
     }
   };
 
-  const deleteProject = async (id: string, e: React.MouseEvent) => {
+  const handleDeleteClick = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm("Are you sure you want to delete this project?")) return;
+    setProjectToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!projectToDelete) return;
     
+    setIsDeleting(true);
     try {
-      const { error } = await supabase.from('projects').delete().eq('id', id);
+      const { error } = await supabase.from('projects').delete().eq('id', projectToDelete);
       if (error) throw error;
-      setProjects(projects.filter(p => p.id !== id));
-      toast.success("Project deleted");
+      setProjects(projects.filter(p => p.id !== projectToDelete));
+      toast.success("Project deleted successfully");
+      setProjectToDelete(null);
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete project");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -133,36 +151,38 @@ export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) 
                     {new Date(project.created_at).toLocaleDateString()}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button 
-                          onClick={(e) => deleteProject(project.id, e)}
-                          className="p-2 hover:bg-red-500/10 text-slate-500 hover:text-red-500 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top">
-                        <p>Delete Project</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={(e) => handleDeleteClick(project.id, e)}
+                            className="p-2 hover:bg-red-500/10 text-slate-500 hover:text-red-500 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>Delete Project</p>
+                        </TooltipContent>
+                      </Tooltip>
 
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectProject(project.id);
-                          }}
-                          className="p-2 bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 rounded-lg transition-colors"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top">
-                        <p>Open Workspace</p>
-                      </TooltipContent>
-                    </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectProject(project.id);
+                            }}
+                            className="p-2 bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 rounded-lg transition-colors"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>Open Workspace</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               </Card>
@@ -170,6 +190,35 @@ export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) 
           ))}
         </div>
       )}
+
+      <Dialog open={!!projectToDelete} onOpenChange={(open) => !open && setProjectToDelete(null)}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle>Delete Project?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete the project and all its specifications. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex-row gap-2 sm:justify-end">
+            <Button 
+              variant="ghost" 
+              onClick={() => setProjectToDelete(null)}
+              disabled={isDeleting}
+              className="flex-1 sm:flex-none"
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

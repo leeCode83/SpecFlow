@@ -38,6 +38,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const [loading, setLoading] = useState(true);
   const [creationLoading, setCreationLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     fetchData();
@@ -169,7 +170,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
               />
             </div>
             <div className="h-6 w-px bg-slate-800" />
-            <Tabs defaultValue="grid" className="hidden sm:block">
+            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'grid' | 'list')} className="hidden sm:block">
               <TabsList className="bg-transparent h-8 p-0">
                 <TabsTrigger value="grid" className="data-[state=active]:bg-slate-800 rounded-lg p-2"><LayoutGrid className="w-4 h-4" /></TabsTrigger>
                 <TabsTrigger value="list" className="data-[state=active]:bg-slate-800 rounded-lg p-2"><List className="w-4 h-4" /></TabsTrigger>
@@ -177,7 +178,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             </Tabs>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "flex flex-col gap-3"}>
             {filteredSpecs.map((spec) => (
               <motion.div
                 key={spec.id}
@@ -185,29 +186,65 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
                 onClick={() => onSelectSpec(spec.id)}
                 className="group cursor-pointer"
               >
-                <Card className="bg-slate-900/40 border-slate-800 p-5 rounded-2xl hover:border-orange-500/30 hover:bg-slate-900/60 transition-all flex items-center gap-4 border-l-4 border-l-transparent group-hover:border-l-orange-500">
-                  <div className={`p-3 rounded-xl ${
-                    spec.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-slate-800 text-slate-400'
-                  }`}>
-                    {spec.status === 'completed' ? <CheckCircle2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                       <h4 className="font-bold truncate">{spec.title}</h4>
+                {viewMode === 'grid' ? (
+                  <Card className="bg-slate-900/40 border-slate-800 p-5 rounded-2xl hover:border-orange-500/30 hover:bg-slate-900/60 transition-all flex items-center gap-4 border-l-4 border-l-transparent group-hover:border-l-orange-500">
+                    <div className={`p-3 rounded-xl ${
+                      spec.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-slate-800 text-slate-400'
+                    }`}>
+                      {spec.status === 'completed' ? <CheckCircle2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                     </div>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500">{spec.type}</span>
-                      <span className="text-slate-700">•</span>
-                      <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                        <Clock className="w-3 h-3" />
-                        {new Date(spec.created_at).toLocaleDateString()}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                         <h4 className="font-bold truncate">{spec.title}</h4>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500">{spec.type}</span>
+                        <span className="text-slate-700">•</span>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                          <Clock className="w-3 h-3" />
+                          {new Date(spec.created_at).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <Button variant="ghost" className="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Sparkles className="w-4 h-4 text-orange-500" />
-                  </Button>
-                </Card>
+                    <Button variant="ghost" className="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Sparkles className="w-4 h-4 text-orange-500" />
+                    </Button>
+                  </Card>
+                ) : (
+                  <Card className="bg-slate-900/40 border-slate-800 p-4 rounded-xl hover:border-orange-500/30 hover:bg-slate-900/60 transition-all flex items-center gap-6 border-l-2 border-l-transparent group-hover:border-l-orange-500">
+                    <div className={`flex-shrink-0 p-2 rounded-lg ${
+                      spec.status === 'completed' ? 'bg-emerald-500/5 text-emerald-500' : 'bg-slate-800/50 text-slate-500'
+                    }`}>
+                      {spec.status === 'completed' ? <CheckCircle2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold truncate text-sm">{spec.title}</h4>
+                    </div>
+
+                    <div className="flex items-center gap-8 text-xs">
+                      <div className="w-24">
+                        <Badge variant="outline" className="bg-slate-900 border-slate-800 text-slate-400 font-mono text-[9px] px-2 py-0">
+                          {spec.type}
+                        </Badge>
+                      </div>
+
+                      <div className="w-32 flex items-center gap-2">
+                        <div className={`w-1.5 h-1.5 rounded-full ${spec.status === 'completed' ? 'bg-emerald-500' : 'bg-slate-600'}`} />
+                        <span className={`uppercase tracking-tighter font-bold text-[9px] ${spec.status === 'completed' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                          {spec.status === 'completed' ? 'Ready' : 'Draft'}
+                        </span>
+                      </div>
+
+                      <div className="w-32 text-slate-500 flex items-center gap-1.5">
+                        <Clock className="w-3 h-3" />
+                        <span>{new Date(spec.created_at).toLocaleDateString()}</span>
+                      </div>
+
+                      <Sparkles className="w-4 h-4 text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </Card>
+                )}
               </motion.div>
             ))}
 

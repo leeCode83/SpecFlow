@@ -15,7 +15,8 @@ import {
   BrainCircuit,
   History,
   FileSearch,
-  Pencil
+  Pencil,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -256,6 +257,9 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
           <div className="flex items-center gap-3">
              {spec?.status === 'completed' && <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-1 h-5 text-[9px]">READY</Badge>}
              <div className="flex items-center gap-2">
+               <div className="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center">
+                 <FileText className="w-4 h-4 text-orange-500" />
+               </div>
                <h1 className="text-lg font-bold tracking-tight">{title}</h1>
                <Button 
                 variant="ghost" 
