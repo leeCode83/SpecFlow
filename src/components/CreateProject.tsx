@@ -13,15 +13,16 @@ interface CreateProjectProps {
   onBack: () => void;
   onCreateProject: (id: string) => void;
   onStartIdeation: () => void;
+  initialData?: { title: string; description: string; mode: string } | null;
 }
 
-export function CreateProject({ onBack, onCreateProject, onStartIdeation }: CreateProjectProps) {
-  const [step, setStep] = useState<'choice' | 'form'>('choice');
+export function CreateProject({ onBack, onCreateProject, onStartIdeation, initialData }: CreateProjectProps) {
+  const [step, setStep] = useState<'choice' | 'form'>(initialData ? 'form' : 'choice');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    mode: 'Startup' as Mode,
+    title: initialData?.title || '',
+    description: initialData?.description || '',
+    mode: (initialData?.mode as Mode) || 'Startup',
   });
 
   const handleQuickCreate = async (e: React.FormEvent) => {

@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 interface LandingPageProps {
   onCreateProject: (id: string) => void;
   onSignIn?: () => void;
+  onStartIdeation?: () => void;
 }
 
 const testimonials = [
@@ -42,7 +43,7 @@ const testimonials = [
   },
 ];
 
-export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
+export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: LandingPageProps) {
   const [idea, setIdea] = useState('');
   const [mode, setMode] = useState<Mode>('Hackathon');
   const [analyzing, setAnalyzing] = useState(false);
@@ -113,7 +114,7 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
           <Button variant="ghost" className="text-slate-300 hover:text-white" onClick={onSignIn}>
             Log In
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold" onClick={onSignIn}>
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold" onClick={onStartIdeation}>
             Get Started
           </Button>
         </div>
@@ -153,7 +154,7 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
               transition={{ delay: 0.2 }}
               className="flex gap-4"
             >
-              <Button size="lg" className="bg-orange-500 hover:bg-orange-600 font-bold h-14 px-8 text-base" onClick={onSignIn}>
+              <Button size="lg" className="bg-orange-500 hover:bg-orange-600 font-bold h-14 px-8 text-base" onClick={onStartIdeation}>
                 Start Building Free
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -292,7 +293,7 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
                     <div className="flex flex-wrap gap-2">
                       {feedback.techStack.frontend.map(t => <Badge key={t} variant="outline" className="bg-blue-500/5 border-blue-500/20 text-blue-400">{t}</Badge>)}
                       {feedback.techStack.backend.map(t => <Badge key={t} variant="outline" className="bg-purple-500/5 border-purple-500/20 text-purple-400">{t}</Badge>)}
-                      {feedback.techStack.ai.map(t => <Badge key={t} variant="outline" className="bg-emerald-500/5 border-emerald-500/20 text-emerald-400">{t}</Badge>)}
+                      {feedback.techStack.ai?.map(t => <Badge key={t} variant="outline" className="bg-emerald-500/5 border-emerald-500/20 text-emerald-400">{t}</Badge>)}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -308,13 +309,21 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
                   </div>
                 </div>
 
-                <Button 
-                  onClick={handleSaveProject} 
-                  className="w-full bg-slate-50 text-slate-950 font-bold py-6 rounded-xl hover:bg-slate-200"
-                >
-                  Create Workspace & Start IdeaFrame
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-800">
+                  <Button 
+                    onClick={onSignIn} 
+                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold h-14 rounded-xl"
+                  >
+                    Log In to Elaborate
+                  </Button>
+                  <Button 
+                    onClick={handleSaveProject} 
+                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl"
+                  >
+                    Sign In & Create Project
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </div>
               </Card>
 
               <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
@@ -345,7 +354,6 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
           )}
         </section>
 
-        {/* Testimonial Section */}
         <section className="w-full bg-slate-900/30 border-y border-slate-800/50 py-24 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 text-center space-y-12">
             <div className="space-y-4">

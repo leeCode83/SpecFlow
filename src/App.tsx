@@ -22,10 +22,11 @@ import { Dashboard } from './components/Dashboard';
 import { Workspace } from './components/Workspace';
 import { SpecDetail } from './components/SpecDetail';
 import { CreateProject } from './components/CreateProject';
+import { IdeationPage } from './components/IdeationPage';
 
 import { Auth } from './components/Auth';
 
-type View = 'landing' | 'auth' | 'dashboard' | 'workspace' | 'spec' | 'create_project';
+type View = 'landing' | 'auth' | 'ideation' | 'dashboard' | 'workspace' | 'spec' | 'create_project';
 
 export default function App() {
   const [view, setView] = useState<View>('landing');
@@ -33,6 +34,7 @@ export default function App() {
   const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [configured, setConfigured] = useState(isSupabaseConfigured());
+  const [ideationData, setIdeationData] = useState<{ title: string; description: string; mode: string } | null>(null);
 
   useEffect(() => {
     if (!configured) return;
@@ -60,7 +62,7 @@ export default function App() {
           });
           if (!error && data.session) {
             setUser(data.session.user);
-            if (view === 'landing') setView('dashboard');
+            setView(prev => (prev === 'landing' || prev === 'auth') ? 'dashboard' : prev);
           }
         }
       }
@@ -73,8 +75,8 @@ export default function App() {
       if (session?.user) {
         if (window.opener) {
           window.close();
-        } else if (view === 'landing') {
-          setView('dashboard');
+        } else {
+          setView(prev => (prev === 'landing' || prev === 'auth') ? 'dashboard' : prev);
         }
       }
     });
@@ -85,13 +87,11 @@ export default function App() {
       if (session?.user) {
         if (window.opener) {
           window.close();
-        } else if (view === 'landing' || view === 'auth') {
-          setView('dashboard');
+        } else {
+          setView(prev => (prev === 'landing' || prev === 'auth') ? 'dashboard' : prev);
         }
       } else if (!session?.user) {
-        if (view !== 'landing' && view !== 'auth') {
-          setView('landing');
-        }
+        setView(prev => (prev !== 'landing' && prev !== 'auth' && prev !== 'ideation') ? 'landing' : prev);
       }
     });
 
@@ -99,7 +99,7 @@ export default function App() {
       subscription.unsubscribe();
       window.removeEventListener('message', handleMessage);
     };
-  }, [configured, view]);
+  }, [configured]);
 
   const handleCreateProject = (projectId: string) => {
     setSelectedProjectId(projectId);
@@ -146,7 +146,7 @@ export default function App() {
   }
 
   // Auth Gate
-  if (!user && view !== 'landing' && view !== 'auth') {
+  if (!user && view !== 'landing' && view !== 'auth' && view !== 'ideation') {
     return <Auth onBack={() => setView('landing')} />;
   }
 
@@ -156,13 +156,19 @@ export default function App() {
         <Toaster position="top-right" theme="dark" />
         
         {/* Sidebar / Navigation */}
-        {view !== 'landing' && view !== 'auth' && (
+        {view !== 'landing' && view !== 'auth' && view !== 'ideation' && (
           <aside className="fixed left-0 top-0 bottom-0 w-64 border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-50 flex flex-col">
-            <div className="p-6 flex items-center gap-3">
-              <div className="bg-orange-500 rounded-lg p-1.5">
+            <div 
+              className="p-6 flex items-center gap-3 cursor-pointer group"
+              onClick={() => {
+                if (user) setView('dashboard');
+                else setView('landing');
+              }}
+            >
+              <div className="bg-orange-500 rounded-lg p-1.5 group-hover:scale-105 transition-transform">
                 <Rocket className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold tracking-tight text-xl">IdeaFrame</span>
+              <span className="font-bold tracking-tight text-xl group-hover:text-orange-400 transition-colors">IdeaFrame</span>
             </div>
 
             <nav className="flex-1 px-4 space-y-2 py-4">
@@ -200,7 +206,7 @@ export default function App() {
           </aside>
         )}
 
-        <main className={view === 'landing' || view === 'auth' ? "" : "pl-64"}>
+        <main className={view === 'landing' || view === 'auth' || view === 'ideation' ? "" : "pl-64"}>
           <AnimatePresence mode="wait">
             {view === 'landing' && (
               <motion.div
@@ -209,7 +215,23 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
               >
-                <LandingPage onCreateProject={handleCreateProject} onSignIn={() => setView('auth')} />
+                <LandingPage onCreateProject={handleCreateProject} onSignIn={() => setView('auth')} onStartIdeation={() => setView('ideation')} />
+              </motion.div>
+            )}
+            {view === 'ideation' && (
+              <motion.div
+                key="ideation"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <IdeationPage 
+                  onBack={() => setView('landing')}
+                  onCreateProject={(id, title, desc, feedback, mode) => {
+                    setIdeationData({ title: title || '', description: desc || '', mode: mode || 'Startup' });
+                    setView('create_project');
+                  }} 
+                />
               </motion.div>
             )}
             {view === 'auth' && (
@@ -245,7 +267,8 @@ export default function App() {
                 <CreateProject 
                   onBack={() => setView('dashboard')}
                   onCreateProject={handleCreateProject}
-                  onStartIdeation={() => setView('landing')}
+                  onStartIdeation={() => setView('ideation')}
+                  initialData={ideationData}
                 />
               </motion.div>
             )}
