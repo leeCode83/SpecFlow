@@ -25,6 +25,7 @@ export interface Database {
           title: string;
           description: string;
           mode: string;
+          teammates: string[];
           refined_idea_json: any;
           created_at: string;
         };
@@ -34,6 +35,7 @@ export interface Database {
           title: string;
           description: string;
           mode: string;
+          teammates?: string[];
           refined_idea_json?: any;
           created_at?: string;
         };
