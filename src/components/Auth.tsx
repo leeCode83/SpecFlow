@@ -47,18 +47,27 @@ export function Auth() {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           // Use popup for iframe compatibility in AI Studio
+          skipBrowserRedirect: true,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           },
-          redirectTo: window.location.origin,
+          redirectTo: process.env.APP_URL || window.location.origin,
         },
       });
       if (error) throw error;
+      
+      if (data?.url) {
+        // Open the authorization URL in a new popup window to avoid iframe restrictions
+        const popup = window.open(data.url, 'google-oauth', 'width=500,height=600');
+        if (!popup) {
+          toast.error("Popup blocked! Please allow popups for this site to sign in with Google.");
+        }
+      }
     } catch (error: any) {
       toast.error(error.message);
     } finally {

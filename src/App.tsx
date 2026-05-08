@@ -35,25 +35,66 @@ export default function App() {
   useEffect(() => {
     if (!configured) return;
     
+    // Popup flow handler: if inside popup with access_token, send to opener and close
+    if (window.opener && window.location.hash.includes('access_token=')) {
+      window.opener.postMessage({ 
+        type: 'OAUTH_AUTH_SUCCESS', 
+        hash: window.location.hash 
+      }, '*');
+      window.close();
+      return;
+    }
+
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data?.type === 'OAUTH_AUTH_SUCCESS' && event.data.hash) {
+        const hashParams = new URLSearchParams(event.data.hash.substring(1));
+        const access_token = hashParams.get('access_token');
+        const refresh_token = hashParams.get('refresh_token');
+        
+        if (access_token && refresh_token) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token
+          });
+          if (!error && data.session) {
+            setUser(data.session.user);
+            if (view === 'landing') setView('dashboard');
+          }
+        }
+      }
+    };
+    window.addEventListener('message', handleMessage);
+
     // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user && view === 'landing') {
-        setView('dashboard');
+      if (session?.user) {
+        if (window.opener) {
+          window.close();
+        } else if (view === 'landing') {
+          setView('dashboard');
+        }
       }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user && view === 'landing') {
-        setView('dashboard');
+      if (session?.user) {
+        if (window.opener) {
+          window.close();
+        } else if (view === 'landing') {
+          setView('dashboard');
+        }
       } else if (!session?.user) {
         setView('landing');
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('message', handleMessage);
+    };
   }, [configured, view]);
 
   const handleCreateProject = (projectId: string) => {
