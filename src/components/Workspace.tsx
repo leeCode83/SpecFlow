@@ -12,7 +12,13 @@ import {
   LayoutGrid,
   List,
   Search,
-  Filter
+  Filter,
+  Shield,
+  Database,
+  Monitor,
+  Brain,
+  Server,
+  Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -32,6 +38,15 @@ interface WorkspaceProps {
 
 const SPEC_TYPES: SpecType[] = ['Auth', 'API', 'Frontend', 'AI', 'Infrastructure', 'Custom'];
 
+const TYPE_ICONS: Record<SpecType, any> = {
+  Auth: Shield,
+  API: Database,
+  Frontend: Monitor,
+  AI: Brain,
+  Infrastructure: Server,
+  Custom: Zap
+};
+
 export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const [project, setProject] = useState<Project | null>(null);
   const [specs, setSpecs] = useState<Spec[]>([]);
@@ -39,6 +54,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const [creationLoading, setCreationLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showAddMenu, setShowAddMenu] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -132,27 +148,80 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar: New Spec Templates */}
+        {/* Sidebar: Spec Collection */}
         <div className="space-y-6">
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 px-2">Templates</h3>
-            <div className="space-y-1">
-              {SPEC_TYPES.map(type => (
-                <button
-                  key={type}
-                  disabled={creationLoading}
-                  onClick={() => handleCreateSpec(type)}
-                  className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-900 transition-colors flex items-center justify-between group"
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-2">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">Spec Collection</h3>
+              <div className="relative">
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-7 w-7 rounded-lg hover:bg-slate-800 text-orange-500"
+                  onClick={() => setShowAddMenu(!showAddMenu)}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-orange-500/5 border border-orange-500/10 flex items-center justify-center text-orange-500">
-                      <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4" />
+                </Button>
+
+                {showAddMenu && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowAddMenu(false)} />
+                    <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-2 z-50 overflow-hidden backdrop-blur-xl">
+                      <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 px-3 py-2 border-b border-slate-800 mb-1">
+                        Select Template
+                      </p>
+                      {SPEC_TYPES.map(type => {
+                        const Icon = TYPE_ICONS[type];
+                        return (
+                          <button
+                            key={type}
+                            onClick={() => {
+                              handleCreateSpec(type);
+                              setShowAddMenu(false);
+                            }}
+                            className="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors flex items-center gap-3"
+                          >
+                            <Icon className="w-3.5 h-3.5 text-orange-500" />
+                            <span>{type}</span>
+                          </button>
+                        );
+                      })}
                     </div>
-                    <span className="text-sm font-medium">{type}</span>
-                  </div>
-                  <ChevronLeft className="w-4 h-4 rotate-180 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </button>
-              ))}
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              {specs.map(spec => {
+                const Icon = TYPE_ICONS[spec.type] || FileText;
+                return (
+                  <button
+                    key={spec.id}
+                    onClick={() => onSelectSpec(spec.id)}
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-900 transition-colors flex items-center gap-3 group relative overflow-hidden"
+                  >
+                    <div className={`p-1.5 rounded-md ${
+                      spec.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-800 text-slate-400'
+                    }`}>
+                      <Icon className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate text-slate-300 group-hover:text-white transition-colors">{spec.title}</p>
+                      <p className="text-[9px] text-slate-500 flex items-center gap-1">
+                        {spec.status === 'completed' ? 'Ready' : 'Draft'}
+                      </p>
+                    </div>
+                    <ChevronLeft className="w-3 h-3 rotate-180 opacity-0 group-hover:opacity-100 transition-opacity text-slate-500" />
+                  </button>
+                );
+              })}
+              
+              {specs.length === 0 && (
+                <div className="px-4 py-8 text-center border-2 border-dashed border-slate-800/50 rounded-xl">
+                  <p className="text-[10px] text-slate-600 font-medium">No specs yet</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -187,27 +256,25 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
                 className="group cursor-pointer"
               >
                 {viewMode === 'grid' ? (
-                  <Card className="bg-slate-900/40 border-slate-800 p-5 rounded-2xl hover:border-orange-500/30 hover:bg-slate-900/60 transition-all flex items-center gap-4 border-l-4 border-l-transparent group-hover:border-l-orange-500">
-                    <div className={`p-3 rounded-xl ${
+                  <Card className="bg-slate-900/40 border-slate-800 p-4 rounded-xl hover:border-orange-500/30 hover:bg-slate-900/60 transition-all flex items-center gap-4 border-l-4 border-l-transparent group-hover:border-l-orange-500">
+                    <div className={`p-2.5 rounded-lg shrink-0 ${
                       spec.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-slate-800 text-slate-400'
                     }`}>
-                      {spec.status === 'completed' ? <CheckCircle2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                      {spec.status === 'completed' ? <CheckCircle2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                         <h4 className="font-bold truncate">{spec.title}</h4>
-                      </div>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500">{spec.type}</span>
-                        <span className="text-slate-700">•</span>
-                        <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                          <Clock className="w-3 h-3" />
+                      <h4 className="font-bold text-sm truncate">{spec.title}</h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[9px] uppercase font-bold tracking-wider text-slate-500">{spec.type}</span>
+                        <span className="text-slate-700 text-[10px]">•</span>
+                        <div className="flex items-center gap-1 text-[9px] text-slate-500">
+                          <Clock className="w-2.5 h-2.5" />
                           {new Date(spec.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
-                    <Button variant="ghost" className="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Sparkles className="w-4 h-4 text-orange-500" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Sparkles className="w-3.5 h-3.5 text-orange-500" />
                     </Button>
                   </Card>
                 ) : (

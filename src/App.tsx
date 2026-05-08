@@ -11,7 +11,8 @@ import {
   Plus, 
   Settings, 
   LogOut, 
-  ChevronRight
+  ChevronRight,
+  Folder
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from 'sonner';
@@ -23,6 +24,7 @@ import { Workspace } from './components/Workspace';
 import { SpecDetail } from './components/SpecDetail';
 import { CreateProject } from './components/CreateProject';
 import { IdeationPage } from './components/IdeationPage';
+import { Project } from './types';
 
 import { Auth } from './components/Auth';
 
@@ -35,6 +37,28 @@ export default function App() {
   const [user, setUser] = useState<any>(null);
   const [configured, setConfigured] = useState(isSupabaseConfigured());
   const [ideationData, setIdeationData] = useState<{ title: string; description: string; mode: string } | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  const fetchProjects = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error) {
+      console.error('Error fetching projects for sidebar:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchProjects();
+    }
+  }, [user, view]); // Re-fetch on view change to keep sync
 
   useEffect(() => {
     if (!configured) return;
@@ -178,6 +202,44 @@ export default function App() {
                 active={view === 'dashboard'} 
                 onClick={() => setView('dashboard')} 
               />
+              
+              <div className="relative group/projects">
+                <NavItem 
+                  icon={<Folder className="w-4 h-4" />} 
+                  label="Your Projects" 
+                  active={view === 'dashboard'}
+                  onClick={() => setView('dashboard')} 
+                />
+                
+                {/* Dropdown on Hover */}
+                <div className="absolute left-full top-0 ml-2 w-48 opacity-0 invisible group-hover/projects:opacity-100 group-hover/projects:visible transition-all duration-200 z-[60]">
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-2 overflow-hidden backdrop-blur-xl">
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 px-3 py-2 border-b border-slate-800 mb-1">
+                      Recent Projects
+                    </p>
+                    <div className="space-y-1 max-h-64 overflow-y-auto">
+                      {projects.length > 0 ? (
+                        projects.map((project) => (
+                          <button
+                            key={project.id}
+                            onClick={() => {
+                              setSelectedProjectId(project.id);
+                              setView('workspace');
+                            }}
+                            className="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors flex items-center justify-between group/item"
+                          >
+                            <span className="truncate flex-1">{project.title}</span>
+                            <ChevronRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                          </button>
+                        ))
+                      ) : (
+                        <p className="text-[10px] text-slate-600 px-3 py-4 text-center">No projects yet</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <NavItem 
                 icon={<Plus className="w-4 h-4" />} 
                 label="New Project" 

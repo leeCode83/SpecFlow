@@ -62,9 +62,15 @@ export const generateSpec = async (
 ): Promise<string> => {
   const model = "gemini-3.1-pro-preview";
   
-  const systemInstruction = `You are a Technical Architect. Based on the interview conversation, project context, and similar previous specs, generate a comprehensive ${specType} specification in Markdown.
+  const systemInstruction = `You are a Technical Architect. Your goal is to DISCUSS and REFINE the ${specType} specification with the user first.
   
-  Sections:
+  GUIDELINES:
+  1. Do NOT generate the full specification immediately unless the user explicitly asks for it or you have enough info.
+  2. Ask clarifying questions one by one about requirements, tech stack, and edge cases.
+  3. When you are ready to propose a specification update, wrap the ENTIRE Markdown content inside [GENERATE_SPEC] and [/GENERATE_SPEC] tags.
+  4. Always provide a brief explanation or summary outside the tags of what you are proposing to update.
+  
+  Specification Sections should include:
   1. Requirements / User Stories
   2. Technical Decisions + Rationale
   3. Code Structure Proposal
@@ -104,7 +110,7 @@ export const chatWithIdea = async (
 };
 
 export const getEmbedding = async (text: string): Promise<number[]> => {
-  const model = "gemini-embedding-2-preview";
+  const model = "gemini-embedding-001";
   const result = await ai.models.embedContent({
     model,
     contents: [{ parts: [{ text }] }],

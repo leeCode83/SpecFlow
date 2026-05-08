@@ -60,6 +60,11 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
   const [input, setInput] = useState('');
   const [similarSpecs, setSimilarSpecs] = useState<string[]>([]);
   
+  // New state for confirmation logic
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingContent, setPendingContent] = useState('');
+  const [cleanMessage, setCleanMessage] = useState('');
+  
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentContentRef = useRef(content);
 
@@ -216,8 +221,26 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
         similarSpecs
       );
       
-      setMessages([...updatedMessages, { role: 'assistant', content: response }]);
-      setContent(response); // Live update the spec draft
+      // Check if there is a generation proposal in the response
+      const generateIndex = response.indexOf('[GENERATE_SPEC]');
+      const generateEndIndex = response.indexOf('[/GENERATE_SPEC]');
+      
+      let displayMessage = response;
+      let specToProcess = '';
+      
+      if (generateIndex !== -1 && generateEndIndex !== -1) {
+        specToProcess = response.substring(generateIndex + 15, generateEndIndex).trim();
+        // Remove the spec content from the chat display message
+        displayMessage = response.replace(/\[GENERATE_SPEC\][\s\S]*?\[\/GENERATE_SPEC\]/, '').trim();
+        
+        if (!displayMessage) displayMessage = "I've drafted a specification update for you. Would you like to apply it?";
+        
+        setPendingContent(specToProcess);
+        setCleanMessage(displayMessage);
+        setIsConfirmOpen(true);
+      }
+      
+      setMessages([...updatedMessages, { role: 'assistant', content: displayMessage }]);
     } catch (error) {
       console.error(error);
       toast.error("AI Generation failed");
@@ -459,6 +482,43 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
           </div>
         </aside>
       </div>
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-lg">
+          <DialogHeader>
+            <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mb-4">
+              <BrainCircuit className="w-6 h-6 text-orange-500" />
+            </div>
+            <DialogTitle className="text-xl">Apply AI Proposal?</DialogTitle>
+            <DialogDescription className="text-slate-400 mt-2">
+              The AI has generated a new draft for your <span className="text-orange-500 font-bold">{spec?.type}</span> specification. 
+              Review the chat for details. This will update your current editor content.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 my-4 max-h-48 overflow-y-auto">
+            <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">Message Summary</p>
+            <p className="text-xs text-slate-300 italic">"{cleanMessage}"</p>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button 
+              variant="ghost" 
+              onClick={() => setIsConfirmOpen(false)} 
+              className="flex-1 sm:flex-none text-slate-400 hover:bg-slate-800"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                setContent(pendingContent);
+                setIsConfirmOpen(false);
+                toast.success("Draft updated! Don't forget to save.");
+              }} 
+              className="flex-1 sm:flex-none bg-orange-500 hover:bg-orange-600 font-bold"
+            >
+              Process & Apply
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
