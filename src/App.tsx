@@ -130,7 +130,7 @@ export default function App() {
           </div>
           <h1 className="text-2xl font-bold">Supabase Required</h1>
           <p className="text-slate-400">
-            Please configure <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in the Secrets panel to use SpecFlow MVP.
+            Please configure <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in the Secrets panel to use IdeaFrame MVP.
           </p>
           <div className="p-4 bg-slate-800 rounded-lg text-left text-xs font-mono overflow-auto">
             <p># Example .env</p>
@@ -162,7 +162,7 @@ export default function App() {
               <div className="bg-orange-500 rounded-lg p-1.5">
                 <Rocket className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold tracking-tight text-xl">SpecFlow</span>
+              <span className="font-bold tracking-tight text-xl">IdeaFrame</span>
             </div>
 
             <nav className="flex-1 px-4 space-y-2 py-4">

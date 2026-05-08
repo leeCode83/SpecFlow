@@ -1,4 +1,4 @@
--- SpecFlow Database Schema
+-- IdeaFrame Database Schema
 -- Run these in your Supabase SQL Editor
 
 -- Enable pgvector extension securely

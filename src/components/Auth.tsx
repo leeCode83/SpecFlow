@@ -99,7 +99,7 @@ export function Auth({ onBack }: { onBack?: () => void }) {
           <div className="inline-flex p-3 bg-orange-500 rounded-2xl mb-4">
             <Rocket className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white italic">SpecFlow MVP</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white italic">IdeaFrame MVP</h1>
           <p className="text-slate-400">Sign in to start building technical blueprints.</p>
         </div>
 

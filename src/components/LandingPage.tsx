@@ -17,7 +17,7 @@ interface LandingPageProps {
 
 const testimonials = [
   {
-    quote: "SpecFlow literally saved our hackathon team. We generated our specs in 5 minutes and knew exactly what to build. Shipped a day early.",
+    quote: "IdeaFrame literally saved our hackathon team. We generated our specs in 5 minutes and knew exactly what to build. Shipped a day early.",
     author: "Jane Doe",
     role: "Hackathon Winner",
     initials: "JD"
@@ -35,7 +35,7 @@ const testimonials = [
     initials: "SC"
   },
   {
-    quote: "Instead of staring at a blank repository, our team gets a structured blueprint on day one. SpecFlow is now part of our core workflow.",
+    quote: "Instead of staring at a blank repository, our team gets a structured blueprint on day one. IdeaFrame is now part of our core workflow.",
     author: "Taylor Smith",
     role: "Engineering Manager",
     initials: "TS"
@@ -107,7 +107,7 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
           <div className="bg-orange-500 rounded-lg p-1.5">
             <Rocket className="w-5 h-5 text-white" />
           </div>
-          <span className="font-bold tracking-tight text-xl italic">SpecFlow</span>
+          <span className="font-bold tracking-tight text-xl italic">IdeaFrame</span>
         </div>
         <div className="flex gap-4">
           <Button variant="ghost" className="text-slate-300 hover:text-white" onClick={onSignIn}>
@@ -178,7 +178,7 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
         <section className="w-full bg-slate-900/30 border-y border-slate-800/50 py-24">
           <div className="max-w-6xl mx-auto px-6">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Why Choose SpecFlow?</h2>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Why Choose IdeaFrame?</h2>
               <p className="text-slate-400 text-lg max-w-2xl mx-auto">
                 Stop guessing your architecture. We provide structure so you can focus on writing code.
               </p>
@@ -312,7 +312,7 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
                   onClick={handleSaveProject} 
                   className="w-full bg-slate-50 text-slate-950 font-bold py-6 rounded-xl hover:bg-slate-200"
                 >
-                  Create Workspace & Start SpecFlow
+                  Create Workspace & Start IdeaFrame
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Card>
@@ -386,10 +386,10 @@ export function LandingPage({ onCreateProject, onSignIn }: LandingPageProps) {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2 opacity-80">
             <Rocket className="w-5 h-5 text-orange-500" />
-            <span className="font-bold tracking-tight text-white italic">SpecFlow</span>
+            <span className="font-bold tracking-tight text-white italic">IdeaFrame</span>
           </div>
           <p className="text-slate-500 text-sm text-center md:text-left">
-            © {new Date().getFullYear()} SpecFlow. All rights reserved. 
+            © {new Date().getFullYear()} IdeaFrame. All rights reserved. 
           </p>
           <div className="flex gap-4">
             <a href="#" className="text-slate-500 hover:text-orange-500 text-sm transition-colors">Privacy</a>
