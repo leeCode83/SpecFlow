@@ -22,6 +22,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '../lib/supabase';
 import { Project, Spec, SpecType } from '../types';
 import { toast } from 'sonner';
+import { SPEC_TEMPLATES } from '../constants/spec-templates';
 
 interface WorkspaceProps {
   projectId: string;
@@ -29,7 +30,7 @@ interface WorkspaceProps {
   onBack: () => void;
 }
 
-const SPEC_TYPES: SpecType[] = ['Auth', 'API', 'Frontend', 'AI', 'Infrastructure', 'General'];
+const SPEC_TYPES: SpecType[] = ['Auth', 'API', 'Frontend', 'AI', 'Infrastructure', 'Custom'];
 
 export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const [project, setProject] = useState<Project | null>(null);
@@ -66,11 +67,13 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const handleCreateSpec = async (type: SpecType) => {
     setCreationLoading(true);
     try {
+      const initialContent = SPEC_TEMPLATES[type] || `# New ${type} Specification\n\nClick "Generate with AI" to start the conversation and build this spec.`;
+      
       const { data, error } = await supabase.from('specs').insert({
         project_id: projectId,
         title: `New ${type} Spec`,
         type,
-        content: `# New ${type} Specification\n\nClick "Generate with AI" to start the conversation and build this spec.`,
+        content: initialContent,
         status: 'draft'
       }).select().single();
 
@@ -119,7 +122,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             <Settings className="w-4 h-4" />
             Config
           </Button>
-          <Button onClick={() => handleCreateSpec('General')} className="bg-orange-500 hover:bg-orange-600 gap-2 font-bold px-6">
+          <Button onClick={() => handleCreateSpec('Custom')} className="bg-orange-500 hover:bg-orange-600 gap-2 font-bold px-6">
             <Plus className="w-4 h-4" />
             New Spec
           </Button>

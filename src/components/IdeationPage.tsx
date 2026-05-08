@@ -63,9 +63,10 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
   const handleCreateProject = () => {
     if (!feedback) return;
     // Combine chat context into description if needed or just pass it
-    const fullDescription = chatMessages.length > 0 
-      ? `Original Idea: ${idea}\n\nElaboration History:\n` + chatMessages.map(m => `${m.role}: ${m.content}`).join('\n')
-      : idea;
+    let fullDescription = feedback.summary;
+    if (chatMessages.length > 0) {
+      fullDescription += '\n\nElaboration History:\n' + chatMessages.map(m => `${m.role === 'user' ? 'You' : 'AI'}: ${m.content}`).join('\n');
+    }
       
     // pass it to the CreateProject view which can handle saving or we trigger it here.
     // wait, if user isn't auth'd, it will go to auth then we might lose state.

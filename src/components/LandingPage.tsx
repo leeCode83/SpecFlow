@@ -78,7 +78,7 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
       const { data, error } = await supabase.from('projects').insert({
         user_id: user.id,
         title: idea.split(' ').slice(0, 5).join(' ') + '...',
-        description: idea,
+        description: feedback.summary,
         mode,
         refined_idea_json: feedback
       }).select().single();

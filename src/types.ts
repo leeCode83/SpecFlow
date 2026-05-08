@@ -33,7 +33,7 @@ export interface IdeaFeedback {
   nextSteps: string[];
 }
 
-export type SpecType = 'Auth' | 'API' | 'Frontend' | 'AI' | 'Infrastructure' | 'General';
+export type SpecType = 'Auth' | 'API' | 'Frontend' | 'AI' | 'Infrastructure' | 'Custom';
 
 export interface Spec {
   id: string;

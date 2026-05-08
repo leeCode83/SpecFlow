@@ -38,7 +38,11 @@ export function Auth({ onBack }: { onBack?: () => void }) {
         toast.success("Welcome back!");
       }
     } catch (error: any) {
-      toast.error(error.message || "Authentication failed");
+      if (error.message === 'Invalid login credentials') {
+        toast.error("Email tidak terdaftar atau password salah.");
+      } else {
+        toast.error(error.message || "Authentication failed");
+      }
     } finally {
       setLoading(false);
     }

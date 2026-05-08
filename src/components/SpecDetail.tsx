@@ -14,13 +14,24 @@ import {
   Download,
   BrainCircuit,
   History,
-  FileSearch
+  FileSearch,
+  Pencil
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../lib/supabase';
 import { generateSpec, getEmbedding } from '../lib/gemini';
@@ -37,15 +48,26 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
   const [spec, setSpec] = useState<Spec | null>(null);
   const [project, setProject] = useState<Project | null>(null);
   const [content, setContent] = useState('');
+  const [title, setTitle] = useState('');
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [similarSpecs, setSimilarSpecs] = useState<string[]>([]);
   
   const scrollRef = useRef<HTMLDivElement>(null);
+  const currentContentRef = useRef(content);
+
+  useEffect(() => {
+    if (content !== spec?.content) {
+      setHasUnsavedChanges(true);
+    }
+    currentContentRef.current = content;
+  }, [content, spec?.content]);
 
   useEffect(() => {
     fetchData();
@@ -71,6 +93,8 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       setSpec(specRes.data);
       setProject(projRes.data);
       setContent(specRes.data.content);
+      setTitle(specRes.data.title || '');
+      setNewTitle(specRes.data.title || '');
       
       // Perform vector search for similar specs
       if (specRes.data.embedding) {
@@ -92,26 +116,85 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
     }
   };
 
-  const handleSave = async () => {
+  const handleUpdateTitle = async () => {
+    if (!newTitle.trim()) return;
     setSaving(true);
     try {
-      // Get embedding for RAG
-      const embedding = await getEmbedding(content.substring(0, 5000));
-      
-      const { error } = await supabase.from('specs').update({
-        content,
-        embedding,
-        status: content.length > 500 ? 'completed' : 'draft'
-      }).eq('id', specId);
+      const { error } = await supabase
+        .from('specs')
+        .update({ title: newTitle })
+        .eq('id', specId);
 
       if (error) throw error;
-      toast.success("Spec saved and indexed");
+      
+      setTitle(newTitle);
+      setSpec(prev => prev ? { ...prev, title: newTitle } : null);
+      setIsEditingTitle(false);
+      toast.success("Title updated successfully");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to save spec");
+      toast.error("Failed to update title");
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSave = async (contentToSave: string, showToast = true) => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      // 1. Save content first without embedding
+      const { error: saveError } = await supabase.from('specs').update({
+        content: contentToSave,
+        status: contentToSave.length > 500 ? 'completed' : 'draft'
+      }).eq('id', specId);
+
+      if (saveError) throw saveError;
+      
+      // Update local state immediately after content save
+      setSpec(prev => prev ? { ...prev, content: contentToSave, status: contentToSave.length > 500 ? 'completed' : 'draft' } : null);
+      setHasUnsavedChanges(false);
+      
+      if (showToast) toast.success("Spec saved successfully");
+
+      // 2. Start embedding process in the background if save was successful
+      try {
+        const embedding = await getEmbedding(contentToSave.substring(0, 5000));
+        const { error: embedError } = await supabase.from('specs').update({
+          embedding
+        }).eq('id', specId);
+        
+        if (embedError) {
+          console.error("Embedding update failed:", embedError);
+        } else {
+          console.log("Vector index updated");
+          // Optionally update local spec state with embedding if needed
+          setSpec(prev => prev ? { ...prev, embedding } : null);
+        }
+      } catch (embedFail) {
+        console.error("Embedding generation failed:", embedFail);
+        // We don't notify the user about embedding failure as per request
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Save Error:", error);
+      if (showToast) toast.error("Failed to save spec. Please check your connection.");
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleBackAndSave = async () => {
+    if (hasUnsavedChanges) {
+      const success = await handleSave(currentContentRef.current, false);
+      if (!success) {
+        toast.error("Auto-save failed. Stay here to save manually?");
+        return; // Prevent exit if save failed
+      }
+    }
+    onBack();
   };
 
   const handleSendMessage = async () => {
@@ -127,7 +210,7 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       // This is the "Interview" model. If it's the first message, we set context.
       const response = await generateSpec(
         updatedMessages, 
-        spec?.type || 'General',
+        spec?.type || 'Custom',
         project?.description || '',
         similarSpecs
       );
@@ -167,14 +250,54 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
       {/* Top Header */}
       <header className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md p-4 flex items-center justify-between z-10">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={onBack} className="p-2 hover:bg-slate-900 rounded-xl">
+          <Button variant="ghost" onClick={handleBackAndSave} className="p-2 hover:bg-slate-900 rounded-xl">
             <ChevronLeft className="w-5 h-5 text-slate-400" />
           </Button>
           <div className="flex items-center gap-3">
-             {spec?.status === 'completed' && <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">READY</Badge>}
-             <h1 className="text-lg font-bold tracking-tight">{spec?.title}</h1>
+             {spec?.status === 'completed' && <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-1 h-5 text-[9px]">READY</Badge>}
+             <div className="flex items-center gap-2">
+               <h1 className="text-lg font-bold tracking-tight">{title}</h1>
+               <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 text-slate-500 hover:text-orange-500 hover:bg-orange-500/10 rounded-md"
+                onClick={() => {
+                  setNewTitle(title);
+                  setIsEditingTitle(true);
+                }}
+               >
+                 <Pencil className="w-3.5 h-3.5" />
+               </Button>
+             </div>
+             {hasUnsavedChanges && <span className="text-[10px] text-orange-500 font-bold animate-pulse">● UNSAVED</span>}
           </div>
         </div>
+
+        <Dialog open={isEditingTitle} onOpenChange={setIsEditingTitle}>
+          <DialogContent className="bg-slate-900 border-slate-800 text-white">
+            <DialogHeader>
+              <DialogTitle>Edit Spec Name</DialogTitle>
+              <DialogDescription className="text-slate-400">
+                Enter a new name for this specification.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Input 
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Spec name..."
+                className="bg-slate-950 border-slate-800 text-white"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleUpdateTitle();
+                }}
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setIsEditingTitle(false)} className="text-slate-400">Cancel</Button>
+              <Button onClick={handleUpdateTitle} disabled={saving} className="bg-orange-500 hover:bg-orange-600">Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <div className="flex items-center gap-2">
           <Button 
@@ -186,7 +309,7 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
             Copy Prompt
           </Button>
           <Button 
-            onClick={handleSave} 
+            onClick={() => handleSave(content, true)} 
             disabled={saving}
             className="bg-orange-500 hover:bg-orange-600 font-bold gap-2"
           >
@@ -237,99 +360,99 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
         </div>
 
         {/* AI Assistant Sidebar */}
-        <aside className={`${chatOpen ? 'w-96' : 'w-16'} border-l border-slate-800 bg-slate-950/50 transition-all duration-300 flex flex-col overflow-hidden`}>
+        <aside className="w-96 border-l border-slate-800 bg-slate-950/50 flex flex-col overflow-hidden">
           <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/10">
-            <button 
-              onClick={() => setChatOpen(!chatOpen)}
-              className="p-2 hover:bg-slate-900 rounded-xl text-orange-500"
-            >
-              <Sparkles className="w-6 h-6" />
-            </button>
-            {chatOpen && <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Spec Generator</h2>}
-            {chatOpen && (
-              <button onClick={() => setMessages([])} className="p-2 hover:bg-slate-900 rounded-xl text-slate-500">
-                <History className="w-4 h-4" />
-              </button>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-orange-500" />
+              <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Spec Generator</h2>
+            </div>
+            {hasUnsavedChanges && (
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => handleSave(content)}
+                className="h-7 text-[10px] bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 gap-1 px-2"
+              >
+                <Save className="w-3 h-3" />
+                Save Draft
+              </Button>
             )}
           </div>
 
-          <AnimatePresence>
-            {chatOpen && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex-1 flex flex-col overflow-hidden"
-              >
-                <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
-                  {messages.length === 0 && (
-                    <div className="text-center py-10 space-y-4">
-                      <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto">
-                        <Sparkles className="w-6 h-6 text-orange-500" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-bold">Start AI Interview</p>
-                        <p className="text-xs text-slate-500">I'll ask questions to help you build a bullet-proof {spec?.type} spec.</p>
-                      </div>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        className="text-orange-500 font-bold"
-                        onClick={() => {
-                          setInput(`Help me build the ${spec?.type} specification for this project.`);
-                          setTimeout(handleSendMessage, 100);
-                        }}
-                      >
-                        Launch Conversation
-                      </Button>
-                    </div>
-                  )}
-                  {messages.map((m, i) => (
-                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
-                        m.role === 'user' ? 'bg-orange-600 text-white rounded-tr-none' : 'bg-slate-900 text-slate-300 rounded-tl-none border border-slate-800'
-                      }`}>
-                        {m.content}
-                      </div>
-                    </div>
-                  ))}
-                  {chatLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-slate-900 p-3 rounded-2xl border border-slate-800 animate-pulse flex items-center gap-2">
-                        <Loader2 className="w-3 h-3 animate-spin text-orange-500" />
-                        <span className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Thinking...</span>
-                      </div>
-                    </div>
-                  )}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
+              {messages.length === 0 && (
+                <div className="text-center py-10 space-y-4">
+                  <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto">
+                    <Sparkles className="w-6 h-6 text-orange-500" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold">Start AI Interview</p>
+                    <p className="text-xs text-slate-500">I'll ask questions to help you build a bullet-proof {spec?.type} spec.</p>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="text-orange-500 font-bold"
+                    onClick={() => {
+                      setInput(`Help me build the ${spec?.type} specification for this project.`);
+                      setTimeout(handleSendMessage, 100);
+                    }}
+                  >
+                    Launch Conversation
+                  </Button>
                 </div>
-
-                <div className="p-4 border-t border-slate-800 space-y-4">
-                  <div className="flex gap-2">
-                    <Textarea 
-                      placeholder="Type your requirements..."
-                      className="min-h-[80px] bg-slate-900/50 border-slate-800 text-xs p-3 rounded-xl resize-none"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                    />
-                    <Button 
-                      size="icon" 
-                      className="h-auto aspect-square bg-orange-500 hover:bg-orange-600 self-stretch"
-                      onClick={handleSendMessage}
-                      disabled={chatLoading}
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
+              )}
+              {messages.map((m, i) => (
+                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
+                    m.role === 'user' ? 'bg-orange-600 text-white rounded-tr-none' : 'bg-slate-900 text-slate-300 rounded-tl-none border border-slate-800'
+                  }`}>
+                    {m.role === 'user' ? (
+                      m.content
+                    ) : (
+                      <div className="markdown-body text-xs prose prose-invert prose-orange max-w-none">
+                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              ))}
+              {chatLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-slate-900 p-3 rounded-2xl border border-slate-800 animate-pulse flex items-center gap-2">
+                    <Loader2 className="w-3 h-3 animate-spin text-orange-500" />
+                    <span className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Thinking...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-slate-800 space-y-4">
+              <div className="flex gap-2">
+                <Textarea 
+                  placeholder="Type your requirements..."
+                  className="min-h-[80px] bg-slate-900/50 border-slate-800 text-xs p-3 rounded-xl resize-none"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                />
+                <Button 
+                  size="icon" 
+                  className="h-auto aspect-square bg-orange-500 hover:bg-orange-600 self-stretch"
+                  onClick={handleSendMessage}
+                  disabled={chatLoading}
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
         </aside>
       </div>
     </div>
