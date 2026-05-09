@@ -1,4 +1,4 @@
-# IdeaFrame MVP
+# IdeaFrame
 
 ## 1. Deskripsi Singkat Mengenai Projek
 IdeaFrame adalah ruang kerja (workspace) ideasi dan pengembangan berbasis spesifikasi (spec-driven development) yang ditenagai oleh AI. Platform ini dibangun khusus untuk mempercepat proses dari sekadar ide mentah menjadi rencana spesifikasi perangkat lunak yang berstruktur.
