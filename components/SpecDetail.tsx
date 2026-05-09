@@ -36,7 +36,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/lib/supabase/supabase';
 import { getProjectById } from '@/lib/supabase/supabase-projects';
-import { updateSpec, getSpecById } from '@/lib/supabase/supabase-specs';
+import { updateSpec, getSpecById, getSpecsByProjectId } from '@/lib/supabase/supabase-specs';
 import { getEmbedding } from '@/lib/gemini/gemini-embeddings';
 import { generateSpec } from '@/lib/gemini/gemini-specs';
 import { retrieveSimilarSpecs, SimilarSpec } from '@/lib/rag';
@@ -181,6 +181,8 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
     try {
       // Retrieve Similar Specs before generating
       let currentSimilarSpecsStr: string[] = [];
+      let existingProjectSpecsStr: string[] = [];
+      
       if (project?.user_id) {
         // Build the context from requirement + conversation
         const queryContext = updatedMessages.map(m => m.content).join("\\n");
@@ -194,6 +196,16 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
         } else {
           currentSimilarSpecsStr = ["No similar specs in history"];
         }
+        
+        // Fetch existing specs in the *same* project to ensure compatibility
+        const allSpecsInProject = await getSpecsByProjectId(projectId);
+        const otherSpecs = allSpecsInProject.filter(s => s.id !== specId);
+        
+        if (otherSpecs.length > 0) {
+          existingProjectSpecsStr = otherSpecs.map(s => 
+            `Title: ${s.title}\nType: ${s.type}\nContent snippet: ${s.content.substring(0, 1000)}...`
+          );
+        }
       }
 
       // This is the "Interview" model. If it's the first message, we set context.
@@ -201,7 +213,8 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
         updatedMessages, 
         spec?.type || 'Custom',
         project?.description || '',
-        currentSimilarSpecsStr
+        currentSimilarSpecsStr,
+        existingProjectSpecsStr
       );
       
       // Check if there is a generation proposal in the response

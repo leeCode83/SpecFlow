@@ -5,7 +5,8 @@ export const generateSpec = async (
   messages: Message[],
   specType: string,
   projectContext: string,
-  similarSpecs?: string[]
+  similarSpecs?: string[],
+  existingProjectSpecs?: string[]
 ): Promise<string> => {
   const model = "gemini-3.1-pro-preview";
   
@@ -25,7 +26,10 @@ export const generateSpec = async (
   5. Edge Cases
   
   Project context: ${projectContext}
-  Similar past specs: ${similarSpecs?.join('\n\n') || 'None'}
+  Existing specs in CURRENT project (ensure compatibility with these):
+  ${existingProjectSpecs?.join('\n\n') || 'None'}
+  
+  Similar past specs from you/others (for reference/ideas): ${similarSpecs?.join('\n\n') || 'None'}
   `;
 
   const response = await ai.models.generateContent({
