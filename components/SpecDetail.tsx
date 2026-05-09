@@ -348,7 +348,7 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
             </TabsContent>
             
             <TabsContent value="preview" className="flex-1 m-0 p-0 overflow-auto">
-              <div className="max-w-3xl mx-auto p-12 prose prose-invert prose-orange">
+              <div className="max-w-3xl mx-auto p-12 prose prose-invert prose-orange prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-headings:font-bold prose-headings:tracking-tight prose-a:text-orange-500">
                 <ReactMarkdown>{content}</ReactMarkdown>
               </div>
             </TabsContent>
@@ -396,7 +396,7 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
                     {m.role === 'user' ? (
                       m.content
                     ) : (
-                      <div className="markdown-body text-xs prose prose-invert prose-orange max-w-none">
+                      <div className="prose prose-invert prose-orange prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800">
                         <ReactMarkdown>{m.content}</ReactMarkdown>
                       </div>
                     )}

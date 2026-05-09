@@ -167,14 +167,16 @@ export function AnimatedAIChat({
                            "py-3 px-4 max-w-[85%] rounded-2xl text-sm leading-relaxed", 
                            m.role === 'user' 
                               ? "bg-orange-500/20 text-orange-50 border border-orange-500/30 rounded-br-sm" 
-                              : "bg-slate-800/80 text-slate-300 border border-slate-700 rounded-bl-sm markdown-body"
+                              : "bg-slate-800/80 text-slate-300 border border-slate-700 rounded-bl-sm"
                          )}
                          style={m.role === 'user' ? { whiteSpace: "pre-wrap" } : {}}
                        >
                          {m.role === 'user' ? (
                            m.content
                          ) : (
-                           <ReactMarkdown>{m.content}</ReactMarkdown>
+                           <div className="prose prose-invert prose-orange prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800">
+                             <ReactMarkdown>{m.content}</ReactMarkdown>
+                           </div>
                          )}
                        </div>
                      </motion.div>
