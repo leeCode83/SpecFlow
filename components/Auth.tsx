@@ -6,6 +6,7 @@ import {
   Lock, 
   Loader2, 
   Chrome, 
+  Github,
   ArrowRight,
   AlertCircle
 } from 'lucide-react';
@@ -79,6 +80,32 @@ export function Auth({ onBack }: { onBack?: () => void }) {
     }
   };
 
+  const signInWithGithub = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          skipBrowserRedirect: true,
+          scopes: 'public_repo',
+          redirectTo: process.env.APP_URL || window.location.origin,
+        },
+      });
+      if (error) throw error;
+      
+      if (data?.url) {
+        const popup = window.open(data.url, 'github-oauth', 'width=500,height=600');
+        if (!popup) {
+          toast.error("Popup blocked! Please allow popups for this site to sign in with GitHub.");
+        }
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background decoration */}
@@ -100,10 +127,10 @@ export function Auth({ onBack }: { onBack?: () => void }) {
           </button>
         )}
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3 bg-orange-500 rounded-2xl mb-4">
+          <div className="inline-flex p-3 bg-orange-500 rounded-2xl mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={onBack}>
             <Rocket className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white italic">IdeaFrame MVP</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white italic cursor-pointer hover:text-slate-200 transition-colors" onClick={onBack}>IdeaFrame MVP</h1>
           <p className="text-slate-400">Sign in to start building technical blueprints.</p>
         </div>
 
@@ -172,15 +199,27 @@ export function Auth({ onBack }: { onBack?: () => void }) {
               </div>
             </div>
 
-            <Button 
-              variant="outline" 
-              className="w-full h-12 rounded-xl border-slate-800 hover:bg-slate-900 gap-3 font-semibold"
-              onClick={signInWithGoogle}
-              disabled={loading}
-            >
-              <Chrome className="w-5 h-5 text-red-500" />
-              Google Workspace
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Button 
+                variant="outline" 
+                className="w-full h-12 rounded-xl border-slate-800 hover:bg-slate-900 gap-3 font-semibold"
+                onClick={signInWithGoogle}
+                disabled={loading}
+              >
+                <Chrome className="w-5 h-5 text-red-500" />
+                Google Workspace
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="w-full h-12 rounded-xl border-slate-800 hover:bg-slate-900 gap-3 font-semibold"
+                onClick={signInWithGithub}
+                disabled={loading}
+              >
+                <Github className="w-5 h-5 text-white" />
+                GitHub (Public Repos)
+              </Button>
+            </div>
           </Tabs>
 
           <p className="mt-8 text-center text-xs text-slate-500 leading-relaxed">

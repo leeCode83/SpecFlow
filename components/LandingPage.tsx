@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
-import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, Code2, GitMerge, FileCode2, CheckCircle2, ChevronRight, MessageSquareQuote } from 'lucide-react';
+import { motion, LayoutGroup } from 'motion/react';
+import Floating, { FloatingElement } from "@/components/ui/parallax-floating";
+import { TextRotate } from "@/components/ui/text-rotate";
+import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, Code2, GitMerge, FileCode2, CheckCircle2, ChevronRight, MessageSquareQuote, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -17,7 +19,11 @@ interface LandingPageProps {
   onStartIdeation?: () => void;
 }
 
-const testimonials = [
+import { TestimonialsColumn, Testimonial } from "@/components/ui/testimonials-columns-1";
+
+interface ModeButtonProps { }
+
+const testimonials: Testimonial[] = [
   {
     quote: "IdeaFrame literally saved our hackathon team. We generated our specs in 5 minutes and knew exactly what to build. Shipped a day early.",
     author: "Jane Doe",
@@ -41,6 +47,126 @@ const testimonials = [
     author: "Taylor Smith",
     role: "Engineering Manager",
     initials: "TS"
+  },
+  {
+    quote: "It's like having a senior engineer review your ideas instantly. The architecture suggestions alone are worth their weight in gold.",
+    author: "David Lee",
+    role: "Indie Hacker",
+    initials: "DL"
+  },
+  {
+    quote: "We use it for our entire agency. Rapid prototyping and spec generation has reduced our planning phase from weeks to days.",
+    author: "Elena Rodriguez",
+    role: "Agency Owner",
+    initials: "ER"
+  },
+  {
+    quote: "Pushing generated specs directly to GitHub and having them as actionable issues is pure magic. Seamless workflow.",
+    author: "Michael Chang",
+    role: "Product Manager",
+    initials: "MC"
+  },
+  {
+    quote: "The way it breaks down complex features into small, testable chunks is exactly how I like to work, but automated.",
+    author: "Sarah Jenkins",
+    role: "Senior Software Engineer",
+    initials: "SJ"
+  },
+  {
+    quote: "I was skeptical about AI blueprints, but IdeaFrame proved me wrong. It generated scalable architecture from prompt one.",
+    author: "Chris Evans",
+    role: "CTO",
+    initials: "CE"
+  },
+];
+
+const firstColumn = testimonials.slice(0, 3);
+const secondColumn = testimonials.slice(3, 6);
+const thirdColumn = testimonials.slice(6, 9);
+
+
+const heroImages = [
+  {
+    url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+    title: "Code on screen",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=1200&q=80",
+    title: "Github Integration",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
+    title: "Laptop with code",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80",
+    title: "Mac code",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=1200&q=80",
+    title: "Workspace",
+  },
+];
+
+import { Calendar, Code, FileText, User, Clock as ClockIcon, Mail, Facebook, Instagram, Twitter, Layers } from "lucide-react";
+import RadialOrbitalTimeline, { TimelineItem } from "@/components/ui/radial-orbital-timeline";
+import { TextHoverEffect, FooterBackgroundGradient } from "@/components/ui/hover-footer";
+
+const timelineData: TimelineItem[] = [
+  {
+    id: 1,
+    title: "Ideation",
+    date: "Phase 1",
+    content: "Input your raw ideas in plain text. Our AI analyzes the intent and prepares a comprehensive workshop.",
+    category: "Ideation",
+    icon: BrainCircuit,
+    relatedIds: [2],
+    status: "completed",
+    energy: 100,
+  },
+  {
+    id: 2,
+    title: "Architecture",
+    date: "Phase 2",
+    content: "Generate a scalable tech stack and folder structure tailored to your application's specific needs.",
+    category: "Architecture",
+    icon: Layers,
+    relatedIds: [1, 3],
+    status: "completed",
+    energy: 90,
+  },
+  {
+    id: 3,
+    title: "Blueprinting",
+    date: "Phase 3",
+    content: "Break down massive feature sets into manageable, trackable spec documents ready for developers.",
+    category: "Blueprinting",
+    icon: FileCode2,
+    relatedIds: [2, 4],
+    status: "in-progress",
+    energy: 75,
+  },
+  {
+    id: 4,
+    title: "Sync & Track",
+    date: "Phase 4",
+    content: "Push generated specifications directly to GitHub issues and PRs for a seamless workflow.",
+    category: "Integration",
+    icon: Github,
+    relatedIds: [3, 5],
+    status: "pending",
+    energy: 40,
+  },
+  {
+    id: 5,
+    title: "Shipping",
+    date: "Phase 5",
+    content: "Start coding with a clear roadmap. Say goodbye to guesswork and build confidently.",
+    category: "Deployment",
+    icon: Rocket,
+    relatedIds: [4],
+    status: "pending",
+    energy: 20,
   },
 ];
 
@@ -122,85 +248,175 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
 
       <main className="flex-1 flex flex-col items-center w-full">
         {/* Hero Section */}
-        <section className="w-full max-w-6xl mx-auto px-6 py-24 md:py-32 flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 space-y-8">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/50 border border-slate-800 text-xs text-orange-500 font-medium"
+        <section className="w-full h-screen overflow-hidden md:overflow-visible flex flex-col items-center justify-center relative py-20 pb-0 md:pb-20">
+          <Floating sensitivity={-0.5} className="h-full z-0 pointer-events-none">
+            <FloatingElement
+              depth={0.5}
+              className="top-[15%] left-[2%] md:top-[25%] md:left-[5%]"
             >
-              <Sparkles className="w-3 h-3" />
-              <span>AI-Driven Specification Workspace</span>
-            </motion.div>
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
+              <motion.img
+                src={heroImages[0].url}
+                alt={heroImages[0].title}
+                className="w-16 h-12 sm:w-24 sm:h-16 md:w-28 md:h-20 lg:w-32 lg:h-24 object-cover transition-transform -rotate-[3deg] shadow-[0_0_30px_rgba(249,115,22,0.1)] rounded-xl opacity-80"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              />
+            </FloatingElement>
+
+            <FloatingElement
+              depth={1}
+              className="top-[0%] left-[8%] md:top-[6%] md:left-[11%]"
+            >
+              <motion.img
+                src={heroImages[1].url}
+                alt={heroImages[1].title}
+                className="w-40 h-28 sm:w-48 sm:h-36 md:w-56 md:h-44 lg:w-60 lg:h-48 object-cover transition-transform -rotate-12 shadow-[0_0_30px_rgba(59,130,246,0.1)] rounded-xl opacity-60 pointer-events-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+              />
+            </FloatingElement>
+
+            <FloatingElement
+              depth={4}
+              className="top-[90%] left-[6%] md:top-[80%] md:left-[8%]"
+            >
+              <motion.img
+                src={heroImages[2].url}
+                alt={heroImages[2].title}
+                className="w-40 h-40 sm:w-48 sm:h-48 md:w-60 md:h-60 lg:w-64 lg:h-64 object-cover -rotate-[4deg] transition-transform shadow-[0_0_30px_rgba(249,115,22,0.15)] rounded-xl opacity-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9 }}
+              />
+            </FloatingElement>
+
+            <FloatingElement
+              depth={2}
+              className="top-[0%] left-[87%] md:top-[2%] md:left-[83%]"
+            >
+              <motion.img
+                src={heroImages[3].url}
+                alt={heroImages[3].title}
+                className="w-40 h-36 sm:w-48 sm:h-44 md:w-60 md:h-52 lg:w-64 lg:h-56 object-cover transition-transform shadow-[0_0_30px_rgba(59,130,246,0.1)] rotate-[6deg] rounded-xl opacity-40"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.1 }}
+              />
+            </FloatingElement>
+
+            <FloatingElement
+              depth={1}
+              className="top-[78%] left-[83%] md:top-[68%] md:left-[83%]"
+            >
+              <motion.img
+                src={heroImages[4].url}
+                alt={heroImages[4].title}
+                className="w-44 h-44 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 object-cover transition-transform shadow-2xl rotate-[19deg] rounded-xl opacity-70 pointer-events-auto shadow-[0_0_40px_rgba(249,115,22,0.1)]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.3 }}
+              />
+            </FloatingElement>
+          </Floating>
+
+          <div className="flex flex-col justify-center items-center w-full z-50 pointer-events-auto px-6 max-w-5xl text-center">
+            <motion.h1
+              className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-center w-full justify-center items-center flex-col flex whitespace-pre leading-tight font-bold tracking-tight space-y-1 md:space-y-4"
               animate={{ opacity: 1, y: 0 }}
-              className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-b from-white to-slate-500 bg-clip-text text-transparent leading-tight"
+              initial={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.2, ease: "easeOut", delay: 0.3 }}
             >
-              Idea to Spec <br/> in Seconds.
+              <span className="bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">Idea to</span>
+              <LayoutGroup>
+                <motion.span layout className="flex whitespace-pre flex-col md:flex-row items-center gap-1 md:gap-4 mt-2">
+                  <TextRotate
+                    texts={[
+                      "Spec",
+                      "Blueprint",
+                      "Architecture",
+                      "Roadmap",
+                      "Code",
+                    ]}
+                    mainClassName="overflow-hidden text-orange-500 py-0"
+                    splitLevelClassName="overflow-hidden"
+                    staggerDuration={0.03}
+                    staggerFrom="last"
+                    rotationInterval={3000}
+                    transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                  />
+                  <motion.span
+                    layout
+                    className="flex whitespace-pre bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent"
+                    transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                  >
+                    in Seconds.
+                  </motion.span>
+                </motion.span>
+              </LayoutGroup>
             </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
+            <motion.p
+              className="text-sm sm:text-lg md:text-xl lg:text-2xl text-center text-slate-400 pt-6 sm:pt-8 md:pt-10 lg:pt-12 max-w-2xl"
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-slate-400 text-lg md:text-xl max-w-xl leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.2, ease: "easeOut", delay: 0.5 }}
             >
               The spec-driven development workspace for high-speed hackers and founders. 
               Brainstorm, refine, and generate technical blueprints instantly with Gemini.
             </motion.p>
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex gap-4"
-            >
-              <Button size="lg" className="bg-orange-500 hover:bg-orange-600 font-bold h-14 px-8 text-base" onClick={onStartIdeation}>
-                Start Building Free
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </motion.div>
+
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 items-center mt-10 md:mt-16 w-full">
+              <motion.button
+                onClick={onStartIdeation}
+                className="w-full sm:w-auto text-base md:text-lg font-bold tracking-tight text-white bg-orange-500 px-8 py-4 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.4)]"
+                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                transition={{
+                  duration: 0.2,
+                  ease: "easeOut",
+                  delay: 0.7,
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  transition: { type: "spring", damping: 30, stiffness: 400 },
+                }}
+              >
+                Try Ideation Feature
+              </motion.button>
+              <motion.button
+                onClick={onSignIn}
+                className="w-full sm:w-auto flex justify-center items-center gap-2 text-base md:text-lg font-bold tracking-tight text-slate-300 bg-slate-900 border border-slate-700 px-8 py-4 rounded-full shadow-xl"
+                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                transition={{
+                  duration: 0.2,
+                  ease: "easeOut",
+                  delay: 0.7,
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  transition: { type: "spring", damping: 30, stiffness: 400 },
+                }}
+              >
+                Get Started
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </motion.button>
+            </div>
           </div>
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex-1 w-full max-w-lg relative"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-blue-500/20 blur-3xl rounded-full" />
-            <img 
-              src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" 
-              alt="Code on screen" 
-              className="rounded-2xl border border-slate-800 shadow-2xl relative z-10 object-cover aspect-[4/3]"
-            />
-          </motion.div>
         </section>
 
-        {/* Features Section */}
+        {/* Features Section - Orbital Timeline */}
         <section className="w-full bg-slate-900/30 border-y border-slate-800/50 py-24">
           <div className="max-w-6xl mx-auto px-6">
             <div className="text-center space-y-4 mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Why Choose IdeaFrame?</h2>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Features</h2>
               <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-                Stop guessing your architecture. We provide structure so you can focus on writing code.
+                Everything you need to turn raw ideas into production-ready specifications.
               </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              <FeatureCard 
-                icon={<BrainCircuit className="w-8 h-8 text-orange-500" />}
-                title="AI Ideation Workshop"
-                desc="Turn a vague sentence into a comprehensive tech stack and feature roadmap in seconds."
-              />
-              <FeatureCard 
-                icon={<FileCode2 className="w-8 h-8 text-blue-500" />}
-                title="Structured Blueprints"
-                desc="Generate clear, actionable specifications for your Next.js, React, or Python applications."
-              />
-              <FeatureCard 
-                icon={<GitMerge className="w-8 h-8 text-emerald-500" />}
-                title="Iterative Refinement"
-                desc="Break down massive features into manageable, trackable components. Never lose context."
-              />
-            </div>
+            
+            <RadialOrbitalTimeline timelineData={timelineData} />
           </div>
         </section>
 
@@ -361,63 +577,156 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight">What Builders Say</h2>
             </div>
             
-            <div className="relative w-full overflow-hidden flex before:absolute before:left-0 before:top-0 before:z-10 before:h-full before:w-20 before:bg-gradient-to-r before:from-slate-950 before:to-transparent after:absolute after:right-0 after:top-0 after:z-10 after:h-full after:w-20 after:bg-gradient-to-l after:from-slate-950 after:to-transparent">
-              <motion.div 
-                className="flex gap-6 w-max"
-                animate={{ x: ["0%", "-50%"] }}
-                transition={{ ease: "linear", duration: 40, repeat: Infinity }}
-              >
-                {[...testimonials, ...testimonials].map((t, i) => (
-                  <Card key={i} className="w-[350px] md:w-[400px] shrink-0 bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col justify-between whitespace-normal text-left">
-                    <p className="text-slate-300 text-lg leading-relaxed italic mb-8">
-                      "{t.quote}"
-                    </p>
-                    <div className="flex items-center gap-4 mt-auto">
-                      <div className="w-10 h-10 shrink-0 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 font-bold text-sm border border-slate-700">
-                        {t.initials}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-slate-200 truncate">{t.author}</p>
-                        <p className="text-sm text-slate-500 truncate">{t.role}</p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </motion.div>
+            <div className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)] max-h-[740px] overflow-hidden">
+              <TestimonialsColumn testimonials={firstColumn} duration={25} />
+              <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={35} />
+              <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={30} />
             </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-950 py-12 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2 opacity-80">
-            <Rocket className="w-5 h-5 text-orange-500" />
-            <span className="font-bold tracking-tight text-white italic">IdeaFrame</span>
+      <footer className="bg-slate-950/80 border-t border-slate-800/80 relative h-fit overflow-hidden mt-24">
+        <div className="max-w-7xl mx-auto p-14 z-40 relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
+            {/* Brand section */}
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center space-x-2">
+                <Rocket className="w-8 h-8 text-orange-500" />
+                <span className="text-white text-3xl font-bold tracking-tight italic">IdeaFrame</span>
+              </div>
+              <p className="text-sm leading-relaxed text-slate-400">
+                The spec-driven development workspace for high-speed hackers and founders.
+              </p>
+            </div>
+
+            {/* Footer link sections */}
+            {[
+              {
+                title: "Product",
+                links: [
+                  { label: "Features", href: "#" },
+                  { label: "Pricing", href: "#" },
+                  { label: "Documentation", href: "#" },
+                  { label: "Changelog", href: "#" },
+                ],
+              },
+              {
+                title: "Resources",
+                links: [
+                  { label: "Community", href: "#" },
+                  { label: "Templates", href: "#" },
+                  { label: "Blog", href: "#" },
+                  {
+                    label: "Discord",
+                    href: "#",
+                    pulse: true,
+                  },
+                ],
+              },
+            ].map((section) => (
+              <div key={section.title}>
+                <h4 className="text-white text-lg font-semibold mb-6">
+                  {section.title}
+                </h4>
+                <ul className="space-y-3">
+                  {section.links.map((link) => (
+                    <li key={link.label} className="relative">
+                      <a
+                        href={link.href}
+                        className="text-slate-400 hover:text-orange-500 transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                      {link.pulse && (
+                        <span className="absolute top-0 right-[40px] w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+
+            {/* Contact section */}
+            <div>
+              <h4 className="text-white text-lg font-semibold mb-6">
+                Contact Us
+              </h4>
+              <ul className="space-y-4">
+                {[
+                  {
+                    icon: <Mail size={18} className="text-orange-500" />,
+                    text: "hello@ideaframe.dev",
+                    href: "mailto:hello@ideaframe.dev",
+                  },
+                  {
+                    icon: <Github size={18} className="text-orange-500" />,
+                    text: "ideaframe-dev",
+                    href: "#",
+                  },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center space-x-3">
+                    {item.icon}
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="text-slate-400 hover:text-orange-500 transition-colors"
+                      >
+                        {item.text}
+                      </a>
+                    ) : (
+                      <span className="text-slate-400 hover:text-orange-500 transition-colors">
+                        {item.text}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <p className="text-slate-500 text-sm text-center md:text-left">
-            © {new Date().getFullYear()} IdeaFrame. All rights reserved. 
-          </p>
-          <div className="flex gap-4">
-            <a href="#" className="text-slate-500 hover:text-orange-500 text-sm transition-colors">Privacy</a>
-            <a href="#" className="text-slate-500 hover:text-orange-500 text-sm transition-colors">Terms</a>
-            <a href="#" className="text-slate-500 hover:text-orange-500 text-sm transition-colors">Contact</a>
+
+          <hr className="border-t border-slate-800 my-8" />
+
+          {/* Footer bottom */}
+          <div className="flex flex-col md:flex-row justify-between items-center text-sm space-y-4 md:space-y-0">
+            {/* Social icons */}
+            <div className="flex space-x-6 text-slate-400">
+              {[
+                { icon: <Facebook size={20} />, label: "Facebook", href: "#" },
+                { icon: <Instagram size={20} />, label: "Instagram", href: "#" },
+                { icon: <Twitter size={20} />, label: "Twitter", href: "#" },
+              ].map(({ icon, label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  className="hover:text-orange-500 transition-colors"
+                >
+                  {icon}
+                </a>
+              ))}
+            </div>
+
+            {/* Copyright */}
+            <p className="text-center md:text-left text-slate-500">
+              &copy; {new Date().getFullYear()} IdeaFrame. All rights reserved.
+            </p>
           </div>
         </div>
-      </footer>
-    </div>
-  );
-}
 
-function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
-  return (
-    <div className="bg-slate-900/50 border border-slate-800 p-8 rounded-2xl hover:border-slate-700 transition-colors">
-      <div className="mb-6 p-4 bg-slate-950/50 rounded-xl inline-block border border-slate-800/50">
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold mb-3 text-slate-100">{title}</h3>
-      <p className="text-slate-400 leading-relaxed">{desc}</p>
+        {/* Text hover effect */}
+        <div className="lg:flex hidden h-[20rem] -mt-32 -mb-20 overflow-hidden pointer-events-none">
+          <div className="pointer-events-auto w-full">
+            <TextHoverEffect 
+              text="IDEAFRAME" 
+              className="z-50 [&_h1]:text-[5rem]" 
+            />
+          </div>
+        </div>
+
+        <FooterBackgroundGradient />
+      </footer>
     </div>
   );
 }

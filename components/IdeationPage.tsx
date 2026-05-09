@@ -10,6 +10,8 @@ import { analyzeIdea } from '@/lib/gemini/gemini-ideation';
 import { chatWithIdea } from '@/lib/gemini/gemini-chat';
 import { Mode, IdeaFeedback, Message } from '@/lib/types';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { AnimatedAIChat } from '@/components/ui/animated-ai-chat';
 
 interface IdeationPageProps {
   onCreateProject: (id?: string, title?: string, description?: string, feedback?: IdeaFeedback, mode?: Mode) => void;
@@ -23,7 +25,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
   const [feedback, setFeedback] = useState<IdeaFeedback | null>(null);
 
   // Chat states
-  const [elaborationMode, setElaborationMode] = useState(false);
+  // Remove elaboration mode state if present
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatting, setChatting] = useState(false);
@@ -43,11 +45,13 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
     }
   };
 
-  const handleSendChat = async () => {
-    if (!chatInput.trim()) return;
-    const newMessages = [...chatMessages, { role: 'user' as const, content: chatInput }];
+  const handleSendChat = async (textToSend?: string) => {
+    const messageContent = typeof textToSend === 'string' ? textToSend : chatInput;
+    if (!messageContent.trim() || chatting) return;
+
+    const newMessages = [...chatMessages, { role: 'user' as const, content: messageContent }];
     setChatMessages(newMessages);
-    setChatInput('');
+    if (!textToSend) setChatInput('');
     setChatting(true);
 
     try {
@@ -63,18 +67,49 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
 
   const handleCreateProject = () => {
     if (!feedback) return;
-    // Combine chat context into description if needed or just pass it
-    let fullDescription = feedback.summary;
+    let fullDescription = (feedback.refinedIdea?.oneLiner || '') + '\n\n' + (feedback.refinedIdea?.problem || '') + '\n\nTarget User: ' + (feedback.refinedIdea?.targetUser || '');
     if (chatMessages.length > 0) {
       fullDescription += '\n\nElaboration History:\n' + chatMessages.map(m => `${m.role === 'user' ? 'You' : 'AI'}: ${m.content}`).join('\n');
     }
       
-    // pass it to the CreateProject view which can handle saving or we trigger it here.
-    // wait, if user isn't auth'd, it will go to auth then we might lose state.
-    // But since create_project is an authenticated route, passing info via props might be tricky if we don't save.
-    // We can bubble these up to App then change view.
-    onCreateProject(undefined, idea.split(' ').slice(0, 5).join(' ') + '...', fullDescription, feedback, mode);
+    onCreateProject(undefined, feedback.refinedIdea?.title || idea.split(' ').slice(0, 5).join(' ') + '...', fullDescription, feedback, mode);
   };
+
+  const getTechStackList = () => {
+    if (!feedback?.techStack) return [];
+    const list: string[] = [];
+    Object.values(feedback.techStack).forEach((techArray) => {
+      if (Array.isArray(techArray)) {
+        techArray.forEach(t => {
+          if (typeof t === 'string') list.push(t);
+          else if (t.tech) list.push(t.tech);
+          else if (t.lib) list.push(t.lib);
+          else list.push(JSON.stringify(t));
+        });
+      }
+    });
+    return list;
+  };
+
+  const techList = getTechStackList();
+  
+  const getNextSteps = () => {
+    if (feedback?.mode === 'Learning') {
+       return feedback.learningPath?.week1 || feedback.mvpScope?.learningMilestones || [];
+    }
+    if (feedback?.mode === 'Hackathon') {
+       return feedback.quickWins?.day1Morning || feedback.mvpScope?.mustHave || [];
+    }
+    if (feedback?.mode === 'Startup') {
+       const steps = [];
+       if (feedback.roadmap?.['month1-3']) steps.push(feedback.roadmap['month1-3']);
+       if (feedback.mvpScope?.mustHave) steps.push(...feedback.mvpScope.mustHave);
+       return steps.slice(0, 4);
+    }
+    return [];
+  };
+
+  const nextSteps = getNextSteps();
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 relative">
@@ -93,7 +128,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-12 space-y-12">
+      <main className={cn("mx-auto px-6 py-12 space-y-12 transition-all duration-500", feedback ? "max-w-7xl" : "max-w-4xl")}>
         {!feedback ? (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -165,32 +200,32 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="space-y-8"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
           >
-            {!elaborationMode ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="md:col-span-2 bg-slate-900/50 border-slate-800 p-8 rounded-2xl space-y-6">
+            <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+                <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl space-y-6">
                   <div className="space-y-2">
                     <h3 className="text-xl font-bold flex items-center gap-2">
                       <BrainCircuit className="w-5 h-5 text-orange-500" />
                       Strategic Summary
                     </h3>
-                    <p className="text-slate-300 leading-relaxed text-lg">{feedback.summary}</p>
+                    <p className="text-slate-300 leading-relaxed text-lg">{feedback.refinedIdea?.oneLiner || feedback.summary}</p>
+                    <p className="text-slate-400 mt-2">{feedback.refinedIdea?.problem}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-800/50">
                     <div className="space-y-3">
                       <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Tech Stack</h4>
                       <div className="flex flex-wrap gap-2">
-                        {feedback.techStack.frontend.map(t => <Badge key={t} variant="outline" className="bg-blue-500/5 border-blue-500/20 text-blue-400">{t}</Badge>)}
-                        {feedback.techStack.backend.map(t => <Badge key={t} variant="outline" className="bg-purple-500/5 border-purple-500/20 text-purple-400">{t}</Badge>)}
-                        {feedback.techStack.ai?.map(t => <Badge key={t} variant="outline" className="bg-emerald-500/5 border-emerald-500/20 text-emerald-400">{t}</Badge>)}
+                        {techList.slice(0, 10).map((t, i) => (
+                           <Badge key={i} variant="outline" className={`h-auto whitespace-normal break-words text-left py-1 text-xs max-w-full ${i % 3 === 0 ? 'bg-blue-500/5 border-blue-500/20 text-blue-400' : i % 3 === 1 ? 'bg-purple-500/5 border-purple-500/20 text-purple-400' : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400'}`}>{t}</Badge>
+                        ))}
                       </div>
                     </div>
                     <div className="space-y-3">
                       <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Next Steps</h4>
                       <ul className="text-sm text-slate-400 space-y-2">
-                        {feedback.nextSteps.map((step, i) => (
+                        {nextSteps.map((step, i) => (
                           <li key={i} className="flex gap-3">
                             <span className="text-orange-500 font-bold">0{i+1}.</span>
                             <span className="leading-tight">{step}</span>
@@ -199,145 +234,76 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
                       </ul>
                     </div>
                   </div>
-
-                  <div className="pt-8 flex flex-col sm:flex-row gap-4">
-                    <Button 
-                      onClick={() => setElaborationMode(true)} 
-                      className="flex-1 bg-slate-800 text-white font-bold h-14 rounded-xl hover:bg-slate-700"
-                    >
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Elaborate with AI
-                    </Button>
-                    <Button 
-                      onClick={handleCreateProject} 
-                      className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl"
-                    >
-                      Create Project Based on This
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
-                  </div>
                 </Card>
 
-                <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col justify-between h-fit sticky top-24">
-                  <h3 className="text-xl font-bold mb-6">Strategic Scores</h3>
+                <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col h-fit">
+                  <h3 className="text-xl font-bold mb-6">Key Insights</h3>
                   <div className="space-y-6">
-                    <ScoreItem label="Originality" score={feedback.originality} color="orange" />
-                    {mode === 'Hackathon' && (
+                    {feedback.mode === 'Hackathon' && (
                       <>
-                        <ScoreItem label="Buildability" score={feedback.buildability} color="blue" />
-                        <ScoreItem label="Impact" score={feedback.impact} color="emerald" />
+                        <ScoreItem label="Originality" score={feedback.hackathonAnalysis?.originalityScore || 8} color="orange" />
+                        <StatItem label="Buildability" text={feedback.hackathonAnalysis?.buildability} color="blue" />
+                        <StatItem label="Demo Impact" text={feedback.hackathonAnalysis?.demoImpact?.split(' - ')[0] || 'High'} color="emerald" />
+                        <div className="mt-4 text-sm text-slate-400">
+                          <span className="font-bold text-slate-300">Time estimate:</span> {feedback.hackathonAnalysis?.timeEstimate}
+                        </div>
                       </>
                     )}
-                    {mode === 'Learning' && (
+                    {feedback.mode === 'Learning' && (
                       <>
-                        <ScoreItem label="Feasibilty" score={feedback.feasibility} color="blue" />
-                        <ScoreItem label="Learning Value" score={feedback.learningValue} color="emerald" />
+                        <StatItem label="Complexity" text={feedback.learningAnalysis?.complexityLevel} color="blue" />
+                        <div className="mt-4 text-sm text-slate-400 space-y-2">
+                           <div><span className="font-bold text-slate-300">Time Estimate:</span> {feedback.learningAnalysis?.timeEstimate}</div>
+                           <div><span className="font-bold text-slate-300">Complexity Reason:</span> {feedback.learningAnalysis?.complexityReason}</div>
+                        </div>
                       </>
                     )}
-                    {mode === 'Startup' && (
+                    {feedback.mode === 'Startup' && (
                       <>
-                        <ScoreItem label="Market Size" score={feedback.marketSize} color="blue" />
-                        <ScoreItem label="Monetization" score={feedback.monetization} color="emerald" />
+                        <div className="mt-4 text-sm text-slate-400 space-y-3">
+                           <div><span className="font-bold text-slate-300 block mb-1">Market Size</span> {feedback.marketAnalysis?.marketSize}</div>
+                           <div><span className="font-bold text-slate-300 block mb-1">Growth Trend</span> {feedback.marketAnalysis?.growthTrend}</div>
+                           <div><span className="font-bold text-slate-300 block mb-1">Target Segment</span> {feedback.marketAnalysis?.targetSegment}</div>
+                           <div><span className="font-bold text-slate-300 block mb-1">Differentiator</span> {feedback.competitiveLandscape?.yourMonat}</div>
+                        </div>
                       </>
                     )}
                   </div>
                 </Card>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[700px]">
-                <div className="lg:col-span-2 flex flex-col bg-slate-900/80 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-xl">
-                  <div className="p-4 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-orange-500/20 rounded-lg">
-                        <MessageSquare className="w-5 h-5 text-orange-500" />
-                      </div>
-                      <span className="font-bold">Idea Elaboration Consultant</span>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={() => setElaborationMode(false)} className="text-slate-400 hover:text-white">
-                      Back to Report
-                    </Button>
-                  </div>
-                  
-                  <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    <div className="flex items-start gap-4 mr-12">
-                      <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
-                        <Rocket className="w-4 h-4 text-orange-500" />
-                      </div>
-                      <div className="bg-slate-800/50 rounded-2xl rounded-tl-sm px-5 py-3.5 border border-slate-800/80 text-sm text-slate-200">
-                        I'm here to help you refine your idea. We can discuss features, simplify your scope, or plan out your architecture. What are you unsure about?
-                      </div>
-                    </div>
+            </div>
 
-                    {chatMessages.map((msg, idx) => (
-                      <div key={idx} className={`flex items-start gap-4 ${msg.role === 'user' ? 'flex-row-reverse ml-12' : 'mr-12'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border ${msg.role === 'user' ? 'bg-orange-500 border-orange-400' : 'bg-slate-800 border-slate-700'}`}>
-                          {msg.role === 'user' ? <span className="font-bold text-xs">U</span> : <Rocket className="w-4 h-4 text-orange-500" />}
+            <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6 sticky top-24 h-[100vh] max-h-[85vh]">
+                <div className="flex-1 min-h-0 bg-slate-900/80 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative w-full">
+                   <div className="p-4 border-b border-slate-800 bg-slate-950/50 flex flex-col gap-1 z-10 shrink-0">
+                      <div className="flex flex-row gap-3 items-center">
+                        <div className="p-2 bg-orange-500/20 rounded-lg">
+                          <MessageSquare className="w-5 h-5 text-orange-500" />
                         </div>
-                        <div className={`rounded-2xl px-5 py-3.5 text-sm ${msg.role === 'user' ? 'bg-orange-500/10 text-orange-50 border border-orange-500/20 rounded-tr-sm' : 'bg-slate-800/50 border border-slate-800/80 text-slate-200 rounded-tl-sm markdown-body'}`}>
-                          {msg.role === 'user' ? (
-                            msg.content
-                          ) : (
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
-                          )}
-                        </div>
+                        <span className="font-bold text-slate-200">Idea Elaboration Consultant</span>
                       </div>
-                    ))}
-                    
-                    {chatting && (
-                      <div className="flex items-start gap-4 mr-12">
-                        <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
-                          <Rocket className="w-4 h-4 text-orange-500" />
-                        </div>
-                        <div className="bg-slate-800/50 rounded-2xl rounded-tl-sm px-5 py-4 border border-slate-800/80">
-                          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      <p className="text-xs text-slate-400 pl-[44px]">Refine features, MVP scope or architecture</p>
+                   </div>
+                   <div className="flex-1 overflow-hidden">
+                       <AnimatedAIChat 
+                          onSendMessage={handleSendChat}
+                          isTyping={chatting}
+                          messages={[
+                              { role: 'assistant', content: "I'm here to help you refine your idea. We can discuss features, simplify your scope, or plan out your architecture. What are you unsure about?" },
+                              ...chatMessages
+                          ]}
+                          compact={true}
+                       />
+                   </div>
+                </div>
 
-                  <div className="p-4 border-t border-slate-800 bg-slate-950/50">
-                    <form 
-                      onSubmit={(e) => { e.preventDefault(); handleSendChat(); }}
-                      className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-xl px-2 py-2 focus-within:border-orange-500/50 transition-colors"
-                    >
-                      <input 
-                        type="text"
-                        value={chatInput}
-                        onChange={(e) => setChatInput(e.target.value)}
-                        placeholder="Discuss your idea..."
-                        className="flex-1 bg-transparent border-none focus:outline-none text-slate-100 px-3 py-2 text-sm"
-                        disabled={chatting}
-                      />
-                      <Button type="submit" size="icon" className="bg-orange-500 hover:bg-orange-600 rounded-lg h-9 w-9 shrink-0 text-white" disabled={chatting || !chatInput.trim()}>
-                        <Send className="w-4 h-4" />
-                      </Button>
-                    </form>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col gap-6">
-                  <Card className="bg-slate-900/50 border-slate-800 p-6 rounded-2xl space-y-4">
-                    <h3 className="font-bold text-slate-300">Tips for Elaboration</h3>
-                    <ul className="text-sm text-slate-400 space-y-2">
-                      <li>• Discuss potential roadblocks</li>
-                      <li>• Ask what edge cases you missed</li>
-                      <li>• Brainstorm pricing strategies</li>
-                      <li>• Ask how to simplify the MVP</li>
-                    </ul>
-                  </Card>
-                  
-                  <div className="mt-auto">
-                    <Button 
-                      onClick={handleCreateProject} 
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-lg"
-                    >
-                      Ready to Build!
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
+                <Button 
+                    onClick={handleCreateProject} 
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-lg shrink-0"
+                >
+                    Ready to Build!
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+            </div>
           </motion.div>
         )}
       </main>
@@ -383,6 +349,20 @@ function ScoreItem({ label, score, color }: { label: string, score: number, colo
           className={`h-full ${colorMap[color]}`} 
         />
       </div>
+    </div>
+  );
+}
+
+function StatItem({ label, text, color }: { label: string, text?: string, color: 'orange' | 'blue' | 'emerald' }) {
+  const textMap = {
+    orange: 'text-orange-400',
+    blue: 'text-blue-400',
+    emerald: 'text-emerald-400'
+  };
+  return (
+    <div className="flex justify-between items-center bg-slate-950/50 p-3 rounded-lg border border-slate-800/80">
+      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</span>
+      <span className={`text-sm font-bold ${textMap[color]}`}>{text || '-'}</span>
     </div>
   );
 }

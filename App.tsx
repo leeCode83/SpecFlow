@@ -185,8 +185,7 @@ export default function App() {
             <div 
               className="p-6 flex items-center gap-3 cursor-pointer group"
               onClick={() => {
-                if (user) setView('dashboard');
-                else setView('landing');
+                setView('landing');
               }}
             >
               <div className="bg-orange-500 rounded-lg p-1.5 group-hover:scale-105 transition-transform">

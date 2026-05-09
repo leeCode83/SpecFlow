@@ -5,6 +5,108 @@
 
 export type Mode = 'Learning' | 'Hackathon' | 'Startup';
 
+export interface BaseModeFeedback {
+  refinedIdea: {
+    title: string;
+    oneLiner: string;
+    problem: string;
+    targetUser: string;
+  };
+  techStack: {
+    frontend?: Array<{ tech: string; reason: string }>;
+    backend?: Array<{ tech: string; reason: string }>;
+    database?: Array<{ tech: string; reason: string }>;
+    infrastructure?: Array<{ tech: string; reason: string }>;
+    tools?: Array<{ tech: string; reason: string }>;
+    readyLibraries?: Array<{ lib: string; saves: string }>;
+    criticalIntegrations?: string[];
+  };
+}
+
+export interface LearningFeedback extends BaseModeFeedback {
+  mode: 'Learning';
+  learningAnalysis: {
+    complexityLevel: string;
+    complexityReason: string;
+    timeEstimate: string;
+    keyConceptsToLearn: string[];
+    prerequisiteSkills: string[];
+    learningResources: Array<{ topic: string; resource: string }>;
+  };
+  learningPath: Record<string, string[]>;
+  mvpScope: {
+    coreFeatures: string[];
+    learningMilestones: string[];
+    stretchGoals: string[];
+  };
+  pitfalls: string[];
+}
+
+export interface HackathonFeedback extends BaseModeFeedback {
+  mode: 'Hackathon';
+  hackathonAnalysis: {
+    originalityScore: number;
+    originalityReason: string;
+    buildability: string;
+    buildabilityReason: string;
+    timeEstimate: string;
+    riskFactors: string[];
+    demoImpact: string;
+  };
+  competitiveEdge: {
+    similarSolutions: Array<{ name: string; weakness: string }>;
+    yourDifferentiator: string;
+    marketGap: string;
+  };
+  mvpScope: {
+    mustHave: string[];
+    niceToHave: string[];
+    outOfScope: string[];
+  };
+  quickWins: Record<string, string[]>;
+  demoStrategy: string;
+}
+
+export interface StartupFeedback extends BaseModeFeedback {
+  mode: 'Startup';
+  marketAnalysis: {
+    marketSize: string;
+    growthTrend: string;
+    targetSegment: string;
+    payingWillingness: string;
+  };
+  competitiveLandscape: {
+    directCompetitors: Array<{ name: string; strength: string; weakness: string }>;
+    indirectCompetitors: string[];
+    yourMonat: string;
+    barriers: string[];
+  };
+  businessModel: {
+    revenueStreams: Array<{ stream: string; potential: string }>;
+    unitEconomics: {
+      cac: string;
+      ltv: string;
+      ltvCacRatio: string;
+    };
+    pricingStrategy: string;
+  };
+  mvpScope: {
+    mustHave: string[];
+    validation: string[];
+    v1Features: string[];
+    outOfScope: string[];
+  };
+  roadmap: Record<string, string>;
+  risks: {
+    technical: string[];
+    business: string[];
+    mitigation: string[];
+  };
+  fundingStrategy: string;
+}
+
+export type IdeaFeedback = LearningFeedback | HackathonFeedback | StartupFeedback;
+
 export interface Project {
   id: string;
   user_id: string;
@@ -35,24 +137,6 @@ export interface ProjectLog {
   action: string;
   details: any;
   created_at: string;
-}
-
-export interface IdeaFeedback {
-  originality: number;
-  buildability: number; // For Hackathon
-  impact: number;      // For Hackathon
-  feasibility: number;  // For Learning
-  learningValue: number; // For Learning
-  marketSize: number;    // For Startup
-  monetization: number;  // For Startup
-  techStack: {
-    frontend: string[];
-    backend: string[];
-    ai: string[];
-    infrastructure: string[];
-  };
-  summary: string;
-  nextSteps: string[];
 }
 
 export type SpecType = 'Auth' | 'API' | 'Frontend' | 'AI' | 'Infrastructure' | 'Custom';
