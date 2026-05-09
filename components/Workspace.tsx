@@ -61,6 +61,12 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { getFilesByProjectId, createProjectFile, deleteProjectFile } from '@/lib/supabase/supabase-files';
 import { getLogsByProjectId, logProjectEvent } from '@/lib/supabase/supabase-logs';
 import { Project, Spec, SpecType, ProjectFile, ProjectLog } from '@/lib/types';
@@ -107,6 +113,10 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const [githubUrl, setGithubUrl] = useState('');
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState('');
   const [logFilter, setLogFilter] = useState({ user: 'All', action: 'All' });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -220,6 +230,16 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
     if (!file || !currentUser) return;
 
     setUploading(true);
+    setShowUploadDialog(true);
+    setUploadProgress(0);
+    setUploadSuccess(false);
+    setUploadedFileUrl('');
+
+    // Simulate progress starting from 0 to 90
+    const interval = setInterval(() => {
+      setUploadProgress(p => p < 90 ? p + Math.floor(Math.random() * 10) + 5 : p);
+    }, 300);
+
     try {
       const fileName = `${projectId}/${Date.now()}_${file.name}`;
       const { error: uploadError } = await supabase.storage.from('project-assets').upload(fileName, file);
@@ -238,12 +258,21 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
 
       setFiles([fileData, ...files]);
       logAction('Upload File', { filename: file.name, size: file.size });
-      toast.success("File uploaded");
+      
+      clearInterval(interval);
+      setUploadProgress(100);
+      setUploadSuccess(true);
+      setUploadedFileUrl(publicUrl);
     } catch (error) {
       console.error(error);
+      clearInterval(interval);
+      setShowUploadDialog(false);
       toast.error("Upload failed");
     } finally {
       setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -680,43 +709,78 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {files.map(file => (
-                  <Card key={file.id} className="bg-slate-900/40 border-slate-800 p-4 rounded-2xl hover:bg-slate-900/60 transition-all flex flex-col group">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400">
-                        {file.type.includes('image') ? <Monitor className="w-6 h-6" /> : <FileText className="w-6 h-6" />}
+              <TooltipProvider delayDuration={200}>
+                <div className="flex flex-col space-y-2">
+                  {files.map(file => (
+                    <div key={file.id} className="bg-slate-900/40 border border-slate-800 p-3 rounded-xl hover:bg-slate-900/80 transition-colors flex items-center justify-between group">
+                      <div className="flex items-center gap-4 flex-1 overflow-hidden">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="w-10 h-10 shrink-0 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 overflow-hidden relative cursor-default border border-slate-700/50">
+                              {file.type.includes('image') ? (
+                                <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <FileText className="w-5 h-5" />
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent 
+                            side="right" 
+                            className="p-0 border-slate-800 bg-slate-900 overflow-hidden shadow-2xl z-50"
+                          >
+                            {file.type.includes('image') ? (
+                              <div className="w-48 h-48 sm:w-64 sm:h-64 flex items-center justify-center bg-black/50">
+                                <img src={file.url} alt={file.name} className="max-w-full max-h-full object-contain" />
+                              </div>
+                            ) : (
+                              <div className="p-3 text-xs text-slate-400 flex items-center gap-2">
+                                <FileText className="w-4 h-4" />
+                                <span>No preview available</span>
+                              </div>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                        
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <p className="font-medium text-sm text-slate-200 truncate">{file.name}</p>
+                          <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
+                            <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                            <span className="w-1 h-1 rounded-full bg-slate-700"></span>
+                            <span>{new Date(file.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
+
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <a 
                           href={file.url} 
                           target="_blank" 
                           rel="noreferrer" 
-                          className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "h-8 w-8 text-slate-400")}
+                          className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "h-8 w-8 text-slate-400 hover:text-slate-200 hover:bg-slate-800")}
                         >
                           <ExternalLink className="w-4 h-4" />
                         </a>
                         { (isOwner || file.user_id === currentUser?.id) && (
-                          <Button variant="ghost" size="icon" onClick={() => deleteFile(file)} className="h-8 w-8 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => deleteFile(file)} 
+                            className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         )}
                       </div>
                     </div>
-                    <p className="font-bold text-sm truncate mb-1">{file.name}</p>
-                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-medium">
-                      <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                      <span>{new Date(file.created_at).toLocaleDateString()}</span>
+                  ))}
+                  {files.length === 0 && (
+                    <div className="py-20 text-center border-2 border-dashed border-slate-800 rounded-2xl space-y-4">
+                      <HardDrive className="w-10 h-10 text-slate-800 mx-auto" />
+                      <p className="text-slate-500 text-sm">No files uploaded yet. Shared assets will appear here.</p>
                     </div>
-                  </Card>
-                ))}
-                {files.length === 0 && (
-                  <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-800 rounded-3xl space-y-4">
-                    <HardDrive className="w-10 h-10 text-slate-800 mx-auto" />
-                    <p className="text-slate-500 text-sm">No files uploaded yet. Shared assets will appear here.</p>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </TooltipProvider>
             </TabsContent>
 
             <TabsContent value="activity" className="mt-6 space-y-6">
@@ -866,6 +930,76 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDeletingSpec(null)} className="text-slate-400">Cancel</Button>
             <Button onClick={handleDeleteSpec} className="bg-red-500 hover:bg-red-600 text-white">Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+        <DialogContent className="bg-slate-900 border-slate-800 text-slate-200 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {uploadSuccess ? (
+                <span className="flex items-center gap-2 text-emerald-400">
+                  <CheckCircle2 className="w-5 h-5" /> Upload Complete
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Upload className="w-5 h-5" /> Uploading File...
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-6 space-y-4">
+            {!uploadSuccess ? (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>Uploading to project assets</span>
+                  <span>{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                  <div 
+                    className="bg-orange-500 h-2.5 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 flex flex-col items-center justify-center py-4">
+                <div className="w-16 h-16 bg-emerald-500/10 rounded-full border border-emerald-500/20 flex items-center justify-center text-emerald-500 mb-2 hover:scale-105 transition-transform">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <p className="text-sm text-center text-slate-300">
+                  Your file has been successfully uploaded to the storage.
+                </p>
+                {uploadedFileUrl && (
+                  <div className="flex items-center gap-2 w-full mt-4">
+                    <Input readOnly value={uploadedFileUrl} className="bg-slate-950 border-slate-800 text-xs focus-visible:ring-0" />
+                    <Button 
+                      size="icon" 
+                      variant="outline" 
+                      onClick={() => {
+                        window.open(uploadedFileUrl, '_blank');
+                      }} 
+                      className="shrink-0 border-slate-800 hover:bg-slate-800"
+                      title="Open file in new tab"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <DialogFooter className="sm:justify-end">
+            <Button 
+              type="button" 
+              variant="default"
+              onClick={() => setShowUploadDialog(false)}
+              className={uploadSuccess ? "bg-orange-500 hover:bg-orange-600 font-bold" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}
+              disabled={!uploadSuccess && uploading}
+            >
+              {uploadSuccess ? 'Done' : 'Cancel'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
