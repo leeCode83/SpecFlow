@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { geminiService } from '../server/services/geminiService';
-import { Mode } from '../lib/types';
+import { Mode } from '../src/lib/types';
 
 // Mock the GoogleGenAI module
 vi.mock('@google/genai', () => {

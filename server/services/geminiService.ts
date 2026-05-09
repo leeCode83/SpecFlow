@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
-import { IDEATION_PROMPTS } from "../../constants/AI-BRIEF";
-import { Message, IdeaFeedback, Mode } from "../../lib/types";
+import { IDEATION_PROMPTS } from "../../src/constants/AI-BRIEF";
+import { Message, IdeaFeedback, Mode } from "../../src/lib/types";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY

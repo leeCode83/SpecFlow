@@ -4,7 +4,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import { geminiService } from "./server/services/geminiService";
-import { updateSpec } from "./lib/supabase/supabase-specs";
+import { updateSpec } from "./src/lib/supabase/supabase-specs";
 import { geminiRoutes } from "./server/routes/geminiRoutes";
 
 const __filename = fileURLToPath(import.meta.url);

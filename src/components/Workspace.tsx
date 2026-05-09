@@ -709,7 +709,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
                 />
               </div>
 
-              <TooltipProvider delayDuration={200}>
+              <TooltipProvider delay={200}>
                 <div className="flex flex-col space-y-2">
                   {files.map(file => (
                     <div key={file.id} className="bg-slate-900/40 border border-slate-800 p-3 rounded-xl hover:bg-slate-900/80 transition-colors flex items-center justify-between group">
