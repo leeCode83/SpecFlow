@@ -36,9 +36,10 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/lib/supabase/supabase';
 import { getProjectById } from '@/lib/supabase/supabase-projects';
-import { getSpecsByProjectId, updateSpec, getSpecById } from '@/lib/supabase/supabase-specs';
+import { updateSpec, getSpecById } from '@/lib/supabase/supabase-specs';
 import { getEmbedding } from '@/lib/gemini/gemini-embeddings';
 import { generateSpec } from '@/lib/gemini/gemini-specs';
+import { retrieveSimilarSpecs, SimilarSpec } from '@/lib/rag';
 import { Project, Spec, Message } from '@/lib/types';
 import { toast } from 'sonner';
 
@@ -61,7 +62,7 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
   const [chatLoading, setChatLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [similarSpecs, setSimilarSpecs] = useState<string[]>([]);
+  const [similarSpecs, setSimilarSpecs] = useState<SimilarSpec[]>([]);
   
   // New state for confirmation logic
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -101,15 +102,6 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       setContent(specData.content);
       setTitle(specData.title || '');
       setNewTitle(specData.title || '');
-      
-      // Perform vector search for similar specs
-      if (specData.embedding) {
-        // In a real pgvector setup, you'd use a RPC call. 
-        // For this MVP, we'll just pull some context OR mock the vector search.
-        const allSpecs = await getSpecsByProjectId(projectId);
-        const others = allSpecs.filter(s => s.id !== specId).slice(0, 3);
-        setSimilarSpecs(others.map(o => o.content));
-      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to load spec");
@@ -187,12 +179,29 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
     setChatLoading(true);
 
     try {
+      // Retrieve Similar Specs before generating
+      let currentSimilarSpecsStr: string[] = [];
+      if (project?.user_id) {
+        // Build the context from requirement + conversation
+        const queryContext = updatedMessages.map(m => m.content).join("\\n");
+        const results = await retrieveSimilarSpecs(queryContext, spec?.type || 'Custom', project.user_id, 3);
+        setSimilarSpecs(results); // For UI sidebar
+        
+        if (results.length > 0) {
+          currentSimilarSpecsStr = results.map(r => 
+            `Title: ${r.title}\nType: ${r.type}\nSimilarity: ${Math.round(r.similarity * 100)}%\nPreview: ${r.content.substring(0, 500)}`
+          );
+        } else {
+          currentSimilarSpecsStr = ["No similar specs in history"];
+        }
+      }
+
       // This is the "Interview" model. If it's the first message, we set context.
       const response = await generateSpec(
         updatedMessages, 
         spec?.type || 'Custom',
         project?.description || '',
-        similarSpecs
+        currentSimilarSpecsStr
       );
       
       // Check if there is a generation proposal in the response
@@ -363,6 +372,28 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
               <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Spec Generator</h2>
             </div>
           </div>
+
+          {similarSpecs.length > 0 && (
+            <div className="p-3 border-b border-slate-800 bg-slate-900/30">
+               <div className="flex items-center gap-2 mb-2">
+                 <FileSearch className="w-3.5 h-3.5 text-slate-400" />
+                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Memory Match</span>
+               </div>
+               <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+                 {similarSpecs.map(s => (
+                   <div key={s.id} className="min-w-[140px] max-w-[140px] p-2 bg-slate-950 border border-slate-800 rounded-lg flex flex-col gap-1 shrink-0">
+                     <div className="flex items-center justify-between gap-1">
+                       <span className="text-[10px] font-medium text-slate-300 truncate outline-none" title={s.title}>{s.title}</span>
+                       <Badge variant="outline" className="text-[9px] h-4 px-1 py-0 border-emerald-500/30 text-emerald-500 bg-emerald-500/10 leading-none flex items-center shrink-0">
+                         {Math.round(s.similarity * 100)}%
+                       </Badge>
+                     </div>
+                     <span className="text-[9px] text-slate-500 truncate">{s.type}</span>
+                   </div>
+                 ))}
+               </div>
+            </div>
+          )}
 
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>

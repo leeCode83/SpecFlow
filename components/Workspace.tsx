@@ -44,7 +44,21 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase/supabase';
 import { getProjectById, updateProject } from '@/lib/supabase/supabase-projects';
-import { getSpecsByProjectId, createSpec } from '@/lib/supabase/supabase-specs';
+import { getSpecsByProjectId, createSpec, updateSpec, deleteSpec } from '@/lib/supabase/supabase-specs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { getFilesByProjectId, createProjectFile, deleteProjectFile } from '@/lib/supabase/supabase-files';
 import { getLogsByProjectId, logProjectEvent } from '@/lib/supabase/supabase-logs';
 import { Project, Spec, SpecType, ProjectFile, ProjectLog } from '@/lib/types';
@@ -82,6 +96,9 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const [creationLoading, setCreationLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [renamingSpec, setRenamingSpec] = useState<Spec | null>(null);
+  const [newSpecTitle, setNewSpecTitle] = useState('');
+  const [deletingSpec, setDeletingSpec] = useState<Spec | null>(null);
   
   // States for new features
   const [editingGithub, setEditingGithub] = useState(false);
@@ -265,6 +282,37 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
       toast.error("Failed to create spec");
     } finally {
       setCreationLoading(false);
+    }
+  };
+
+  const handleDeleteSpec = async () => {
+    if (!deletingSpec) return;
+    try {
+      await deleteSpec(deletingSpec.id);
+      setSpecs(specs.filter(s => s.id !== deletingSpec.id));
+      logAction('Delete Spec', { title: deletingSpec.title });
+      toast.success("Spec deleted");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete spec");
+    } finally {
+      setDeletingSpec(null);
+    }
+  };
+
+  const handleRenameSpec = async () => {
+    if (!renamingSpec || !newSpecTitle.trim()) return;
+    try {
+      await updateSpec(renamingSpec.id, { title: newSpecTitle.trim() });
+      setSpecs(specs.map(s => s.id === renamingSpec.id ? { ...s, title: newSpecTitle.trim() } : s));
+      logAction('Rename Spec', { oldTitle: renamingSpec.title, newTitle: newSpecTitle.trim() });
+      toast.success("Spec renamed");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to rename spec");
+    } finally {
+      setRenamingSpec(null);
+      setNewSpecTitle('');
     }
   };
 
@@ -483,25 +531,56 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
 
             <div className="bg-slate-900/30 rounded-2xl border border-slate-800/50 p-2 space-y-1">
               {specs.map(spec => (
-                <button
-                  key={spec.id}
-                  onClick={() => onSelectSpec(spec.id)}
-                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-900/60 transition-all flex items-center gap-3 group"
-                >
-                  <div className={`p-1.5 rounded-lg ${
-                    spec.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-800 text-slate-400'
-                  }`}>
-                    {TYPE_ICONS[spec.type] ? React.createElement(TYPE_ICONS[spec.type], { className: "w-3.5 h-3.5" }) : <FileText className="w-3.5 h-3.5" />}
+                <div key={spec.id} className="relative group">
+                  <button
+                    onClick={() => onSelectSpec(spec.id)}
+                    className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-900/60 transition-all flex items-center gap-3 pr-10"
+                  >
+                    <div className={`p-1.5 rounded-lg ${
+                      spec.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-800 text-slate-400'
+                    }`}>
+                      {TYPE_ICONS[spec.type] ? React.createElement(TYPE_ICONS[spec.type], { className: "w-3.5 h-3.5" }) : <FileText className="w-3.5 h-3.5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate text-slate-300 group-hover:text-white transition-colors">{spec.title}</p>
+                      <p className="text-[9px] text-slate-500 flex items-center gap-1 mt-0.5">
+                        <Badge variant="outline" className="text-[8px] px-1 py-0 h-3 border-slate-800">{spec.type}</Badge>
+                        <span>•</span>
+                        {spec.status === 'completed' ? 'Ready' : 'Draft'}
+                      </p>
+                    </div>
+                  </button>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-white">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-32 bg-slate-900 border-slate-800">
+                        <DropdownMenuItem 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRenamingSpec(spec);
+                            setNewSpecTitle(spec.title);
+                          }}
+                          className="text-xs text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer"
+                        >
+                          <Edit2 className="w-3.5 h-3.5 mr-2" /> Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletingSpec(spec);
+                          }}
+                          className="text-xs text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate text-slate-300 group-hover:text-white transition-colors">{spec.title}</p>
-                    <p className="text-[9px] text-slate-500 flex items-center gap-1 mt-0.5">
-                      <Badge variant="outline" className="text-[8px] px-1 py-0 h-3 border-slate-800">{spec.type}</Badge>
-                      <span>•</span>
-                      {spec.status === 'completed' ? 'Ready' : 'Draft'}
-                    </p>
-                  </div>
-                </button>
+                </div>
               ))}
               {specs.length === 0 && <p className="text-[10px] text-slate-600 text-center py-4">No specs yet</p>}
             </div>
@@ -739,6 +818,43 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
           </Tabs>
         </div>
       </div>
+
+      <Dialog open={!!renamingSpec} onOpenChange={(open) => !open && setRenamingSpec(null)}>
+        <DialogContent className="bg-slate-900 border-slate-800 text-slate-200">
+          <DialogHeader>
+            <DialogTitle>Rename Spec</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input 
+              value={newSpecTitle}
+              onChange={(e) => setNewSpecTitle(e.target.value)}
+              placeholder="Enter spec title..."
+              className="bg-slate-950 border-slate-800 text-sm"
+              autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleRenameSpec()}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setRenamingSpec(null)} className="text-slate-400">Cancel</Button>
+            <Button onClick={handleRenameSpec} disabled={!newSpecTitle.trim()} className="bg-orange-500 hover:bg-orange-600 text-white">Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!deletingSpec} onOpenChange={(open) => !open && setDeletingSpec(null)}>
+        <DialogContent className="bg-slate-900 border-slate-800 text-slate-200">
+          <DialogHeader>
+            <DialogTitle>Delete Spec</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-slate-400">Are you sure you want to delete <strong className="text-slate-200">{deletingSpec?.title}</strong>? This action cannot be undone.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDeletingSpec(null)} className="text-slate-400">Cancel</Button>
+            <Button onClick={handleDeleteSpec} className="bg-red-500 hover:bg-red-600 text-white">Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
