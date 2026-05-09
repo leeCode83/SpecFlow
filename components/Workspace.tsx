@@ -552,10 +552,8 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
                   </button>
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-white">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
+                      <DropdownMenuTrigger className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "h-7 w-7 text-slate-400 hover:text-white outline-none cursor-pointer")}>
+                        <MoreVertical className="w-4 h-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-32 bg-slate-900 border-slate-800">
                         <DropdownMenuItem 
