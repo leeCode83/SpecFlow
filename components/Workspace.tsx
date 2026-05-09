@@ -33,7 +33,8 @@ import {
   UserMinus,
   FilePlus,
   GitBranch,
-  Edit2
+  Edit2,
+  ChevronRight
 } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -72,6 +73,9 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const [specs, setSpecs] = useState<Spec[]>([]);
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [logs, setLogs] = useState<ProjectLog[]>([]);
+  const [logPage, setLogPage] = useState(1);
+  const [logTotalPages, setLogTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 10;
   const [currentUser, setCurrentUser] = useState<any>(null);
   
   const [loading, setLoading] = useState(true);
@@ -93,11 +97,15 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
     fetchData();
   }, [projectId]);
 
+  useEffect(() => {
+    if (projectId) fetchLogs(logPage);
+  }, [logPage]);
+
   const logAction = async (action: string, details: any) => {
     if (!currentUser) return;
     try {
       await logProjectEvent(projectId, action, details, currentUser.id);
-      fetchLogs();
+      fetchLogs(logPage);
     } catch (error) {
       console.error('Failed to log action:', error);
     }
@@ -117,7 +125,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
       setSpecs(specsData);
 
       fetchFiles();
-      fetchLogs();
+      fetchLogs(1);
     } catch (error) {
       console.error('Error fetching project data:', error);
       toast.error("Failed to load workspace data");
@@ -135,10 +143,11 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
     }
   };
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (page: number) => {
     try {
-      const data = await getLogsByProjectId(projectId);
-      setLogs(data);
+      const logsData = await getLogsByProjectId(projectId, page, ITEMS_PER_PAGE);
+      setLogs(logsData.data);
+      setLogTotalPages(Math.max(1, Math.ceil(logsData.count / ITEMS_PER_PAGE)));
     } catch (error) {
       console.error('Failed to fetch logs:', error);
     }
@@ -698,6 +707,33 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
                     </div>
                   )}
                 </div>
+                {logTotalPages > 1 && (
+                  <div className="p-4 border-t border-slate-800/50 flex items-center justify-between bg-slate-900/50">
+                    <span className="text-sm text-slate-400">
+                      Page {logPage} of {logTotalPages}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setLogPage(p => Math.max(1, p - 1))}
+                        disabled={logPage === 1}
+                        className="border-slate-800"
+                      >
+                        <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setLogPage(p => Math.min(logTotalPages, p + 1))}
+                        disabled={logPage === logTotalPages}
+                        className="border-slate-800"
+                      >
+                        Next <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </TabsContent>
           </Tabs>

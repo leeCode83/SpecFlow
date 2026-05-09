@@ -255,7 +255,6 @@ export default function App() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium truncate">{user?.email}</p>
-                  <p className="text-[10px] text-slate-500">Free Tier</p>
                 </div>
                 <button 
                   onClick={handleLogout}
