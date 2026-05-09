@@ -32,7 +32,8 @@ import {
   PlusCircle,
   UserMinus,
   FilePlus,
-  GitBranch
+  GitBranch,
+  Edit2
 } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -268,22 +269,41 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   );
 
   const getLogVisuals = (action: string) => {
-    switch (action) {
-      case 'Create Spec': return { icon: PlusCircle, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/20' };
-      case 'Update GitHub': return { icon: GitBranch, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/20' };
-      case 'Add Member': return { icon: UserPlus, color: 'text-emerald-400', bg: 'bg-emerald-500/20', border: 'border-emerald-500/20' };
-      case 'Remove Member': return { icon: UserMinus, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/20' };
-      case 'Upload File': return { icon: FilePlus, color: 'text-cyan-400', bg: 'bg-cyan-500/20', border: 'border-cyan-500/20' };
-      case 'Delete File': return { icon: Trash2, color: 'text-rose-400', bg: 'bg-rose-500/20', border: 'border-rose-500/20' };
-      default: return { icon: Activity, color: 'text-slate-400', bg: 'bg-slate-800/50', border: 'border-slate-800' };
+    const act = (action || '').toUpperCase().replace(/_/g, ' ');
+    if (act.includes('CREATE SPEC')) return { icon: PlusCircle, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/20' };
+    if (act.includes('UPDATE GITHUB')) return { icon: GitBranch, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/20' };
+    if (act.includes('EDIT SPEC')) return { icon: Edit2, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/20' };
+    if (act.includes('ADD MEMBER')) return { icon: UserPlus, color: 'text-emerald-400', bg: 'bg-emerald-500/20', border: 'border-emerald-500/20' };
+    if (act.includes('REMOVE MEMBER')) return { icon: UserMinus, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/20' };
+    if (act.includes('UPLOAD FILE')) return { icon: FilePlus, color: 'text-cyan-400', bg: 'bg-cyan-500/20', border: 'border-cyan-500/20' };
+    if (act.includes('DELETE FILE')) return { icon: Trash2, color: 'text-rose-400', bg: 'bg-rose-500/20', border: 'border-rose-500/20' };
+
+    // Deterministic fallback palette so no log is ever plain/polos again
+    const palettes = [
+      { color: 'text-indigo-400', bg: 'bg-indigo-500/20', border: 'border-indigo-500/20' },
+      { color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/20' },
+      { color: 'text-amber-400', bg: 'bg-amber-500/20', border: 'border-amber-500/20' },
+      { color: 'text-lime-400', bg: 'bg-lime-500/20', border: 'border-lime-500/20' },
+      { color: 'text-teal-400', bg: 'bg-teal-500/20', border: 'border-teal-500/20' },
+      { color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/20', border: 'border-fuchsia-500/20' },
+      { color: 'text-violet-400', bg: 'bg-violet-500/20', border: 'border-violet-500/20' },
+      { color: 'text-sky-400', bg: 'bg-sky-500/20', border: 'border-sky-500/20' }
+    ];
+    
+    let hash = 0;
+    for (let i = 0; i < act.length; i++) {
+        hash = act.charCodeAt(i) + ((hash << 5) - hash);
     }
+    const index = Math.abs(hash) % palettes.length;
+    return { icon: Activity, ...palettes[index] };
   };
 
   const renderLogDetails = (log: ProjectLog) => {
     const details = log.details || {};
+    const action = log.action || '';
+    const actUpper = action.toUpperCase().replace(/_/g, ' ');
     
-    switch (log.action) {
-      case 'Create Spec':
+    if (actUpper.includes('CREATE SPEC')) {
         return (
           <div className="flex flex-col gap-1">
             <p className="text-slate-200">
@@ -292,49 +312,62 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             <p className="text-xs text-slate-400">Title: "{details.title || 'Untitled'}"</p>
           </div>
         );
-      case 'Update GitHub':
+    }
+    if (actUpper.includes('UPDATE GITHUB')) {
         return (
           <div className="flex flex-col gap-1">
             <p className="text-slate-200">Linked a new GitHub repository</p>
             <p className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 w-fit truncate max-w-xs">{details.url || 'No URL'}</p>
           </div>
         );
-      case 'Add Member':
+    }
+    if (actUpper.includes('EDIT SPEC')) {
+        return (
+          <div className="flex flex-col gap-1">
+            <p className="text-slate-200">Updated specification content</p>
+            {details.title && <p className="text-xs text-slate-400">Title: "{details.title}"</p>}
+          </div>
+        );
+    }
+    if (actUpper.includes('ADD MEMBER')) {
         return (
           <div className="flex flex-col gap-1">
             <p className="text-slate-200">Added a new contributor to the team</p>
             <p className="text-xs text-emerald-400 font-medium">{details.email || details.uuid || 'Unknown User'}</p>
           </div>
         );
-      case 'Remove Member':
+    }
+    if (actUpper.includes('REMOVE MEMBER')) {
         return (
           <div className="flex flex-col gap-1">
             <p className="text-slate-200 text-red-300/80">Revoked teammate access</p>
             <p className="text-[10px] text-slate-500">Member ID: {details.uuid || 'N/A'}</p>
           </div>
         );
-      case 'Upload File':
+    }
+    if (actUpper.includes('UPLOAD FILE')) {
         return (
           <div className="flex flex-col gap-1">
             <p className="text-slate-200">Uploaded project asset: <span className="text-cyan-400 font-medium">{details.filename || 'File'}</span></p>
             {details.size && <p className="text-[10px] text-slate-500 italic">File Size: {(details.size / 1024 / 1024).toFixed(2)} MB</p>}
           </div>
         );
-      case 'Delete File':
+    }
+    if (actUpper.includes('DELETE FILE')) {
         return (
           <div className="flex flex-col gap-1">
-            <p className="text-slate-400">Deleted asssed from storage: <span className="text-rose-400/80 line-through">{details.filename}</span></p>
-          </div>
-        );
-      default:
-        // Generic fallback that avoids curly braces if details is a simple object
-        const message = details.message || (typeof details === 'string' ? details : null);
-        return (
-          <div className="flex flex-col gap-1 italic text-slate-400 text-xs">
-            {message ? <p>{message}</p> : <p>Performed {log.action || 'an action'}</p>}
+            <p className="text-slate-400">Deleted asset from storage: <span className="text-rose-400/80 line-through">{details.filename}</span></p>
           </div>
         );
     }
+
+    // Generic fallback that avoids curly braces if details is a simple object
+    const message = details.message || (typeof details === 'string' ? details : null);
+    return (
+      <div className="flex flex-col gap-1 italic text-slate-400 text-xs">
+        {message ? <p>{message}</p> : <p>Performed {log.action || 'an action'}</p>}
+      </div>
+    );
   };
 
   if (loading) return (
