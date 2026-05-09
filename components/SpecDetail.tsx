@@ -36,7 +36,8 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/lib/supabase/supabase';
 import { getProjectById } from '@/lib/supabase/supabase-projects';
-import { getSpecById, updateSpec, getSpecsByProjectId } from '@/lib/supabase/supabase-specs';
+import { getSpecsByProjectId, updateSpec, getSpecById } from '@/lib/supabase/supabase-specs';
+import { getEmbedding } from '@/lib/gemini/gemini-embeddings';
 import { generateSpec } from '@/lib/gemini/gemini-specs';
 import { Project, Spec, Message } from '@/lib/types';
 import { toast } from 'sonner';
@@ -71,8 +72,8 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
   const currentContentRef = useRef(content);
 
   useEffect(() => {
-    if (content !== spec?.content) {
-      setHasUnsavedChanges(true);
+    if (spec) {
+      setHasUnsavedChanges(content !== spec.content);
     }
     currentContentRef.current = content;
   }, [content, spec?.content]);
@@ -150,11 +151,10 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       if (showToast) toast.success("Spec saved successfully");
 
       // 2. Start embedding process in the background if save was successful
-      fetch('/api/embed-spec', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ specId, contentToSave })
-      }).catch(err => console.error("Failed to trigger ingestion:", err));
+      getEmbedding(contentToSave.substring(0, 5000))
+        .then(embedding => updateSpec(specId, { embedding }))
+        .then(() => console.log(`Vector index updated for specId: ${specId}`))
+        .catch(err => console.error("Failed to generate and save embedding:", err));
 
       return true;
     } catch (error) {
@@ -335,12 +335,7 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
                 </TabsTrigger>
               </TabsList>
               
-              <div className="flex items-center gap-4 text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                <div className="flex items-center gap-2">
-                  <BrainCircuit className="w-3 h-3 text-emerald-500" />
-                  RAG: {similarSpecs.length} Context Docs
-                </div>
-              </div>
+
             </div>
 
             <TabsContent value="editor" className="flex-1 m-0 p-0 overflow-hidden">
@@ -367,17 +362,6 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
               <Sparkles className="w-5 h-5 text-orange-500" />
               <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Spec Generator</h2>
             </div>
-            {hasUnsavedChanges && !isConfirmOpen && (
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                onClick={() => handleSave(content)}
-                className="h-7 text-[10px] bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 gap-1 px-2"
-              >
-                <Save className="w-3 h-3" />
-                Save Draft
-              </Button>
-            )}
           </div>
 
           <div className="flex-1 flex flex-col overflow-hidden">

@@ -1,7 +1,7 @@
 import { ai } from "./gemini-client";
 
 export const getEmbedding = async (text: string): Promise<number[]> => {
-  const model = "gemini-embedding-001";
+  const model = "text-embedding-004";
   const result = await ai.models.embedContent({
     model,
     contents: [{ parts: [{ text }] }],
