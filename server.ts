@@ -3,8 +3,9 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
-import { getEmbedding } from "./lib/gemini/gemini-embeddings";
+import { geminiService } from "./server/services/geminiService";
 import { updateSpec } from "./lib/supabase/supabase-specs";
+import { geminiRoutes } from "./server/routes/geminiRoutes";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,6 +21,8 @@ async function startServer() {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
+  app.use("/api/gemini", geminiRoutes);
+
   app.post("/api/embed-spec", async (req, res) => {
     try {
       const { specId, contentToSave } = req.body;
@@ -28,7 +31,7 @@ async function startServer() {
       }
 
       console.log(`Starting ingestion for specId: ${specId}`);
-      const embedding = await getEmbedding(contentToSave.substring(0, 5000));
+      const embedding = await geminiService.getEmbedding(contentToSave.substring(0, 5000));
       await updateSpec(specId, { embedding });
       console.log(`Vector index updated for specId: ${specId}`);
       

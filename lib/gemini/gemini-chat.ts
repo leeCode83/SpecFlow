@@ -1,21 +1,16 @@
 import { Message } from "@/lib/types";
-import { ai } from "./gemini-client";
 
 export const chatWithIdea = async (
   messages: Message[],
   idea: string,
   mode: string
 ): Promise<string> => {
-  const model = "gemini-3.1-pro-preview";
-  
-  const systemInstruction = `You are a helpful product strategist consultant. The user wants to build an app based on this idea: "${idea}" with mode "${mode}".
-  Your goal is to help them refine, elaborate, and solidify their project idea. Ask clarifying questions, suggest features, and help them arrive at a clear project title and description.`;
-
-  const response = await ai.models.generateContent({
-    model,
-    contents: JSON.stringify(messages),
-    config: { systemInstruction },
+  const res = await fetch("/api/gemini/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages, idea, mode })
   });
-
-  return response.text;
+  if (!res.ok) throw new Error("Failed to chat with idea");
+  const data = await res.json();
+  return data.text;
 };

@@ -37,7 +37,6 @@ import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/lib/supabase/supabase';
 import { getProjectById } from '@/lib/supabase/supabase-projects';
 import { updateSpec, getSpecById, getSpecsByProjectId } from '@/lib/supabase/supabase-specs';
-import { getEmbedding } from '@/lib/gemini/gemini-embeddings';
 import { generateSpec } from '@/lib/gemini/gemini-specs';
 import { retrieveSimilarSpecs, SimilarSpec } from '@/lib/rag';
 import { Project, Spec, Message } from '@/lib/types';
@@ -143,10 +142,11 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       if (showToast) toast.success("Spec saved successfully");
 
       // 2. Start embedding process in the background if save was successful
-      getEmbedding(contentToSave.substring(0, 5000))
-        .then(embedding => updateSpec(specId, { embedding }))
-        .then(() => console.log(`Vector index updated for specId: ${specId}`))
-        .catch(err => console.error("Failed to generate and save embedding:", err));
+      fetch('/api/embed-spec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ specId, contentToSave })
+      }).catch(err => console.error("Failed to generate and save embedding via API:", err));
 
       return true;
     } catch (error) {

@@ -1,13 +1,10 @@
-import { ai } from "./gemini-client";
-
 export const getEmbedding = async (text: string): Promise<number[]> => {
-  const model = "gemini-embedding-001";
-  const result = await ai.models.embedContent({
-    model,
-    contents: text,
-    config: {
-      outputDimensionality: 768
-    }
+  const res = await fetch("/api/gemini/embedding", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
   });
-  return result.embeddings[0].values;
+  if (!res.ok) throw new Error("Failed to get embedding");
+  const data = await res.json();
+  return data.embedding;
 };
