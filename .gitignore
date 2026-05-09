@@ -26,6 +26,7 @@ dist-ssr/
 
 # Build outputs
 build/
+dist-server/
 coverage/
 *.tsbuildinfo
 

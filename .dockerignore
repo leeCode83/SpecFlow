@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-server
+.env
+.env.local
+.git
+.vscode
+README.md
+Dockerfile
+cloudbuild.yaml
+.gitignore
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
