@@ -34,9 +34,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import ReactMarkdown from 'react-markdown';
-import { supabase } from '../lib/supabase';
-import { generateSpec, getEmbedding } from '../lib/gemini';
-import { Project, Spec, Message } from '../types';
+import { supabase } from '@/lib/supabase';
+import { getProjectById } from '@/lib/supabase-projects';
+import { getSpecById, updateSpec, getSpecsByProjectId } from '@/lib/supabase-specs';
+import { generateSpec } from '@/lib/gemini-specs';
+import { getEmbedding } from '@/lib/gemini-embeddings';
+import { Project, Spec, Message } from '@/types';
 import { toast } from 'sonner';
 
 interface SpecDetailProps {
@@ -88,31 +91,24 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [specRes, projRes] = await Promise.all([
-        supabase.from('specs').select('*').eq('id', specId).single(),
-        supabase.from('projects').select('*').eq('id', projectId).single()
+      const [specData, projectData] = await Promise.all([
+        getSpecById(specId),
+        getProjectById(projectId)
       ]);
 
-      if (specRes.error) throw specRes.error;
-      if (projRes.error) throw projRes.error;
-
-      setSpec(specRes.data);
-      setProject(projRes.data);
-      setContent(specRes.data.content);
-      setTitle(specRes.data.title || '');
-      setNewTitle(specRes.data.title || '');
+      setSpec(specData);
+      setProject(projectData);
+      setContent(specData.content);
+      setTitle(specData.title || '');
+      setNewTitle(specData.title || '');
       
       // Perform vector search for similar specs
-      if (specRes.data.embedding) {
+      if (specData.embedding) {
         // In a real pgvector setup, you'd use a RPC call. 
         // For this MVP, we'll just pull some context OR mock the vector search.
-        const { data: others } = await supabase
-          .from('specs')
-          .select('content')
-          .eq('project_id', projectId)
-          .neq('id', specId)
-          .limit(3);
-        setSimilarSpecs(others?.map(o => o.content) || []);
+        const allSpecs = await getSpecsByProjectId(projectId);
+        const others = allSpecs.filter(s => s.id !== specId).slice(0, 3);
+        setSimilarSpecs(others.map(o => o.content));
       }
     } catch (error) {
       console.error(error);
@@ -126,13 +122,8 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
     if (!newTitle.trim()) return;
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('specs')
-        .update({ title: newTitle })
-        .eq('id', specId);
+      await updateSpec(specId, { title: newTitle });
 
-      if (error) throw error;
-      
       setTitle(newTitle);
       setSpec(prev => prev ? { ...prev, title: newTitle } : null);
       setIsEditingTitle(false);
@@ -150,15 +141,11 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
     setSaving(true);
     try {
       // 1. Save content first without embedding
-      const { error: saveError } = await supabase.from('specs').update({
-        content: contentToSave,
-        status: contentToSave.length > 500 ? 'completed' : 'draft'
-      }).eq('id', specId);
+      const status = contentToSave.length > 500 ? 'completed' : 'draft';
+      await updateSpec(specId, { content: contentToSave, status });
 
-      if (saveError) throw saveError;
-      
       // Update local state immediately after content save
-      setSpec(prev => prev ? { ...prev, content: contentToSave, status: contentToSave.length > 500 ? 'completed' : 'draft' } : null);
+      setSpec(prev => prev ? { ...prev, content: contentToSave, status } : null);
       setHasUnsavedChanges(false);
       
       if (showToast) toast.success("Spec saved successfully");
@@ -166,20 +153,13 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       // 2. Start embedding process in the background if save was successful
       try {
         const embedding = await getEmbedding(contentToSave.substring(0, 5000));
-        const { error: embedError } = await supabase.from('specs').update({
-          embedding
-        }).eq('id', specId);
+        await updateSpec(specId, { embedding });
         
-        if (embedError) {
-          console.error("Embedding update failed:", embedError);
-        } else {
-          console.log("Vector index updated");
-          // Optionally update local spec state with embedding if needed
-          setSpec(prev => prev ? { ...prev, embedding } : null);
-        }
+        console.log("Vector index updated");
+        // Optionally update local spec state with embedding if needed
+        setSpec(prev => prev ? { ...prev, embedding } : null);
       } catch (embedFail) {
         console.error("Embedding generation failed:", embedFail);
-        // We don't notify the user about embedding failure as per request
       }
 
       return true;

@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Mode } from '../types';
-import { supabase } from '../lib/supabase';
+import { Mode } from '@/types';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 interface CreateProjectProps {

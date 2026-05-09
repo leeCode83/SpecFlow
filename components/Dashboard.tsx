@@ -4,8 +4,8 @@ import { LayoutDashboard, Clock, ExternalLink, Trash2, Rocket, Plus } from 'luci
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '../lib/supabase';
-import { Project } from '../types';
+import { getProjects, deleteProject } from '@/lib/supabase-projects';
+import { Project } from '@/types';
 import { toast } from 'sonner';
 
 import { 
@@ -40,13 +40,8 @@ export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) 
 
   const fetchProjects = async () => {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setProjects(data || []);
+      const data = await getProjects();
+      setProjects(data);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load projects");
@@ -65,8 +60,7 @@ export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) 
     
     setIsDeleting(true);
     try {
-      const { error } = await supabase.from('projects').delete().eq('id', projectToDelete);
-      if (error) throw error;
+      await deleteProject(projectToDelete);
       setProjects(projects.filter(p => p.id !== projectToDelete));
       toast.success("Project deleted successfully");
       setProjectToDelete(null);

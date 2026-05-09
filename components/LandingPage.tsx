@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { analyzeIdea } from '../lib/gemini';
-import { supabase } from '../lib/supabase';
-import { Mode, IdeaFeedback } from '../types';
+import { analyzeIdea } from '@/lib/gemini-ideation';
+import { supabase } from '@/lib/supabase';
+import { createProject } from '@/lib/supabase-projects';
+import { Mode, IdeaFeedback } from '@/types';
 import { toast } from 'sonner';
 
 interface LandingPageProps {
@@ -75,15 +76,14 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
     }
 
     try {
-      const { data, error } = await supabase.from('projects').insert({
+      const data = await createProject({
         user_id: user.id,
         title: idea.split(' ').slice(0, 5).join(' ') + '...',
         description: feedback.summary,
         mode,
         refined_idea_json: feedback
-      }).select().single();
+      });
 
-      if (error) throw error;
       if (data) {
         toast.success("Project saved!");
         onCreateProject(data.id);

@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 export function Auth({ onBack }: { onBack?: () => void }) {

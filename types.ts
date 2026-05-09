@@ -12,6 +12,28 @@ export interface Project {
   description: string;
   mode: Mode;
   refined_idea_json: IdeaFeedback | null;
+  github_url?: string;
+  teammates?: string[];
+  created_at: string;
+}
+
+export interface ProjectFile {
+  id: string;
+  project_id: string;
+  name: string;
+  url: string;
+  size: number;
+  type: string;
+  user_id: string;
+  created_at: string;
+}
+
+export interface ProjectLog {
+  id: string;
+  project_id: string;
+  user_id: string;
+  action: string;
+  details: any;
   created_at: string;
 }
 

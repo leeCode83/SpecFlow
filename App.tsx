@@ -17,14 +17,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { supabase, isSupabaseConfigured } from './lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { Workspace } from './components/Workspace';
 import { SpecDetail } from './components/SpecDetail';
 import { CreateProject } from './components/CreateProject';
 import { IdeationPage } from './components/IdeationPage';
-import { Project } from './types';
+import { Project } from '@/types';
 
 import { Auth } from './components/Auth';
 
