@@ -4,8 +4,8 @@ import { LayoutDashboard, Clock, ExternalLink, Trash2, Rocket, Plus } from 'luci
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getProjects, deleteProject } from '@/lib/supabase-projects';
-import { Project } from '@/types';
+import { getProjects, deleteProject } from '@/lib/supabase/supabase-projects';
+import { Project } from '@/lib/types';
 import { toast } from 'sonner';
 
 import { 

@@ -6,9 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import ReactMarkdown from 'react-markdown';
-import { analyzeIdea } from '@/lib/gemini-ideation';
-import { chatWithIdea } from '@/lib/gemini-chat';
-import { Mode, IdeaFeedback, Message } from '@/types';
+import { analyzeIdea } from '@/lib/gemini/gemini-ideation';
+import { chatWithIdea } from '@/lib/gemini/gemini-chat';
+import { Mode, IdeaFeedback, Message } from '@/lib/types';
 import { toast } from 'sonner';
 
 interface IdeationPageProps {

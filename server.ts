@@ -1,7 +1,10 @@
+import "dotenv/config";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
+import { getEmbedding } from "./lib/gemini/gemini-embeddings";
+import { updateSpec } from "./lib/supabase/supabase-specs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +18,25 @@ async function startServer() {
   // API Routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  app.post("/api/embed-spec", async (req, res) => {
+    try {
+      const { specId, contentToSave } = req.body;
+      if (!specId || !contentToSave) {
+        return res.status(400).json({ error: "specId and contentToSave are required" });
+      }
+
+      console.log(`Starting ingestion for specId: ${specId}`);
+      const embedding = await getEmbedding(contentToSave.substring(0, 5000));
+      await updateSpec(specId, { embedding });
+      console.log(`Vector index updated for specId: ${specId}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Embedding generation failed:", error);
+      res.status(500).json({ error: "Embedding generation failed" });
+    }
   });
 
   // Vite middleware for development

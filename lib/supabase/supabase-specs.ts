@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Spec } from '@/types';
+import { Spec } from '@/lib/types';
 
 export const getSpecsByProjectId = async (projectId: string): Promise<Spec[]> => {
   const { data, error } = await supabase

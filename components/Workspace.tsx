@@ -40,12 +40,12 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/lib/supabase';
-import { getProjectById, updateProject } from '@/lib/supabase-projects';
-import { getSpecsByProjectId, createSpec } from '@/lib/supabase-specs';
-import { getFilesByProjectId, createProjectFile, deleteProjectFile } from '@/lib/supabase-files';
-import { getLogsByProjectId, logProjectEvent } from '@/lib/supabase-logs';
-import { Project, Spec, SpecType, ProjectFile, ProjectLog } from '@/types';
+import { supabase } from '@/lib/supabase/supabase';
+import { getProjectById, updateProject } from '@/lib/supabase/supabase-projects';
+import { getSpecsByProjectId, createSpec } from '@/lib/supabase/supabase-specs';
+import { getFilesByProjectId, createProjectFile, deleteProjectFile } from '@/lib/supabase/supabase-files';
+import { getLogsByProjectId, logProjectEvent } from '@/lib/supabase/supabase-logs';
+import { Project, Spec, SpecType, ProjectFile, ProjectLog } from '@/lib/types';
 import { toast } from 'sonner';
 import { SPEC_TEMPLATES } from '@/constants/spec-templates';
 

@@ -1,5 +1,5 @@
 import { Type } from "@google/genai";
-import { IdeaFeedback, Mode } from "@/types";
+import { IdeaFeedback, Mode } from "@/lib/types";
 import { ai } from "./gemini-client";
 
 export const analyzeIdea = async (idea: string, mode: Mode): Promise<IdeaFeedback> => {

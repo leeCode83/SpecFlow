@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { ProjectFile } from '@/types';
+import { ProjectFile } from '@/lib/types';
 
 export const getFilesByProjectId = async (projectId: string): Promise<ProjectFile[]> => {
   const { data, error } = await supabase

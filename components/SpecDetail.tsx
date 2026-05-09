@@ -34,12 +34,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import ReactMarkdown from 'react-markdown';
-import { supabase } from '@/lib/supabase';
-import { getProjectById } from '@/lib/supabase-projects';
-import { getSpecById, updateSpec, getSpecsByProjectId } from '@/lib/supabase-specs';
-import { generateSpec } from '@/lib/gemini-specs';
-import { getEmbedding } from '@/lib/gemini-embeddings';
-import { Project, Spec, Message } from '@/types';
+import { supabase } from '@/lib/supabase/supabase';
+import { getProjectById } from '@/lib/supabase/supabase-projects';
+import { getSpecById, updateSpec, getSpecsByProjectId } from '@/lib/supabase/supabase-specs';
+import { generateSpec } from '@/lib/gemini/gemini-specs';
+import { Project, Spec, Message } from '@/lib/types';
 import { toast } from 'sonner';
 
 interface SpecDetailProps {
@@ -151,16 +150,11 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       if (showToast) toast.success("Spec saved successfully");
 
       // 2. Start embedding process in the background if save was successful
-      try {
-        const embedding = await getEmbedding(contentToSave.substring(0, 5000));
-        await updateSpec(specId, { embedding });
-        
-        console.log("Vector index updated");
-        // Optionally update local spec state with embedding if needed
-        setSpec(prev => prev ? { ...prev, embedding } : null);
-      } catch (embedFail) {
-        console.error("Embedding generation failed:", embedFail);
-      }
+      fetch('/api/embed-spec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ specId, contentToSave })
+      }).catch(err => console.error("Failed to trigger ingestion:", err));
 
       return true;
     } catch (error) {
@@ -373,7 +367,7 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
               <Sparkles className="w-5 h-5 text-orange-500" />
               <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Spec Generator</h2>
             </div>
-            {hasUnsavedChanges && (
+            {hasUnsavedChanges && !isConfirmOpen && (
               <Button 
                 size="sm" 
                 variant="ghost" 
@@ -474,11 +468,7 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
               Review the chat for details. This will update your current editor content.
             </DialogDescription>
           </DialogHeader>
-          <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 my-4 max-h-48 overflow-y-auto">
-            <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">Message Summary</p>
-            <p className="text-xs text-slate-300 italic">"{cleanMessage}"</p>
-          </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-0 pt-4">
             <Button 
               variant="ghost" 
               onClick={() => setIsConfirmOpen(false)} 

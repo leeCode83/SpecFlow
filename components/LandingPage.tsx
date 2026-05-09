@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { analyzeIdea } from '@/lib/gemini-ideation';
-import { supabase } from '@/lib/supabase';
-import { createProject } from '@/lib/supabase-projects';
-import { Mode, IdeaFeedback } from '@/types';
+import { analyzeIdea } from '@/lib/gemini/gemini-ideation';
+import { supabase } from '@/lib/supabase/supabase';
+import { createProject } from '@/lib/supabase/supabase-projects';
+import { Mode, IdeaFeedback } from '@/lib/types';
 import { toast } from 'sonner';
 
 interface LandingPageProps {

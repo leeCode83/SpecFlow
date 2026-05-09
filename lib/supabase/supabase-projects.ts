@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Project } from '@/types';
+import { Project } from '@/lib/types';
 
 export const getProjects = async (): Promise<Project[]> => {
   const { data, error } = await supabase

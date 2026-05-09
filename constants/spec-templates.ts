@@ -1,4 +1,4 @@
-import { SpecType } from '../types';
+import { SpecType } from '../lib/types';
 
 export const SPEC_TEMPLATES: Record<SpecType, string> = {
   Auth: `# Authentication & Authorization Specification

@@ -1,4 +1,4 @@
-import { Message } from "@/types";
+import { Message } from "@/lib/types";
 import { ai } from "./gemini-client";
 
 export const chatWithIdea = async (
