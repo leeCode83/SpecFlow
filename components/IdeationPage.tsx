@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import ReactMarkdown from 'react-markdown';
 import { analyzeIdea } from '@/lib/gemini/gemini-ideation';
 import { chatWithIdea } from '@/lib/gemini/gemini-chat';
+import { simplifyProjectDescription } from '@/lib/gemini/gemini-simplify';
 import { Mode, IdeaFeedback, Message } from '@/lib/types';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatting, setChatting] = useState(false);
+  const [isStructuring, setIsStructuring] = useState(false);
 
   const handleAnalyze = async () => {
     if (!idea.trim()) return toast.error("Please describe your idea first");
@@ -65,14 +67,26 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
     }
   };
 
-  const handleCreateProject = () => {
+  const handleCreateProject = async () => {
     if (!feedback) return;
+    setIsStructuring(true);
     let fullDescription = (feedback.refinedIdea?.oneLiner || '') + '\n\n' + (feedback.refinedIdea?.problem || '') + '\n\nTarget User: ' + (feedback.refinedIdea?.targetUser || '');
-    if (chatMessages.length > 0) {
-      fullDescription += '\n\nElaboration History:\n' + chatMessages.map(m => `${m.role === 'user' ? 'You' : 'AI'}: ${m.content}`).join('\n');
+    
+    try {
+      if (chatMessages.length > 0) {
+        fullDescription = await simplifyProjectDescription(idea, feedback, chatMessages);
+      }
+        
+      onCreateProject(undefined, feedback.refinedIdea?.title || idea.split(' ').slice(0, 5).join(' ') + '...', fullDescription, feedback, mode);
+    } catch (e) {
+      toast.error('Failed to simplify description. Creating anyway with raw data.');
+      if (chatMessages.length > 0) {
+        fullDescription += '\n\nElaboration History:\n' + chatMessages.map(m => `${m.role === 'user' ? 'You' : 'AI'}: ${m.content}`).join('\n');
+      }
+      onCreateProject(undefined, feedback.refinedIdea?.title || idea.split(' ').slice(0, 5).join(' ') + '...', fullDescription, feedback, mode);
+    } finally {
+      setIsStructuring(false);
     }
-      
-    onCreateProject(undefined, feedback.refinedIdea?.title || idea.split(' ').slice(0, 5).join(' ') + '...', fullDescription, feedback, mode);
   };
 
   const getTechStackList = () => {
@@ -202,7 +216,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
             animate={{ opacity: 1, scale: 1 }}
             className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
           >
-            <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+            <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-6">
                 <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl space-y-6">
                   <div className="space-y-2">
                     <h3 className="text-xl font-bold flex items-center gap-2">
@@ -272,7 +286,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
                 </Card>
             </div>
 
-            <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6 sticky top-24 h-[100vh] max-h-[85vh]">
+            <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 sticky top-24 h-[100vh] max-h-[85vh]">
                 <div className="flex-1 min-h-0 bg-slate-900/80 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative w-full">
                    <div className="p-4 border-b border-slate-800 bg-slate-950/50 flex flex-col gap-1 z-10 shrink-0">
                       <div className="flex flex-row gap-3 items-center">
@@ -298,10 +312,20 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
 
                 <Button 
                     onClick={handleCreateProject} 
+                    disabled={isStructuring}
                     className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-lg shrink-0"
                 >
-                    Ready to Build!
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    {isStructuring ? (
+                        <>
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            Structuring Requirements...
+                        </>
+                    ) : (
+                        <>
+                            Ready to Build!
+                            <ArrowRight className="w-5 h-5 ml-2" />
+                        </>
+                    )}
                 </Button>
             </div>
           </motion.div>

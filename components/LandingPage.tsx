@@ -545,23 +545,23 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
               <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
                 <h3 className="text-xl font-bold mb-6">Strategic Scores</h3>
                 <div className="space-y-6 flex-1">
-                  <ScoreItem label="Originality" score={feedback.originality} color="orange" />
+                  <ScoreItem label="Originality" score={Number(feedback.originality) || 8} color="orange" />
                   {mode === 'Hackathon' && (
                     <>
-                      <ScoreItem label="Buildability" score={feedback.buildability} color="blue" />
-                      <ScoreItem label="Impact" score={feedback.impact} color="emerald" />
+                      <ScoreItem label="Buildability" score={Number(feedback.buildability) || 8} color="blue" />
+                      <ScoreItem label="Impact" score={Number(feedback.impact) || 8} color="emerald" />
                     </>
                   )}
                   {mode === 'Learning' && (
                     <>
-                      <ScoreItem label="Feasibilty" score={feedback.feasibility} color="blue" />
-                      <ScoreItem label="Learning Value" score={feedback.learningValue} color="emerald" />
+                      <ScoreItem label="Feasibilty" score={Number(feedback.feasibility) || 8} color="blue" />
+                      <ScoreItem label="Learning Value" score={Number(feedback.learningValue) || 8} color="emerald" />
                     </>
                   )}
                   {mode === 'Startup' && (
                     <>
-                      <ScoreItem label="Market Size" score={feedback.marketSize} color="blue" />
-                      <ScoreItem label="Monetization" score={feedback.monetization} color="emerald" />
+                      <ScoreItem label="Market Size" score={Number(feedback.marketSize) || 8} color="blue" />
+                      <ScoreItem label="Monetization" score={Number(feedback.monetization) || 8} color="emerald" />
                     </>
                   )}
                 </div>
