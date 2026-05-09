@@ -6,6 +6,15 @@
 export type Mode = 'Learning' | 'Hackathon' | 'Startup';
 
 export interface BaseModeFeedback {
+  summary?: string;
+  nextSteps?: string[];
+  originality?: string | number;
+  buildability?: string | number;
+  impact?: string | number;
+  feasibility?: string | number;
+  learningValue?: string | number;
+  marketSize?: string | number;
+  monetization?: string | number;
   refinedIdea: {
     title: string;
     oneLiner: string;
@@ -20,6 +29,7 @@ export interface BaseModeFeedback {
     tools?: Array<{ tech: string; reason: string }>;
     readyLibraries?: Array<{ lib: string; saves: string }>;
     criticalIntegrations?: string[];
+    ai?: Array<{ tech: string; reason: string }>;
   };
 }
 

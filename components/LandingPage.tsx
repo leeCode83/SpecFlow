@@ -507,15 +507,15 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
                   <div className="space-y-2">
                     <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Tech Stack</h4>
                     <div className="flex flex-wrap gap-2">
-                      {feedback.techStack.frontend.map(t => <Badge key={t} variant="outline" className="bg-blue-500/5 border-blue-500/20 text-blue-400">{t}</Badge>)}
-                      {feedback.techStack.backend.map(t => <Badge key={t} variant="outline" className="bg-purple-500/5 border-purple-500/20 text-purple-400">{t}</Badge>)}
-                      {feedback.techStack.ai?.map(t => <Badge key={t} variant="outline" className="bg-emerald-500/5 border-emerald-500/20 text-emerald-400">{t}</Badge>)}
+                      {feedback.techStack.frontend?.map(t => <Badge key={t.tech} variant="outline" className="bg-blue-500/5 border-blue-500/20 text-blue-400">{t.tech}</Badge>)}
+                      {feedback.techStack.backend?.map(t => <Badge key={t.tech} variant="outline" className="bg-purple-500/5 border-purple-500/20 text-purple-400">{t.tech}</Badge>)}
+                      {feedback.techStack.ai?.map(t => <Badge key={t.tech} variant="outline" className="bg-emerald-500/5 border-emerald-500/20 text-emerald-400">{t.tech}</Badge>)}
                     </div>
                   </div>
                   <div className="space-y-2">
                     <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Next Steps</h4>
                     <ul className="text-sm text-slate-400 space-y-1">
-                      {feedback.nextSteps.map((step, i) => (
+                      {feedback.nextSteps?.map((step, i) => (
                         <li key={i} className="flex gap-2">
                           <span className="text-orange-500 font-bold">0{i+1}.</span>
                           {step}

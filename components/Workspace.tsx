@@ -34,8 +34,10 @@ import {
   FilePlus,
   GitBranch,
   Edit2,
-  ChevronRight
+  ChevronRight,
+  Info
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -106,6 +108,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [uploading, setUploading] = useState(false);
   const [logFilter, setLogFilter] = useState({ user: 'All', action: 'All' });
+  const [showDescription, setShowDescription] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -477,6 +480,10 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
               {project?.github_url ? 'Change Repo' : 'Link GitHub'}
             </Button>
           )}
+          <Button variant="outline" onClick={() => setShowDescription(true)} className="gap-2 border-slate-800 text-xs py-1 h-9">
+            <Info className="w-4 h-4" />
+            View Description
+          </Button>
           <Button onClick={() => setShowAddMenu(true)} className="bg-orange-500 hover:bg-orange-600 gap-2 font-bold px-6 h-9">
             <Plus className="w-4 h-4" />
             New Spec
@@ -851,6 +858,19 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             <Button variant="ghost" onClick={() => setDeletingSpec(null)} className="text-slate-400">Cancel</Button>
             <Button onClick={handleDeleteSpec} className="bg-red-500 hover:bg-red-600 text-white">Delete</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDescription} onOpenChange={setShowDescription}>
+        <DialogContent className="w-full max-w-[84rem] bg-slate-900 border-slate-800 text-slate-100 max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-xl pb-2 border-b border-white/10">{project?.title} - Description</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto pr-2 mt-4 space-y-4">
+            <div className="markdown-body p-4 bg-slate-950/50 rounded-xl border border-white/5">
+              <ReactMarkdown>{project?.description || 'No description available.'}</ReactMarkdown>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
