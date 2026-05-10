@@ -34,7 +34,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import ReactMarkdown from 'react-markdown';
-import { supabase } from '@/lib/supabase/supabase';
+import { authenticatedFetch } from '@/lib/api-client';
 import { getProjectById } from '@/lib/supabase/supabase-projects';
 import { updateSpec, getSpecById, getSpecsByProjectId } from '@/lib/supabase/supabase-specs';
 import { generateSpec } from '@/lib/gemini/gemini-specs';
@@ -142,9 +142,8 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       if (showToast) toast.success("Spec saved successfully");
 
       // 2. Start embedding process in the background if save was successful
-      fetch('/api/embed-spec', {
+      authenticatedFetch('/api/embed-spec', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ specId, contentToSave })
       }).catch(err => console.error("Failed to generate and save embedding via API:", err));
 

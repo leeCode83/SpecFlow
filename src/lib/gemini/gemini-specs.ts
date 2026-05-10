@@ -1,4 +1,5 @@
 import { Message } from "@/lib/types";
+import { authenticatedFetch } from "@/lib/api-client";
 
 export const generateSpec = async (
   messages: Message[],
@@ -7,9 +8,8 @@ export const generateSpec = async (
   similarSpecs?: string[],
   existingProjectSpecs?: string[]
 ): Promise<string> => {
-  const res = await fetch("/api/gemini/generate-spec", {
+  const res = await authenticatedFetch("/api/gemini/generate-spec", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ messages, specType, projectContext, similarSpecs, existingProjectSpecs })
   });
   if (!res.ok) throw new Error("Failed to generate spec");

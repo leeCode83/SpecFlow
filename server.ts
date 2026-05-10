@@ -6,6 +6,9 @@ import { fileURLToPath } from "url";
 import { geminiService } from "./server/services/geminiService";
 import { updateSpec } from "./src/lib/supabase/supabase-specs";
 import { geminiRoutes } from "./server/routes/geminiRoutes";
+import { requireAuth } from "./server/middleware/auth";
+import { validateBody } from "./server/middleware/validate";
+import { EmbedSpecSchema } from "./server/schemas/geminiSchemas";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,7 +26,7 @@ async function startServer() {
 
   app.use("/api/gemini", geminiRoutes);
 
-  app.post("/api/embed-spec", async (req, res) => {
+  app.post("/api/embed-spec", requireAuth, validateBody(EmbedSpecSchema), async (req, res) => {
     try {
       const { specId, contentToSave } = req.body;
       if (!specId || !contentToSave) {

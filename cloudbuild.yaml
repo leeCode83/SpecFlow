@@ -7,7 +7,7 @@ steps:
       - '-c'
       - |
         docker build \
-          -t asia-southeast2-docker.pkg.dev/$PROJECT_ID/specflow-repo/specflow-app:$COMMIT_SHA \
+          -t asia-southeast2-docker.pkg.dev/$PROJECT_ID/specflow-repo/ideaframe:$COMMIT_SHA \
           --build-arg VITE_SUPABASE_URL=$$SUPABASE_URL \
           --build-arg VITE_SUPABASE_ANON_KEY=$$SUPABASE_ANON_KEY \
           .
@@ -15,7 +15,7 @@ steps:
 
   # 2. Push the image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/specflow-repo/specflow-app:$COMMIT_SHA']
+    args: ['push', 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/specflow-repo/ideaframe:$COMMIT_SHA']
 
   # 3. Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -23,9 +23,9 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'specflow-app'
+      - 'ideaframe'
       - '--image'
-      - 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/specflow-repo/specflow-app:$COMMIT_SHA'
+      - 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/specflow-repo/ideaframe:$COMMIT_SHA'
       - '--region'
       - 'asia-southeast2'
       - '--platform'
@@ -43,7 +43,7 @@ availableSecrets:
     env: 'SUPABASE_ANON_KEY'
 
 images:
-  - 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/specflow-repo/specflow-app:$COMMIT_SHA'
+  - 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/specflow-repo/ideaframe:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
