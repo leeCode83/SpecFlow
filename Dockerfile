@@ -13,10 +13,12 @@ COPY . .
 # Build-time arguments for Vite
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
+ARG APP_URL
 
 # Set them as environment variables for the build process
 ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+ENV APP_URL=$APP_URL
 
 # Build the frontend and the server
 RUN npm run build:all
