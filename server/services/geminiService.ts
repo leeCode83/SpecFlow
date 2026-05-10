@@ -96,7 +96,7 @@ export class GeminiService {
     similarSpecs?: string[],
     existingProjectSpecs?: string[]
   ): Promise<string> {
-    const model = "gemini-3.1-pro-preview";
+    const model = "gemini-3-flash-preview";
     const history = this.truncateHistory(messages);
 
     const systemInstruction = `You are a Technical Architect. Your goal is to DISCUSS and REFINE the ${specType} specification with the user first.
