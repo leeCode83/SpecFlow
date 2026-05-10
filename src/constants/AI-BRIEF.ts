@@ -134,7 +134,7 @@ OUTPUT STRUCTURE (JSON):
       ...
     ],
     "indirectCompetitors": ["Traditional banks", "Loan sharks"],
-    "yourMonat": "AI credit scoring using alternative data = serve underbanked segment competitors ignore",
+    "yourMoat": "AI credit scoring using alternative data = serve underbanked segment competitors ignore",
     "barriers": ["Network effects from lender partnerships", "Proprietary data moat"]
   },
   "businessModel": {

@@ -280,7 +280,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
                            <div><span className="font-bold text-slate-300 block mb-1">Market Size</span> {feedback.marketAnalysis?.marketSize}</div>
                            <div><span className="font-bold text-slate-300 block mb-1">Growth Trend</span> {feedback.marketAnalysis?.growthTrend}</div>
                            <div><span className="font-bold text-slate-300 block mb-1">Target Segment</span> {feedback.marketAnalysis?.targetSegment}</div>
-                           <div><span className="font-bold text-slate-300 block mb-1">Differentiator</span> {feedback.competitiveLandscape?.yourMonat}</div>
+                           <div><span className="font-bold text-slate-300 block mb-1">Differentiator</span> {feedback.competitiveLandscape?.yourMoat}</div>
                         </div>
                       </>
                     )}

@@ -73,7 +73,7 @@ export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) 
   };
 
   const renderLogDetails = (log: ProjectLog) => {
-    const details = log.details || {};
+    const details = (log.details as any) || {};
     const action = log.action || '';
     const actUpper = action.toUpperCase().replace(/_/g, ' ');
     

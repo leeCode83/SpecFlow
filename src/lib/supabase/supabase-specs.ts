@@ -1,5 +1,9 @@
 import { supabase } from './supabase';
-import { Spec } from '@/lib/types';
+import { Spec, CreateSpecInput, UpdateSpecInput } from '@/lib/types';
+
+/**
+ * Service for managing project specifications (Specs) in Supabase.
+ */
 
 export const getSpecsByProjectId = async (projectId: string): Promise<Spec[]> => {
   const { data, error } = await supabase
@@ -23,7 +27,11 @@ export const getSpecById = async (id: string): Promise<Spec> => {
   return data;
 };
 
-export const createSpec = async (spec: Partial<Spec>): Promise<Spec> => {
+/**
+ * Creates a new specification.
+ * @param spec - The specification data to insert.
+ */
+export const createSpec = async (spec: CreateSpecInput): Promise<Spec> => {
   const { data, error } = await supabase
     .from('specs')
     .insert(spec)
@@ -34,7 +42,12 @@ export const createSpec = async (spec: Partial<Spec>): Promise<Spec> => {
   return data;
 };
 
-export const updateSpec = async (id: string, updates: Partial<Spec>): Promise<void> => {
+/**
+ * Updates an existing specification.
+ * @param id - The ID of the spec to update.
+ * @param updates - The fields to update.
+ */
+export const updateSpec = async (id: string, updates: UpdateSpecInput): Promise<void> => {
   const { error } = await supabase
     .from('specs')
     .update(updates)

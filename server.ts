@@ -4,6 +4,12 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import { geminiRoutes } from "./server/routes/geminiRoutes";
+import { errorHandler } from "./server/middleware/errorHandler";
+
+/**
+ * Main Server Entry Point
+ * Handles API routes and serves the frontend in production or through Vite in development.
+ */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,6 +26,9 @@ async function startServer() {
   });
 
   app.use("/api/gemini", geminiRoutes);
+
+  // Global Error Handler (must be after routes)
+  app.use(errorHandler);
 
 
   // Vite middleware for development

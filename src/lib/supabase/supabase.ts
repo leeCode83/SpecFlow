@@ -1,4 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
+import type { IdeaFeedback } from '../types';
+
+/**
+ * Supabase client and database schema definitions.
+ */
 
 const getEnv = (key: string) => {
   if (typeof process !== 'undefined' && process.env && process.env[key]) {
@@ -36,7 +41,7 @@ export interface Database {
           description: string;
           mode: string;
           teammates: string[];
-          refined_idea_json: any;
+          refined_idea_json: IdeaFeedback | null; // AI-generated feedback in JSON format
           created_at: string;
         };
         Insert: {
@@ -46,7 +51,7 @@ export interface Database {
           description: string;
           mode: string;
           teammates?: string[];
-          refined_idea_json?: any;
+          refined_idea_json?: IdeaFeedback | null;
           created_at?: string;
         };
       };

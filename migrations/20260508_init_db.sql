@@ -32,8 +32,8 @@ create table specs (
 
 -- Index for project_id
 create index idx_specs_project_id on specs(project_id);
--- HNSW Index for vector search (optional but good for performance)
--- create index on specs using hnsw (embedding vector_cosine_ops);
+-- HNSW Index for vector search (Provides efficient similarity search)
+create index on specs using hnsw (embedding vector_cosine_ops);
 
 -- 3. Enable RLS
 alter table projects enable row level security;
