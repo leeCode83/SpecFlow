@@ -70,6 +70,8 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentContentRef = useRef(content);
+  const similarSpecsCache = useRef<Record<string, SimilarSpec[]>>({});
+  const projectSpecsCache = useRef<Spec[] | null>(null);
 
   useEffect(() => {
     if (spec) {
@@ -185,7 +187,16 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
       if (project?.user_id) {
         // Build the context from requirement + conversation
         const queryContext = updatedMessages.map(m => m.content).join("\\n");
-        const results = await retrieveSimilarSpecs(queryContext, spec?.type || 'Custom', project.user_id, 3);
+        const cacheKey = `${queryContext}-${spec?.type || 'Custom'}`;
+        
+        let results: SimilarSpec[];
+        if (similarSpecsCache.current[cacheKey]) {
+          results = similarSpecsCache.current[cacheKey];
+        } else {
+          results = await retrieveSimilarSpecs(queryContext, spec?.type || 'Custom', project.user_id, 3);
+          similarSpecsCache.current[cacheKey] = results;
+        }
+        
         setSimilarSpecs(results); // For UI sidebar
         
         if (results.length > 0) {
@@ -197,7 +208,14 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
         }
         
         // Fetch existing specs in the *same* project to ensure compatibility
-        const allSpecsInProject = await getSpecsByProjectId(projectId);
+        let allSpecsInProject: Spec[];
+        if (projectSpecsCache.current) {
+          allSpecsInProject = projectSpecsCache.current;
+        } else {
+          allSpecsInProject = await getSpecsByProjectId(projectId);
+          projectSpecsCache.current = allSpecsInProject;
+        }
+        
         const otherSpecs = allSpecsInProject.filter(s => s.id !== specId);
         
         if (otherSpecs.length > 0) {

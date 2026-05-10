@@ -7,18 +7,40 @@ const ai = new GoogleGenAI({
 });
 
 export class GeminiService {
+  private async withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3): Promise<T> {
+    let lastError: any;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return await fn();
+      } catch (error: any) {
+        lastError = error;
+        // Check for common retryable errors (429, 5xx)
+        // Note: @google/genai might throw errors with status code in different ways
+        const status = error?.status || error?.response?.status;
+        if (status === 429 || (status >= 500 && status <= 599)) {
+          const delay = Math.pow(2, i) * 1000;
+          console.warn(`Gemini API error ${status}. Retrying in ${delay}ms... (Attempt ${i + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw lastError;
+  }
+
   async analyzeIdea(idea: string, mode: Mode): Promise<IdeaFeedback> {
     const model = "gemini-3-flash-preview";
     const systemInstruction = IDEATION_PROMPTS[mode.toLowerCase() as keyof typeof IDEATION_PROMPTS];
 
-    const response = await ai.models.generateContent({
+    const response = await this.withRetry(() => ai.models.generateContent({
       model,
       contents: idea,
       config: {
         systemInstruction,
         responseMimeType: "application/json",
       },
-    });
+    }));
 
     const parsed = JSON.parse(response.text || '{}');
     return { ...parsed, mode } as IdeaFeedback;
@@ -29,11 +51,11 @@ export class GeminiService {
     const systemInstruction = `You are a helpful product strategist consultant. The user wants to build an app based on this idea: "${idea}" with mode "${mode}".
   Your goal is to help them refine, elaborate, and solidify their project idea. Ask clarifying questions, suggest features, and help them arrive at a clear project title and description.`;
 
-    const response = await ai.models.generateContent({
+    const response = await this.withRetry(() => ai.models.generateContent({
       model,
       contents: JSON.stringify(messages),
       config: { systemInstruction },
-    });
+    }));
 
     return response.text || '';
   }
@@ -68,11 +90,11 @@ export class GeminiService {
   Similar past specs from you/others (for reference/ideas): ${similarSpecs?.join('\n\n') || 'None'}
   `;
 
-    const response = await ai.models.generateContent({
+    const response = await this.withRetry(() => ai.models.generateContent({
       model,
       contents: JSON.stringify(messages),
       config: { systemInstruction },
-    });
+    }));
 
     return response.text || '';
   }
@@ -110,27 +132,27 @@ Target User: ${analysisFeedback.refinedIdea?.targetUser || ""}
 ${chatMessages.length > 0 ? chatMessages.map(m => `**${m.role === 'user' ? 'User' : 'AI Consultant'}**: ${m.content}`).join('\n') : "No elaboration conversation."}
   `;
 
-    const response = await ai.models.generateContent({
+    const response = await this.withRetry(() => ai.models.generateContent({
       model: model,
       contents: inputContext,
       config: {
         systemInstruction: systemPrompt,
         temperature: 0.7,
       }
-    });
+    }));
 
     return response.text || "Failed to generate refined description.";
   }
 
   async getEmbedding(text: string): Promise<number[]> {
     const model = "gemini-embedding-001";
-    const result = await ai.models.embedContent({
+    const result = await this.withRetry(() => ai.models.embedContent({
       model,
       contents: text,
       config: {
         outputDimensionality: 768
       }
-    });
+    }));
     return (result.embeddings?.[0]?.values as number[]) || [];
   }
 }

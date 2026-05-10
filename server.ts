@@ -3,12 +3,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
-import { geminiService } from "./server/services/geminiService";
-import { updateSpec } from "./src/lib/supabase/supabase-specs";
 import { geminiRoutes } from "./server/routes/geminiRoutes";
-import { requireAuth } from "./server/middleware/auth";
-import { validateBody } from "./server/middleware/validate";
-import { EmbedSpecSchema } from "./server/schemas/geminiSchemas";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,24 +21,6 @@ async function startServer() {
 
   app.use("/api/gemini", geminiRoutes);
 
-  app.post("/api/embed-spec", requireAuth, validateBody(EmbedSpecSchema), async (req, res) => {
-    try {
-      const { specId, contentToSave } = req.body;
-      if (!specId || !contentToSave) {
-        return res.status(400).json({ error: "specId and contentToSave are required" });
-      }
-
-      console.log(`Starting ingestion for specId: ${specId}`);
-      const embedding = await geminiService.getEmbedding(contentToSave.substring(0, 5000));
-      await updateSpec(specId, { embedding });
-      console.log(`Vector index updated for specId: ${specId}`);
-      
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Embedding generation failed:", error);
-      res.status(500).json({ error: "Embedding generation failed" });
-    }
-  });
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {

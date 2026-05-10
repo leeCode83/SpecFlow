@@ -40,9 +40,9 @@ IdeaFrame adalah platform spec-driven development yang menggunakan **React 19 + 
 - **Build coupling:** Backend code mengimpor frontend code → tsup build bisa bermasalah jika ada browser-only API.
 
 **Aksi:**
-- Buat **server-side Supabase client** terpisah di `server/lib/supabase.ts` menggunakan `SUPABASE_SERVICE_ROLE_KEY`
-- Server-side operations (embed, update spec) harus melewati service-role client
-- Tambahkan `SUPABASE_SERVICE_ROLE_KEY` ke `.env.example` dan Secret Manager
+- Buat **server-side Supabase client** terpisah di `server/lib/supabase.ts` menggunakan `VITE_SUPABASE_SERVICE_ROLE_KEY`
+- Pisahkan route `/api/embed-spec` ke `server/routes/geminiRoutes.ts` dan hapus dari `server.ts`
+- Tambahkan `VITE_SUPABASE_SERVICE_ROLE_KEY` ke `.env.example` dan Secret Manager
 
 ---
 

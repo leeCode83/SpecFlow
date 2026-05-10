@@ -96,9 +96,11 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
       if (Array.isArray(techArray)) {
         techArray.forEach(t => {
           if (typeof t === 'string') list.push(t);
-          else if (t.tech) list.push(t.tech);
-          else if (t.lib) list.push(t.lib);
-          else list.push(JSON.stringify(t));
+          else if (typeof t === 'object' && t !== null) {
+            if ('tech' in t) list.push((t as any).tech);
+            else if ('lib' in t) list.push((t as any).lib);
+            else list.push(JSON.stringify(t));
+          }
         });
       }
     });

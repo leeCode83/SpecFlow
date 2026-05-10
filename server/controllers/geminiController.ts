@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { geminiService } from "../services/geminiService";
+import { specService } from "../services/specService";
 
 export class GeminiController {
   async analyzeIdea(req: Request, res: Response) {
@@ -60,6 +61,22 @@ export class GeminiController {
     } catch (error) {
       console.error('Error generating embedding:', error);
       res.status(500).json({ error: 'Failed to generate embedding' });
+    }
+  }
+
+  async embedSpec(req: Request, res: Response) {
+    try {
+      const { specId, contentToSave } = req.body;
+      
+      console.log(`Starting ingestion for specId: ${specId}`);
+      const embedding = await geminiService.getEmbedding(contentToSave.substring(0, 5000));
+      await specService.updateSpec(specId, { embedding });
+      console.log(`Vector index updated for specId: ${specId}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Embedding generation failed:", error);
+      res.status(500).json({ error: "Embedding generation failed" });
     }
   }
 }
