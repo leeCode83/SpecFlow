@@ -9,6 +9,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { Progress } from '@/components/ui/progress';
+
 interface FileListProps {
   files: ProjectFile[];
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
@@ -63,6 +65,16 @@ export function FileList({
           onChange={handleFileChange} 
         />
       </div>
+
+      {uploading && (
+        <div className="space-y-2 animate-in fade-in slide-in-from-top-1">
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span>Uploading your file...</span>
+            <span className="animate-pulse">Please wait</span>
+          </div>
+          <Progress />
+        </div>
+      )}
 
       <TooltipProvider delay={200}>
         <div className="flex flex-col space-y-2">
