@@ -231,9 +231,7 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
       {/* Navigation Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <div className="bg-orange-500 rounded-lg p-1.5">
-            <Rocket className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.png" alt="IdeaFrame" className="w-7 h-7" />
           <span className="font-bold tracking-tight text-xl italic">IdeaFrame</span>
         </div>
         <div className="flex gap-4">

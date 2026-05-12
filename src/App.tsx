@@ -188,9 +188,7 @@ export default function App() {
                 setView('landing');
               }}
             >
-              <div className="bg-orange-500 rounded-lg p-1.5 group-hover:scale-105 transition-transform">
-                <Rocket className="w-5 h-5 text-white" />
-              </div>
+              <img src="/logo.png" alt="IdeaFrame" className="w-7 h-7 group-hover:scale-105 transition-transform" />
               <span className="font-bold tracking-tight text-xl group-hover:text-orange-400 transition-colors">IdeaFrame</span>
             </div>
 
