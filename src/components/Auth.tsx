@@ -206,7 +206,7 @@ export function Auth({ onBack }: { onBack?: () => void }) {
                 disabled={loading}
               >
                 <Chrome className="w-5 h-5 text-red-500" />
-                Google Workspace
+                Google
               </Button>
 
               <Button 
@@ -216,7 +216,7 @@ export function Auth({ onBack }: { onBack?: () => void }) {
                 disabled={loading}
               >
                 <Github className="w-5 h-5 text-white" />
-                GitHub (Public Repos)
+                Github
               </Button>
             </div>
           </Tabs>
