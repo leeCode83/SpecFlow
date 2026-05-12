@@ -29,6 +29,19 @@ export const isSupabaseConfigured = () => {
   return !!supabaseUrl && !!supabaseAnonKey && supabaseUrl !== 'https://placeholder.supabase.co';
 };
 
+// Server-side admin client (bypasses RLS)
+const supabaseUrlServer = process.env.SUPABASE_URL || supabaseUrl;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+export const supabaseAdmin = supabaseServiceKey
+  ? createClient(supabaseUrlServer, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  : supabase; // Fallback to anon client if service key not available
+
 // Types for the database tables
 export interface Database {
   public: {
@@ -75,6 +88,46 @@ export interface Database {
           status?: string;
           embedding?: number[] | null;
           created_at?: string;
+        };
+      };
+      profiles: {
+        Row: {
+          id: string;
+          email: string;
+          full_name: string | null;
+          avatar_url: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          email: string;
+          full_name?: string | null;
+          avatar_url?: string | null;
+          created_at?: string;
+        };
+      };
+      project_invitations: {
+        Row: {
+          id: string;
+          project_id: string;
+          email: string;
+          token: string;
+          status: 'pending' | 'accepted' | 'declined' | 'expired';
+          expires_at: string;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          email: string;
+          token?: string;
+          status?: 'pending' | 'accepted' | 'declined' | 'expired';
+          expires_at: string;
+          created_by: string;
+          created_at?: string;
+          updated_at?: string;
         };
       };
     };

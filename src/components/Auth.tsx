@@ -59,7 +59,6 @@ export function Auth({ onBack }: { onBack?: () => void }) {
           skipBrowserRedirect: true,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
           },
           redirectTo: process.env.APP_URL || window.location.origin,
         },

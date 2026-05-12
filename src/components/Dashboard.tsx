@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { getProjects } from '@/lib/supabase/supabase-projects';
 import { getAllRecentLogs } from '@/lib/supabase/supabase-logs';
 import { Project, ProjectLog } from '@/lib/types';
+import { PendingInvitations } from './workspace/PendingInvitations';
 import { toast } from 'sonner';
 
 interface DashboardProps {
@@ -217,6 +218,11 @@ export function Dashboard({ onSelectProject, onCreateProject }: DashboardProps) 
           </Card>
         </motion.div>
       </div>
+
+      {/* Pending Invitations Banner */}
+      <PendingInvitations onInvitationAccepted={() => {
+        fetchDashboardData(page);
+      }} />
 
       <div className="space-y-6">
         <div className="flex items-center gap-3">

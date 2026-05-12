@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { HardDrive, Activity } from 'lucide-react';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
+import { parseGithubUrl } from '@/lib/github/github-client';
 
 // Modular Components
 import { WorkspaceHeader } from './workspace/WorkspaceHeader';
@@ -11,6 +12,8 @@ import { SpecList } from './workspace/SpecList';
 import { LogPanel } from './workspace/LogPanel';
 import { FileList } from './workspace/FileList';
 import { TeamList } from './workspace/TeamList';
+import { RepoBrowser } from './workspace/RepoBrowser';
+import { InviteMemberModal } from './workspace/InviteMemberModal';
 
 interface WorkspaceProps {
   projectId: string;
@@ -33,6 +36,8 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
     logs,
     loading,
     currentUser,
+    githubRepo,
+    githubTokenAvailable,
     logPage,
     setLogPage,
     logTotalPages,
@@ -42,12 +47,16 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
     handleFileUpload,
     deleteFile,
     updateGithubUrl,
+    syncGithubUrl,
     addMember,
     removeMember
   } = useWorkspaceData(projectId);
 
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [browseRepoOpen, setBrowseRepoOpen] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const isOwner = project?.user_id === currentUser?.id;
+  const githubFullName = project?.github_url ? parseGithubUrl(project.github_url) : null;
 
   if (loading) {
     return (
@@ -66,7 +75,11 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
         </Button>
         <WorkspaceHeader 
           project={project} 
+          githubRepo={githubRepo}
+          githubTokenAvailable={githubTokenAvailable}
           onUpdateGithub={updateGithubUrl}
+          onSyncGithub={syncGithubUrl}
+          onBrowseRepo={() => setBrowseRepoOpen(true)}
           onNewSpec={() => setShowAddMenu(true)}
         />
       </div>
@@ -95,6 +108,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             currentUserId={currentUser?.id}
             onAddMember={addMember}
             onRemoveMember={removeMember}
+            onOpenInviteModal={() => setInviteModalOpen(true)}
           />
         </div>
 
@@ -136,6 +150,22 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
           </Tabs>
         </div>
       </div>
+      {/* Repo Browser Modal */}
+      {githubFullName && (
+        <RepoBrowser
+          open={browseRepoOpen}
+          onOpenChange={setBrowseRepoOpen}
+          fullName={githubFullName}
+        />
+      )}
+      {/* Invite Member Modal */}
+      {inviteModalOpen && project && (
+        <InviteMemberModal
+          projectId={project.id}
+          isOwner={isOwner}
+          onClose={() => setInviteModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/supabase';
 import { User } from '@supabase/supabase-js';
-import { Project, Spec, ProjectFile, ProjectLog, SpecType } from '@/lib/types';
+import { Project, Spec, ProjectFile, ProjectLog, SpecType, GithubRepoData } from '@/lib/types';
 import { getSpecsByProjectId, createSpec, updateSpec, deleteSpec as deleteSpecService } from '@/lib/supabase/supabase-specs';
 import { getFilesByProjectId, createProjectFile, deleteProjectFile } from '@/lib/supabase/supabase-files';
 import { getLogsByProjectId, logProjectEvent } from '@/lib/supabase/supabase-logs';
 import { updateProject } from '@/lib/supabase/supabase-projects';
 import { SPEC_TEMPLATES } from '@/constants/spec-templates';
+import { syncRepo, getRepoStatus, parseGithubUrl } from '@/lib/github/github-client';
 import { toast } from 'sonner';
 
 /**
@@ -21,6 +22,8 @@ export function useWorkspaceData(projectId: string) {
   const [logPage, setLogPage] = useState(1);
   const [logTotalPages, setLogTotalPages] = useState(1);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [githubRepo, setGithubRepo] = useState<GithubRepoData | null>(null);
+  const [githubTokenAvailable, setGithubTokenAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [creationLoading, setCreationLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -31,6 +34,7 @@ export function useWorkspaceData(projectId: string) {
     async function getSession() {
       const { data: { session } } = await supabase.auth.getSession();
       setCurrentUser(session?.user ?? null);
+      setGithubTokenAvailable(!!session?.provider_token || !!sessionStorage.getItem("github_oauth_token"));
     }
     getSession();
   }, []);
@@ -60,7 +64,7 @@ export function useWorkspaceData(projectId: string) {
       if (projectError) throw projectError;
       setProject(projectData);
 
-      // Fetch specs and files in parallel
+      // Fetch specs, files, and github data in parallel
       const [specsData, filesData] = await Promise.all([
         getSpecsByProjectId(projectId),
         getFilesByProjectId(projectId)
@@ -68,6 +72,16 @@ export function useWorkspaceData(projectId: string) {
 
       setSpecs(specsData);
       setFiles(filesData);
+
+      // Fetch GitHub repo status if URL is set
+      if (projectData?.github_url) {
+        const fullName = parseGithubUrl(projectData.github_url);
+        if (fullName) {
+          getRepoStatus(projectId).then(data => {
+            if (data) setGithubRepo(data);
+          }).catch(() => { /* silently fail */ });
+        }
+      }
     } catch (error) {
       console.error('Error loading workspace data:', error);
       toast.error('Failed to load workspace data');
@@ -196,8 +210,36 @@ export function useWorkspaceData(projectId: string) {
       setProject(p => p ? { ...p, github_url: url } : null);
       logAction('Update GitHub', { url });
       toast.success("GitHub URL updated");
+
+      // Auto-sync if valid GitHub URL
+      const fullName = parseGithubUrl(url);
+      if (fullName) {
+        try {
+          const data = await syncRepo(projectId, fullName);
+          setGithubRepo(data);
+          logAction('Sync GitHub', { fullName });
+          toast.success("Repository synced!");
+        } catch (syncErr: any) {
+          toast.error(syncErr.message || "Failed to sync repository");
+        }
+      } else {
+        setGithubRepo(null);
+      }
     } catch (error) {
       toast.error("Failed to update GitHub URL");
+    }
+  };
+
+  const syncGithubUrl = async (fullName: string) => {
+    try {
+      const data = await syncRepo(projectId, fullName);
+      setGithubRepo(data);
+      logAction('Sync GitHub', { fullName });
+      toast.success("Repository synced!");
+      return data;
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sync repository");
+      throw error;
     }
   };
 
@@ -236,6 +278,8 @@ export function useWorkspaceData(projectId: string) {
     logPage,
     logTotalPages,
     currentUser,
+    githubRepo,
+    githubTokenAvailable,
     loading,
     creationLoading,
     uploading,
@@ -249,5 +293,6 @@ export function useWorkspaceData(projectId: string) {
     addMember,
     removeMember,
     refreshLogs: loadLogs,
+    syncGithubUrl,
   };
 }

@@ -129,6 +129,45 @@ export interface Project {
   created_at: string;
 }
 
+export interface ProjectGithub {
+  id: string;
+  project_id: string;
+  full_name: string;
+  description: string | null;
+  stars: number;
+  language: string | null;
+  topics: string[];
+  default_branch: string;
+  fetched_at: string;
+}
+
+export interface GithubContentItem {
+  name: string;
+  path: string;
+  type: "file" | "dir";
+  size: number;
+}
+
+export interface GithubFileContent {
+  content: string;
+  size: number;
+  sha: string;
+}
+
+export interface GithubRepoData {
+  fullName: string;
+  description: string | null;
+  stars: number;
+  language: string | null;
+  topics: string[];
+  defaultBranch: string;
+}
+
+export interface GithubPRResult {
+  prUrl: string;
+  prNumber: number;
+}
+
 export interface ProjectFile {
   id: string;
   project_id: string;

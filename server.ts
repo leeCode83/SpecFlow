@@ -4,6 +4,10 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import { geminiRoutes } from "./server/routes/geminiRoutes";
+import { githubRoutes } from "./server/routes/githubRoutes";
+
+import { invitationRoutes, projectInvitationRoutes } from "./server/routes/invitationRoutes";
+import { userRoutes } from "./server/routes/userRoutes";
 import { errorHandler } from "./server/middleware/errorHandler";
 
 /**
@@ -26,7 +30,10 @@ async function startServer() {
   });
 
   app.use("/api/gemini", geminiRoutes);
-
+  app.use("/api/github", githubRoutes);
+  app.use("/api/invitations", invitationRoutes);
+  app.use("/api/projects", projectInvitationRoutes);
+  app.use("/api/users", userRoutes);
   // Global Error Handler (must be after routes)
   app.use(errorHandler);
 

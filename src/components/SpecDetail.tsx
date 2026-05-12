@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSpecChat } from '@/hooks/useSpecChat';
 import { toast } from 'sonner';
+import { parseGithubUrl, createSpecPR } from '@/lib/github/github-client';
 
 // Modular Components
 import { SpecHeader } from './spec-detail/SpecHeader';
@@ -42,6 +43,33 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
     currentContentRef
   } = useSpecChat(specId, projectId);
 
+  const [pushingPR, setPushingPR] = useState(false);
+  const githubFullName = project?.github_url ? parseGithubUrl(project.github_url) : null;
+
+  const handlePushPR = async () => {
+    if (!githubFullName || !spec) return;
+    setPushingPR(true);
+    try {
+      const result = await createSpecPR(
+        githubFullName,
+        spec.title,
+        content,
+        spec.type
+      );
+      toast.success(
+        <div className="flex items-center gap-2">
+          <span>PR created!</span>
+          <a href={result.prUrl} target="_blank" rel="noreferrer" className="underline font-bold">View PR #{result.prNumber}</a>
+        </div>,
+        { duration: 8000 }
+      );
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create pull request");
+    } finally {
+      setPushingPR(false);
+    }
+  };
+
   // Handle auto-save on exit
   const handleBackAndSave = async () => {
     if (hasUnsavedChanges) {
@@ -69,9 +97,12 @@ export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
         title={title}
         hasUnsavedChanges={hasUnsavedChanges}
         saving={saving}
+        pushingPR={pushingPR}
+        githubFullName={githubFullName}
         onBack={handleBackAndSave}
         onSave={() => handleSave(content, true)}
         onUpdateTitle={handleUpdateTitle}
+        onPushPR={handlePushPR}
         content={content}
       />
 
