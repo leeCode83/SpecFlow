@@ -112,7 +112,6 @@ export function useWorkspaceData(projectId: string) {
       });
 
       setSpecs([data, ...specs]);
-      logAction('Create Spec', { title: data.title, type: type });
       onSelect(data.id);
       toast.success("Spec created");
     } catch (error) {
@@ -127,7 +126,6 @@ export function useWorkspaceData(projectId: string) {
     try {
       await deleteSpecService(spec.id);
       setSpecs(specs.filter(s => s.id !== spec.id));
-      logAction('Delete Spec', { title: spec.title });
       toast.success("Spec deleted");
     } catch (error) {
       console.error(error);
@@ -140,7 +138,6 @@ export function useWorkspaceData(projectId: string) {
     try {
       await updateSpec(spec.id, { title: newTitle.trim() });
       setSpecs(specs.map(s => s.id === spec.id ? { ...s, title: newTitle.trim() } : s));
-      logAction('Rename Spec', { oldTitle: spec.title, newTitle: newTitle.trim() });
       toast.success("Spec renamed");
     } catch (error) {
       console.error(error);

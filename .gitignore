@@ -42,3 +42,5 @@ vite.config.ts.timestamp-*
 
 # Preserve .env.example
 !.env.example
+# Added by code-review-graph
+.code-review-graph/
