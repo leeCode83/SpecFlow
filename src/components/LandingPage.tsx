@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { motion, LayoutGroup } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { motion, LayoutGroup, AnimatePresence } from 'motion/react';
 import Floating, { FloatingElement } from "@/components/ui/parallax-floating";
 import { TextRotate } from "@/components/ui/text-rotate";
-import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, FileCode2, MessageSquareQuote, MessageSquare, Users, Github, LayoutDashboard } from 'lucide-react';
+import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, FileCode2, MessageSquareQuote, MessageSquare, Users, Github, LayoutDashboard, CheckCircle2, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -156,11 +156,31 @@ const features = [
   },
 ];
 
+const quickPrompts = [
+  "A real-time collaborative code editor for technical interviews with AI debugging",
+  "An AI-powered personal finance tracker with budgeting and smart insights",
+  "A social marketplace for indie game developers to share assets and tools",
+  "A SaaS platform for automated social media content scheduling and analytics",
+];
+
+const subtitles = [
+  "Describe your idea in plain English — let AI do the rest.",
+  "Choose a mode: Hackathon, Startup, or Learning.",
+  "Get instant strategic scores and tech stack analysis.",
+  "Refine your blueprint with AI-powered suggestions.",
+];
+
 export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: LandingPageProps) {
   const [idea, setIdea] = useState('');
   const [mode, setMode] = useState<Mode>('Hackathon');
   const [analyzing, setAnalyzing] = useState(false);
   const [feedback, setFeedback] = useState<IdeaFeedback | null>(null);
+  const [subtitleIdx, setSubtitleIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => setSubtitleIdx((p) => (p + 1) % subtitles.length), 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleAnalyze = async () => {
     if (!idea.trim()) return toast.error("Please describe your idea first");
@@ -425,153 +445,343 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
         </section>
 
         {/* Try Ideation Section */}
-        <section className="w-full max-w-5xl mx-auto px-6 py-24 z-10">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Try the Ideation Engine</h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              Test it right here. Tell us what you want to build.
-            </p>
+        <section className="relative w-full max-w-5xl mx-auto px-6 py-24 z-10 overflow-hidden">
+          {/* Gradient Mesh Background */}
+          <div className="absolute inset-0 -z-10 pointer-events-none">
+            <div className="absolute top-[-5%] left-[20%] w-80 h-80 bg-orange-500/5 blur-[120px] rounded-full animate-[slow-drift_20s_ease-in-out_infinite]" />
+            <div className="absolute bottom-[-5%] right-[20%] w-96 h-96 bg-blue-500/5 blur-[140px] rounded-full animate-[slow-drift-reverse_25s_ease-in-out_infinite]" />
+            <div className="absolute top-[40%] left-[45%] w-64 h-64 bg-purple-500/5 blur-[100px] rounded-full animate-[slow-drift_30s_ease-in-out_infinite_reverse]" />
           </div>
 
-          <motion.div 
+          {/* Zone 1: Section Header */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative bg-slate-900/80 border border-slate-800 rounded-3xl p-6 md:p-10 shadow-2xl backdrop-blur-xl"
+            className="text-center space-y-4 mb-16"
           >
-            <div className="flex flex-wrap gap-4 mb-6">
-              <ModeButton 
-                active={mode === 'Learning'} 
-                onClick={() => setMode('Learning')} 
-                icon={<BrainCircuit className="w-4 h-4" />} 
-                label="Learning" 
-                color="blue"
-              />
-              <ModeButton 
-                active={mode === 'Hackathon'} 
-                onClick={() => setMode('Hackathon')} 
-                icon={<Zap className="w-4 h-4" />} 
-                label="Hackathon" 
-                color="orange"
-              />
-              <ModeButton 
-                active={mode === 'Startup'} 
-                onClick={() => setMode('Startup')} 
-                icon={<Target className="w-4 h-4" />} 
-                label="Startup" 
-                color="emerald"
-              />
-            </div>
-
-            <Textarea 
-              placeholder="Describe your project idea... (e.g. A real-time collaborative code editor for technical interviews with built-in AI debugging)"
-              className="min-h-[150px] bg-slate-950/50 border-slate-800 focus:border-orange-500/50 text-lg p-6 rounded-xl resize-none"
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-            />
-
-            <div className="mt-6 flex justify-end">
-              <Button 
-                size="lg" 
-                className="bg-orange-500 hover:bg-orange-600 text-white gap-2 px-8 rounded-xl font-bold h-12"
-                onClick={handleAnalyze}
-                disabled={analyzing}
-              >
-                {analyzing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Analyzing Idea...
-                  </>
-                ) : (
-                  <>
-                    Generate Analysis
-                    <Sparkles className="w-4 h-4" />
-                  </>
-                )}
-              </Button>
+            <motion.div
+              initial={{ scale: 0.85 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm font-semibold mb-4"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Live Demo
+            </motion.div>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-orange-500 to-orange-200 bg-clip-text text-transparent">Try the Ideation Engine</span>
+            </h2>
+            <div className="h-8">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={subtitleIdx}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-slate-400 text-lg max-w-2xl mx-auto"
+                >
+                  {subtitles[subtitleIdx]}
+                </motion.p>
+              </AnimatePresence>
             </div>
           </motion.div>
 
-          {feedback && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mt-8"
+          {/* Zone 2-4: Main Interactive Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="relative bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 md:p-10 shadow-2xl"
+          >
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-500/[0.02] to-transparent pointer-events-none" />
+
+            {/* Zone 2: Mode Selector */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.15 }}
+              className="flex flex-wrap gap-3 mb-6"
             >
-              <Card className="md:col-span-2 bg-slate-900/50 border-slate-800 p-8 rounded-2xl space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold flex items-center gap-2">
-                    <BrainCircuit className="w-5 h-5 text-orange-500" />
-                    Strategic Summary
-                  </h3>
-                  <p className="text-slate-400 leading-relaxed">{feedback.summary}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Tech Stack</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {feedback.techStack.frontend?.map(t => <Badge key={t.tech} variant="outline" className="bg-blue-500/5 border-blue-500/20 text-blue-400">{t.tech}</Badge>)}
-                      {feedback.techStack.backend?.map(t => <Badge key={t.tech} variant="outline" className="bg-purple-500/5 border-purple-500/20 text-purple-400">{t.tech}</Badge>)}
-                      {feedback.techStack.ai?.map(t => <Badge key={t.tech} variant="outline" className="bg-emerald-500/5 border-emerald-500/20 text-emerald-400">{t.tech}</Badge>)}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Next Steps</h4>
-                    <ul className="text-sm text-slate-400 space-y-1">
-                      {feedback.nextSteps?.map((step, i) => (
-                        <li key={i} className="flex gap-2">
-                          <span className="text-orange-500 font-bold">0{i+1}.</span>
-                          {step}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-800">
-                  <Button 
-                    onClick={onSignIn} 
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold h-14 rounded-xl"
-                  >
-                    Log In to Elaborate
-                  </Button>
-                  <Button 
-                    onClick={handleSaveProject} 
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl"
-                  >
-                    Sign In & Create Project
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </div>
-              </Card>
-
-              <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
-                <h3 className="text-xl font-bold mb-6">Strategic Scores</h3>
-                <div className="space-y-6 flex-1">
-                  <ScoreItem label="Originality" score={Number(feedback.originality) || 8} color="orange" />
-                  {mode === 'Hackathon' && (
-                    <>
-                      <ScoreItem label="Buildability" score={Number(feedback.buildability) || 8} color="blue" />
-                      <ScoreItem label="Impact" score={Number(feedback.impact) || 8} color="emerald" />
-                    </>
+              {[
+                { value: 'Learning' as Mode, icon: <BrainCircuit className="w-4 h-4" />, activeClass: 'bg-blue-500 border-blue-500 text-white shadow-lg' },
+                { value: 'Hackathon' as Mode, icon: <Zap className="w-4 h-4" />, activeClass: 'bg-orange-500 border-orange-500 text-white shadow-lg' },
+                { value: 'Startup' as Mode, icon: <Target className="w-4 h-4" />, activeClass: 'bg-emerald-500 border-emerald-500 text-white shadow-lg' },
+              ].map((m) => (
+                <motion.button
+                  key={m.value}
+                  onClick={() => setMode(m.value)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl border text-sm font-bold transition-all duration-300 ${
+                    mode === m.value ? m.activeClass : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-orange-500/50 hover:text-slate-200'
+                  }`}
+                >
+                  {m.icon}
+                  {m.value}
+                  {mode === m.value && (
+                    <motion.div
+                      layoutId="modeGlow"
+                      className="absolute inset-0 rounded-xl bg-orange-500/10 blur-sm -z-10"
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    />
                   )}
-                  {mode === 'Learning' && (
-                    <>
-                      <ScoreItem label="Feasibilty" score={Number(feedback.feasibility) || 8} color="blue" />
-                      <ScoreItem label="Learning Value" score={Number(feedback.learningValue) || 8} color="emerald" />
-                    </>
-                  )}
-                  {mode === 'Startup' && (
-                    <>
-                      <ScoreItem label="Market Size" score={Number(feedback.marketSize) || 8} color="blue" />
-                      <ScoreItem label="Monetization" score={Number(feedback.monetization) || 8} color="emerald" />
-                    </>
-                  )}
-                </div>
-              </Card>
+                </motion.button>
+              ))}
             </motion.div>
-          )}
+
+            {/* Zone 3: Input Area */}
+            <div className="relative">
+              <Textarea
+                placeholder="Describe your project idea..."
+                className="min-h-[140px] bg-slate-950/50 border-slate-800 focus:border-orange-500/50 text-lg p-6 rounded-xl resize-none transition-all duration-300"
+                value={idea}
+                onChange={(e) => setIdea(e.target.value)}
+              />
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.25 }}
+                className="flex flex-wrap gap-2 mt-4"
+              >
+                {quickPrompts.map((prompt) => (
+                  <motion.button
+                    key={prompt}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setIdea(prompt)}
+                    className="px-3 py-1.5 text-xs rounded-full bg-slate-800/40 border border-slate-700/50 text-slate-500 hover:text-slate-200 hover:border-orange-500/30 hover:bg-slate-800/60 transition-all duration-200 truncate max-w-[240px]"
+                  >
+                    <Lightbulb className="w-3 h-3 inline mr-1.5 text-orange-500/70" />
+                    {prompt}
+                  </motion.button>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Zone 4: Generate Button */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="mt-6 flex justify-end"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 rounded-xl opacity-0 group-hover:opacity-75 blur transition-all duration-500 group-hover:duration-300" />
+                <Button
+                  size="lg"
+                  className="relative bg-orange-500 hover:bg-orange-600 text-white gap-2 px-10 rounded-xl font-bold h-12 shadow-lg transition-all duration-300"
+                  onClick={handleAnalyze}
+                  disabled={analyzing}
+                >
+                  {analyzing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Analyzing</span>
+                      <span className="flex gap-1">
+                        <span className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      Generate Analysis
+                      <Sparkles className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Zone 5: Results */}
+          <AnimatePresence>
+            {feedback && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mt-8"
+              >
+                {/* Summary Card */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2, duration: 0.4 }}
+                  className="md:col-span-2"
+                >
+                  <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl space-y-6 h-full">
+                    <div className="space-y-2">
+                      <motion.h3
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-xl font-bold flex items-center gap-2"
+                      >
+                        <BrainCircuit className="w-5 h-5 text-orange-500" />
+                        Strategic Summary
+                      </motion.h3>
+                      <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-slate-400 leading-relaxed"
+                      >
+                        {feedback.summary}
+                      </motion.p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="space-y-2"
+                      >
+                        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Tech Stack</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {feedback.techStack.frontend?.map((t, i) => (
+                            <motion.span
+                              key={t.tech}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.6 + i * 0.05 }}
+                            >
+                              <Badge variant="outline" className="bg-blue-500/5 border-blue-500/20 text-blue-400">{t.tech}</Badge>
+                            </motion.span>
+                          ))}
+                          {feedback.techStack.backend?.map((t, i) => (
+                            <motion.span
+                              key={t.tech}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.6 + (feedback.techStack.frontend?.length || 0 + i) * 0.05 }}
+                            >
+                              <Badge variant="outline" className="bg-purple-500/5 border-purple-500/20 text-purple-400">{t.tech}</Badge>
+                            </motion.span>
+                          ))}
+                          {feedback.techStack.ai?.map((t, i) => (
+                            <motion.span
+                              key={t.tech}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.6 + ((feedback.techStack.frontend?.length ?? 0) + (feedback.techStack.backend?.length ?? 0) + i) * 0.05 }}
+                            >
+                              <Badge variant="outline" className="bg-emerald-500/5 border-emerald-500/20 text-emerald-400">{t.tech}</Badge>
+                            </motion.span>
+                          ))}
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.55 }}
+                        className="space-y-2"
+                      >
+                        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Next Steps</h4>
+                        <ul className="text-sm text-slate-400 space-y-2">
+                          {feedback.nextSteps?.map((step, i) => (
+                            <motion.li
+                              key={i}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.65 + i * 0.08 }}
+                              className="flex gap-2 items-start"
+                            >
+                              <CheckCircle2 className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
+                              <span>{step}</span>
+                            </motion.li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    </div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 }}
+                      className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-800"
+                    >
+                      <Button
+                        onClick={onSignIn}
+                        className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold h-14 rounded-xl transition-all duration-200"
+                      >
+                        Log In to Elaborate
+                      </Button>
+                      <Button
+                        onClick={handleSaveProject}
+                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl transition-all duration-200"
+                      >
+                        Sign In & Create Project
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </motion.div>
+                  </Card>
+                </motion.div>
+
+                {/* Scores Card - Hybrid Donut + Bar */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.25, duration: 0.4 }}
+                >
+                  <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col h-full">
+                    <motion.h3
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.35 }}
+                      className="text-xl font-bold mb-6"
+                    >
+                      Strategic Scores
+                    </motion.h3>
+                    <div className="flex-1 space-y-6">
+                      {/* Donut: Originality */}
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.45, type: "spring", stiffness: 150, damping: 15 }}
+                        className="flex flex-col items-center"
+                      >
+                        <ScoreDonut score={Number(feedback.originality) || 8} color="orange" size="lg" />
+                        <span className="text-sm font-bold text-slate-400 mt-2">Originality</span>
+                      </motion.div>
+
+                      {/* Bars: mode-specific scores */}
+                      <div className="space-y-4 pt-2 border-t border-slate-800/60">
+                        {mode === 'Hackathon' && (
+                          <>
+                            <ScoreItem label="Buildability" score={Number(feedback.buildability) || 8} color="blue" />
+                            <ScoreItem label="Impact" score={Number(feedback.impact) || 8} color="emerald" />
+                          </>
+                        )}
+                        {mode === 'Learning' && (
+                          <>
+                            <ScoreItem label="Feasibility" score={Number(feedback.feasibility) || 8} color="blue" />
+                            <ScoreItem label="Learning Value" score={Number(feedback.learningValue) || 8} color="emerald" />
+                          </>
+                        )}
+                        {mode === 'Startup' && (
+                          <>
+                            <ScoreItem label="Market Size" score={Number(feedback.marketSize) || 8} color="blue" />
+                            <ScoreItem label="Monetization" score={Number(feedback.monetization) || 8} color="emerald" />
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
 
         <section className="w-full bg-slate-900/30 border-y border-slate-800/50 py-24 overflow-hidden">
@@ -735,21 +945,43 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
   );
 }
 
-function ModeButton({ active, onClick, icon, label, color }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, color: string }) {
-  const colorMap: Record<string, string> = {
-    orange: active ? 'bg-orange-500 border-orange-500 text-white' : 'bg-slate-950 border-slate-800 hover:border-orange-500/50 text-slate-400',
-    blue: active ? 'bg-blue-500 border-blue-500 text-white' : 'bg-slate-950 border-slate-800 hover:border-blue-500/50 text-slate-400',
-    emerald: active ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-slate-950 border-slate-800 hover:border-emerald-500/50 text-slate-400',
+function ScoreDonut({ score, color, size = 'md' }: { score: number; color: 'orange' | 'blue' | 'emerald'; size?: 'sm' | 'md' | 'lg' }) {
+  const colorMap = {
+    orange: '#f97316',
+    blue: '#3b82f6',
+    emerald: '#10b981',
   };
+  const dims = { sm: 60, md: 80, lg: 100 };
+  const strokes = { sm: 5, md: 6, lg: 7 };
+  const d = dims[size];
+  const sw = strokes[size];
+  const r = (d - sw) / 2;
+  const c = 2 * Math.PI * r;
+  const off = c - (score / 10) * c;
 
   return (
-    <button 
-      onClick={onClick}
-      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border transition-all duration-200 text-sm font-bold ${colorMap[color]}`}
-    >
-      {icon}
-      {label}
-    </button>
+    <svg width={d} height={d} viewBox={`0 0 ${d} ${d}`}>
+      <circle cx={d / 2} cy={d / 2} r={r} fill="none" stroke="rgb(30,41,59)" strokeWidth={sw} />
+      <motion.circle
+        cx={d / 2} cy={d / 2} r={r}
+        fill="none" stroke={colorMap[color]}
+        strokeWidth={sw} strokeLinecap="round"
+        strokeDasharray={c}
+        initial={{ strokeDashoffset: c }}
+        animate={{ strokeDashoffset: off }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+        transform={`rotate(-90 ${d / 2} ${d / 2})`}
+      />
+      <text
+        x={d / 2} y={d / 2}
+        textAnchor="middle" dominantBaseline="central"
+        fill="rgb(226,232,240)"
+        fontSize={d * 0.32}
+        fontWeight="700"
+      >
+        {score}
+      </text>
+    </svg>
   );
 }
 
