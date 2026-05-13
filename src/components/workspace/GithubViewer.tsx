@@ -40,7 +40,7 @@ import {
 } from 'lucide-react';
 import { createHighlighter } from 'shiki';
 import { cn } from '@/lib/utils';
-import { useTheme } from 'next-themes';
+
 
 const MAX_FILE_SIZE = 500 * 1024;
 
@@ -64,8 +64,6 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
   const [highlightedHtml, setHighlightedHtml] = useState<string>('');
   const [highlighting, setHighlighting] = useState(false);
   const [treeError, setTreeError] = useState<string | null>(null);
-  const { resolvedTheme } = useTheme();
-
   const hasGithubUrl = Boolean(project.github_url);
 
   const loadRepo = useCallback(async (url: string) => {
@@ -173,7 +171,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
     async function highlight() {
       try {
         const lang = getFileLanguage(selectedFile!);
-        const shikiTheme = resolvedTheme === 'dark' ? 'one-dark-pro' : 'min-light';
+        const shikiTheme = 'github-dark-high-contrast';
 
         const highlighter = await createHighlighter({
           langs: [
@@ -205,7 +203,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
 
     highlight();
     return () => { mounted = false; };
-  }, [fileContent, selectedFile, resolvedTheme]);
+  }, [fileContent, selectedFile]);
 
   const handleCopy = () => {
     if (fileContent) {
@@ -451,7 +449,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
                           </div>
                         ) : highlightedHtml ? (
                           <div
-                            className="shiki-gh rounded-xl text-sm"
+                            className="shiki-gh bg-slate-950 rounded-xl text-sm"
                             dangerouslySetInnerHTML={{ __html: highlightedHtml }}
                           />
                         ) : null}
@@ -471,9 +469,9 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
       )}
 
       <style>{`
-        .shiki-gh { border: 1px solid hsl(var(--border)); }
-        .shiki-gh pre { margin: 0; padding: 1rem; overflow: visible; background: transparent !important; min-width: max-content; }
-        .shiki-gh code { background: transparent; padding: 0; border-radius: 0; font-family: inherit; font-size: 0.875rem; line-height: 1.6; }
+        .shiki-gh { border: 1px solid hsl(var(--border)); border-radius: 0.75rem; overflow: hidden; }
+        .shiki-gh pre { margin: 0; padding: 1rem; overflow: visible; min-width: max-content; }
+        .shiki-gh code { padding: 0; border-radius: 0; font-family: inherit; font-size: 0.875rem; line-height: 1.6; }
       `}</style>
     </div>
   );
