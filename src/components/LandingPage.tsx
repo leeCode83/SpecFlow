@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, LayoutGroup } from 'motion/react';
 import Floating, { FloatingElement } from "@/components/ui/parallax-floating";
 import { TextRotate } from "@/components/ui/text-rotate";
-import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, Code2, GitMerge, FileCode2, CheckCircle2, ChevronRight, MessageSquareQuote, Github } from 'lucide-react';
+import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, FileCode2, MessageSquareQuote, MessageSquare, Users, Github, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -108,65 +108,51 @@ const heroImages = [
   },
 ];
 
-import { Calendar, Code, FileText, User, Clock as ClockIcon, Mail, Facebook, Instagram, Twitter, Layers } from "lucide-react";
-import RadialOrbitalTimeline, { TimelineItem } from "@/components/ui/radial-orbital-timeline";
+import { Mail, Facebook, Instagram, Twitter } from "lucide-react";
 import { TextHoverEffect, FooterBackgroundGradient } from "@/components/ui/hover-footer";
 
-const timelineData: TimelineItem[] = [
+const features = [
   {
-    id: 1,
-    title: "Ideation",
-    date: "Phase 1",
-    content: "Input your raw ideas in plain text. Our AI analyzes the intent and prepares a comprehensive workshop.",
-    category: "Ideation",
     icon: BrainCircuit,
-    relatedIds: [2],
-    status: "completed",
-    energy: 100,
+    title: "AI Ideation Engine",
+    description: "Describe your idea in plain text. Our AI generates a complete technical blueprint with tech stack recommendations, strategic scores, and a refined product vision.",
+    iconBg: "bg-orange-500/10 text-orange-500",
+    span: "lg" as const,
   },
   {
-    id: 2,
-    title: "Architecture",
-    date: "Phase 2",
-    content: "Generate a scalable tech stack and folder structure tailored to your application's specific needs.",
-    category: "Architecture",
-    icon: Layers,
-    relatedIds: [1, 3],
-    status: "completed",
-    energy: 90,
-  },
-  {
-    id: 3,
-    title: "Blueprinting",
-    date: "Phase 3",
-    content: "Break down massive feature sets into manageable, trackable spec documents ready for developers.",
-    category: "Blueprinting",
     icon: FileCode2,
-    relatedIds: [2, 4],
-    status: "in-progress",
-    energy: 75,
+    title: "Smart Specs",
+    description: "Generate technical specifications in 6 categories: Auth, API, Frontend, AI, Infrastructure, and Custom. Full Markdown editor with live preview.",
+    iconBg: "bg-blue-500/10 text-blue-400",
+    span: "sm" as const,
   },
   {
-    id: 4,
-    title: "Sync & Track",
-    date: "Phase 4",
-    content: "Push generated specifications directly to GitHub issues and PRs for a seamless workflow.",
-    category: "Integration",
+    icon: MessageSquare,
+    title: "AI Chat Refinement",
+    description: "Chat interactively with AI to refine features, scope, and architecture. Get intelligent suggestions while building your technical blueprint.",
+    iconBg: "bg-purple-500/10 text-purple-400",
+    span: "sm" as const,
+  },
+  {
     icon: Github,
-    relatedIds: [3, 5],
-    status: "pending",
-    energy: 40,
+    title: "GitHub Sync",
+    description: "Link any GitHub repository, browse the complete file tree, and preview code with full syntax highlighting powered by Shiki.",
+    iconBg: "bg-slate-500/10 text-slate-300",
+    span: "lg" as const,
   },
   {
-    id: 5,
-    title: "Shipping",
-    date: "Phase 5",
-    content: "Start coding with a clear roadmap. Say goodbye to guesswork and build confidently.",
-    category: "Deployment",
-    icon: Rocket,
-    relatedIds: [4],
-    status: "pending",
-    energy: 20,
+    icon: Users,
+    title: "Team Collaboration",
+    description: "Invite teammates to your workspace with email invitations. Accept/decline workflow with automatic expiration tracking.",
+    iconBg: "bg-emerald-500/10 text-emerald-400",
+    span: "lg" as const,
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Smart Dashboard",
+    description: "Get a bird's-eye view of all your projects with stats, activity logs, recent projects, and quick access to any workspace.",
+    iconBg: "bg-orange-500/10 text-orange-500",
+    span: "sm" as const,
   },
 ];
 
@@ -404,17 +390,37 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
           </div>
         </section>
 
-        {/* Features Section - Orbital Timeline */}
-        <section className="w-full bg-slate-900/30 border-y border-slate-800/50 py-24">
+        {/* Features Section - Animated Card Grid */}
+        <section className="w-full bg-slate-900/30 border-y border-slate-800/50 py-24 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6">
-            <div className="text-center space-y-4 mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Features</h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
+              className="text-center space-y-4 mb-16"
+            >
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+                <span className="bg-gradient-to-r from-orange-500 to-orange-200 bg-clip-text text-transparent">Features</span>
+              </h2>
               <p className="text-slate-400 text-lg max-w-2xl mx-auto">
                 Everything you need to turn raw ideas into production-ready specifications.
               </p>
-            </div>
-            
-            <RadialOrbitalTimeline timelineData={timelineData} />
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={{
+                visible: { transition: { staggerChildren: 0.1 } },
+              }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              {features.map((feature) => (
+                <FeatureCard key={feature.title} feature={feature} span={feature.span} />
+              ))}
+            </motion.div>
           </div>
         </section>
 
@@ -768,5 +774,35 @@ function ScoreItem({ label, score, color }: { label: string, score: number, colo
         />
       </div>
     </div>
+  );
+}
+
+function FeatureCard({ feature, span }: { feature: typeof features[0]; span: "sm" | "lg" }) {
+  const Icon = feature.icon;
+  const lg = span === "lg";
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+      }}
+      whileHover={{ y: -6, transition: { type: "spring", stiffness: 300, damping: 20 } }}
+      className={`group relative bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl transition-all duration-300 hover:border-orange-500/30 hover:shadow-[0_0_30px_rgba(249,115,22,0.08)] ${lg ? 'md:col-span-2 p-8 md:p-10' : 'p-6 md:p-8'}`}
+    >
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-orange-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+      <div className={`${lg ? 'w-14 h-14' : 'w-12 h-12'} rounded-xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg ${feature.iconBg}`}>
+        <Icon className={lg ? 'w-7 h-7' : 'w-6 h-6'} />
+      </div>
+
+      <h3 className={`font-bold text-slate-100 mb-3 group-hover:text-orange-400 transition-colors duration-300 ${lg ? 'text-xl' : 'text-lg'}`}>
+        {feature.title}
+      </h3>
+      <p className={`text-slate-400 leading-relaxed ${lg ? 'text-base max-w-2xl' : 'text-sm'}`}>
+        {feature.description}
+      </p>
+
+      <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    </motion.div>
   );
 }
