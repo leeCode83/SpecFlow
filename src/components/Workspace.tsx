@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { LayoutGrid, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { HardDrive, Activity, FileText } from 'lucide-react';
+import { HardDrive, Activity, FileText, Github } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
+import { Project } from '@/lib/types';
 
 // Modular Components
 import { WorkspaceHeader } from './workspace/WorkspaceHeader';
@@ -13,6 +14,7 @@ import { LogPanel } from './workspace/LogPanel';
 import { FileList } from './workspace/FileList';
 import { TeamList } from './workspace/TeamList';
 import { InviteMemberModal } from './workspace/InviteMemberModal';
+import { GithubViewer } from './workspace/GithubViewer';
 
 interface WorkspaceProps {
   projectId: string;
@@ -46,7 +48,16 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
 
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
-  const isOwner = project?.user_id === currentUser?.id;
+  const [localProject, setLocalProject] = useState<Project | null>(project);
+  const isOwner = (localProject?.user_id ?? project?.user_id) === currentUser?.id;
+
+  const handleProjectUpdate = useCallback((updated: Project) => {
+    setLocalProject(updated);
+  }, []);
+
+  React.useEffect(() => {
+    if (project) setLocalProject(project);
+  }, [project]);
 
   if (loading) {
     return (
@@ -63,7 +74,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
           <ChevronLeft className="w-5 h-5" />
         </Button>
         <WorkspaceHeader 
-          project={project} 
+          project={localProject} 
           onNewSpec={() => setShowAddMenu(true)}
         />
       </div>
@@ -86,7 +97,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
           />
 
           <TeamList 
-            project={project}
+            project={localProject}
             isOwner={isOwner}
             currentUserId={currentUser?.id}
             onAddMember={addMember}
@@ -101,6 +112,10 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
               <TabsTrigger value="storage" className="gap-2 rounded-xl px-6 data-[state=active]:bg-slate-800">
                 <HardDrive className="w-4 h-4" />
                 Storage
+              </TabsTrigger>
+              <TabsTrigger value="github" className="gap-2 rounded-xl px-6 data-[state=active]:bg-slate-800">
+                <Github className="w-4 h-4" />
+                GitHub
               </TabsTrigger>
               <TabsTrigger value="activity" className="gap-2 rounded-xl px-6 data-[state=active]:bg-slate-800">
                 <Activity className="w-4 h-4" />
@@ -121,6 +136,10 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
               />
             </TabsContent>
 
+            <TabsContent value="github" className="mt-6 space-y-6">
+              {localProject && <GithubViewer project={localProject} onProjectUpdate={handleProjectUpdate} />}
+            </TabsContent>
+
             <TabsContent value="activity" className="mt-6 space-y-6">
               <LogPanel 
                 logs={logs}
@@ -134,21 +153,21 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
       </div>
 
       {/* Project Description */}
-      {project?.description && (
+      {localProject?.description && (
         <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="flex items-center gap-2 text-slate-400">
             <FileText className="w-5 h-5" />
             <h2 className="font-bold text-lg">Project Description</h2>
           </div>
           <div className="prose prose-invert prose-orange max-w-none">
-            <ReactMarkdown>{project.description}</ReactMarkdown>
+            <ReactMarkdown>{localProject.description}</ReactMarkdown>
           </div>
         </div>
       )}
       
-      {inviteModalOpen && project && (
+      {inviteModalOpen && localProject && (
         <InviteMemberModal
-          projectId={project.id}
+          projectId={localProject.id}
           isOwner={isOwner}
           onClose={() => setInviteModalOpen(false)}
         />

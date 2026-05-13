@@ -98,11 +98,11 @@ export function SpecList({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium truncate text-slate-300 group-hover:text-white transition-colors">{spec.title}</p>
-                <p className="text-[9px] text-slate-500 flex items-center gap-1 mt-0.5">
+                <div className="text-[9px] text-slate-500 flex items-center gap-1 mt-0.5">
                   <Badge variant="outline" className="text-[8px] px-1 py-0 h-3 border-slate-800">{spec.type}</Badge>
                   <span>•</span>
                   {spec.status === 'completed' ? 'Ready' : 'Draft'}
-                </p>
+                </div>
               </div>
             </button>
             <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
