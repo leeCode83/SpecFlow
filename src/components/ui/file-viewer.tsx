@@ -87,7 +87,7 @@ export function ShikiViewer({
       try {
         setIsLoading(true);
         const shikiTheme =
-          resolvedTheme === "dark" ? "github-dark" : "github-light";
+          resolvedTheme === "dark" ? "one-dark-pro" : "min-light";
         const highlighter = await createHighlighter({
           langs: [
             "tsx",
@@ -134,8 +134,8 @@ export function ShikiViewer({
   return (
     <>
       <style>{`
-        .shiki-viewer { border-radius: 0.5rem; overflow: hidden; border: 1px solid hsl(var(--border)); }
-        .shiki-viewer pre { margin: 0; padding: 1rem; overflow-x: auto; background: transparent; font-size: 0.875rem; line-height: 1.5; white-space: pre; }
+        .shiki-viewer { border-radius: 0.5rem; overflow: visible; border: 1px solid hsl(var(--border)); }
+        .shiki-viewer pre { margin: 0; padding: 1rem; overflow: visible; background: transparent; font-size: 0.875rem; line-height: 1.5; white-space: pre; min-width: max-content; }
         .shiki-viewer code { background: transparent; padding: 0; border-radius: 0; font-family: inherit; font-size: inherit; line-height: inherit; white-space: pre; }
         .shiki-viewer .line-numbers { display: flex; }
         .shiki-viewer .line-numbers .line-numbers-rows { display: flex; flex-direction: column; padding-right: 0.2rem; margin-right: 0.2rem; border-right: 1px solid hsl(var(--border)); text-align: right; color: hsl(var(--muted-foreground)); font-size: 0.8755rem; user-select: none; }

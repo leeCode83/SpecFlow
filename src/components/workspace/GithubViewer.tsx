@@ -173,7 +173,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
     async function highlight() {
       try {
         const lang = getFileLanguage(selectedFile!);
-        const shikiTheme = resolvedTheme === 'dark' ? 'github-dark' : 'github-light';
+        const shikiTheme = resolvedTheme === 'dark' ? 'one-dark-pro' : 'min-light';
 
         const highlighter = await createHighlighter({
           langs: [
@@ -451,7 +451,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
                           </div>
                         ) : highlightedHtml ? (
                           <div
-                            className="shiki-gh rounded-xl overflow-x-auto text-sm"
+                            className="shiki-gh rounded-xl text-sm"
                             dangerouslySetInnerHTML={{ __html: highlightedHtml }}
                           />
                         ) : null}
@@ -472,7 +472,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
 
       <style>{`
         .shiki-gh { border: 1px solid hsl(var(--border)); }
-        .shiki-gh pre { margin: 0; padding: 1rem; overflow-x: auto; background: transparent !important; }
+        .shiki-gh pre { margin: 0; padding: 1rem; overflow: visible; background: transparent !important; min-width: max-content; }
         .shiki-gh code { background: transparent; padding: 0; border-radius: 0; font-family: inherit; font-size: 0.875rem; line-height: 1.6; }
       `}</style>
     </div>
