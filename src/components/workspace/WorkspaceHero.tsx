@@ -1,5 +1,6 @@
-import React from 'react';
-import { FileText, Calendar, Users, FileCode, Shield } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { FileText, Calendar, Users, FileCode, Shield, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Badge } from '@/components/ui/badge';
 import { Project, Spec, ProjectFile } from '@/lib/types';
 import ReactMarkdown from 'react-markdown';
@@ -12,6 +13,16 @@ interface WorkspaceHeroProps {
 }
 
 export function WorkspaceHero({ project, specs, files, teamCount }: WorkspaceHeroProps) {
+  const [expanded, setExpanded] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setIsOverflowing(contentRef.current.scrollHeight > 120);
+    }
+  }, [project?.description]);
+
   return (
     <div className="space-y-6">
       <div>
@@ -47,8 +58,35 @@ export function WorkspaceHero({ project, specs, files, teamCount }: WorkspaceHer
             <FileText className="w-4 h-4" />
             <h2 className="font-bold text-sm">Description</h2>
           </div>
-          <div className="prose prose-invert prose-orange max-w-none prose-sm">
-            <ReactMarkdown>{project.description}</ReactMarkdown>
+          <div className="relative">
+            <div
+              ref={contentRef}
+              className={`prose prose-invert prose-orange max-w-none prose-sm overflow-hidden transition-all duration-300 ${
+                !expanded ? 'max-h-[120px]' : ''
+              }`}
+              style={
+                !expanded
+                  ? { maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)' }
+                  : {}
+              }
+            >
+              <ReactMarkdown>{project.description}</ReactMarkdown>
+            </div>
+            {isOverflowing && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="flex items-center gap-1 text-xs text-orange-500 hover:text-orange-400 transition-colors mt-2"
+              >
+                <motion.span
+                  animate={{ rotate: expanded ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="inline-flex"
+                >
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </motion.span>
+                {expanded ? 'View less' : 'View more'}
+              </button>
+            )}
           </div>
         </div>
       )}
