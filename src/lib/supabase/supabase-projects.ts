@@ -50,3 +50,36 @@ export const deleteProject = async (id: string): Promise<void> => {
 
   if (error) throw error;
 };
+
+export interface PaginatedResult<T> {
+  data: T[];
+  count: number;
+}
+
+export const getProjectsPaginated = async (
+  page: number,
+  limit: number,
+  filters?: { search?: string; mode?: string }
+): Promise<PaginatedResult<Project>> => {
+  let query = supabase
+    .from('projects')
+    .select('*', { count: 'exact' });
+
+  if (filters?.search) {
+    query = query.ilike('title', `%${filters.search}%`);
+  }
+
+  if (filters?.mode && filters.mode !== 'All') {
+    query = query.eq('mode', filters.mode);
+  }
+
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
+  if (error) throw error;
+  return { data: data || [], count: count || 0 };
+};

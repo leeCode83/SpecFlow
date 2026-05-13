@@ -27,11 +27,12 @@ import { Workspace } from './components/Workspace';
 import { SpecDetail } from './components/SpecDetail';
 import { CreateProject } from './components/CreateProject';
 import { IdeationPage } from './components/IdeationPage';
+import { AllProjects } from './components/AllProjects';
 import { Project } from '@/lib/types';
 
 import { Auth } from './components/Auth';
 
-type View = 'landing' | 'auth' | 'ideation' | 'dashboard' | 'workspace' | 'spec' | 'create_project';
+type View = 'landing' | 'auth' | 'ideation' | 'dashboard' | 'workspace' | 'spec' | 'create_project' | 'allProjects';
 
 export default function App() {
   const [view, setView] = useState<View>('landing');
@@ -141,7 +142,7 @@ export default function App() {
   }
 
   // Auth Gate
-  if (!user && view !== 'landing' && view !== 'auth' && view !== 'ideation') {
+  if (!user && view !== 'landing' && view !== 'auth' && view !== 'ideation' && view !== 'allProjects') {
     return <Auth onBack={() => setView('landing')} />;
   }
 
@@ -196,8 +197,8 @@ export default function App() {
                 <NavItem 
                   icon={<Folder className="w-4 h-4" />} 
                   label="Your Projects" 
-                  active={view === 'dashboard'}
-                  onClick={() => setView('dashboard')} 
+                  active={view === 'allProjects'}
+                  onClick={() => setView('allProjects')} 
                   collapsed={isSidebarCollapsed}
                 />
                 
@@ -328,6 +329,19 @@ export default function App() {
               >
                 <Dashboard 
                   onSelectProject={handleSelectProject} 
+                  onCreateProject={() => setView('create_project')}
+                />
+              </motion.div>
+            )}
+            {view === 'allProjects' && (
+              <motion.div
+                key="allProjects"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <AllProjects
+                  onSelectProject={handleSelectProject}
                   onCreateProject={() => setView('create_project')}
                 />
               </motion.div>
