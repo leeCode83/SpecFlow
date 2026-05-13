@@ -1,18 +1,15 @@
 import React, { useState, useCallback } from 'react';
-import { LayoutGrid, ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { LayoutGrid, HardDrive, Activity, Github } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { HardDrive, Activity, FileText, Github } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
 import { Project } from '@/lib/types';
 
-// Modular Components
 import { WorkspaceHeader } from './workspace/WorkspaceHeader';
+import { WorkspaceHero } from './workspace/WorkspaceHero';
 import { SpecList } from './workspace/SpecList';
+import { TeamList } from './workspace/TeamList';
 import { LogPanel } from './workspace/LogPanel';
 import { FileList } from './workspace/FileList';
-import { TeamList } from './workspace/TeamList';
 import { InviteMemberModal } from './workspace/InviteMemberModal';
 import { GithubViewer } from './workspace/GithubViewer';
 
@@ -22,10 +19,6 @@ interface WorkspaceProps {
   onBack: () => void;
 }
 
-/**
- * Workspace Component
- * Main container for project management, including specs, files, and activity logs.
- */
 export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   const {
     project,
@@ -46,7 +39,6 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
     removeMember
   } = useWorkspaceData(projectId);
 
-  const [showAddMenu, setShowAddMenu] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [localProject, setLocalProject] = useState<Project | null>(project);
   const isOwner = (localProject?.user_id ?? project?.user_id) === currentUser?.id;
@@ -68,24 +60,24 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center gap-4">
-        <Button variant="ghost" onClick={onBack} className="p-2 hover:bg-slate-900 rounded-xl w-fit">
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        <WorkspaceHeader 
-          project={localProject} 
-          onNewSpec={() => setShowAddMenu(true)}
-        />
-      </div>
+    <div className="min-h-screen bg-slate-950">
+      <WorkspaceHeader
+        project={localProject}
+        onBack={onBack}
+        onCreateSpec={(type) => handleCreateSpec(type, onSelectSpec)}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="space-y-8">
-          <SpecList 
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 pb-20">
+        <WorkspaceHero
+          project={localProject}
+          specs={specs}
+          files={files}
+          teamCount={(localProject?.teammates?.length || 0) + 1}
+        />
+
+        <section>
+          <SpecList
             specs={specs}
-            showAddMenu={showAddMenu}
-            setShowAddMenu={setShowAddMenu}
-            onCreateSpec={(type) => handleCreateSpec(type, onSelectSpec)}
             onSelectSpec={onSelectSpec}
             onRenameSpec={async (spec) => {
               const newTitle = prompt("Enter new title", spec.title);
@@ -95,8 +87,10 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             }}
             onDeleteSpec={handleDeleteSpec}
           />
+        </section>
 
-          <TeamList 
+        <section>
+          <TeamList
             project={localProject}
             isOwner={isOwner}
             currentUserId={currentUser?.id}
@@ -104,9 +98,9 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             onRemoveMember={removeMember}
             onOpenInviteModal={() => setInviteModalOpen(true)}
           />
-        </div>
+        </section>
 
-        <div className="lg:col-span-3">
+        <section>
           <Tabs defaultValue="storage" className="w-full">
             <TabsList className="bg-slate-900/50 p-1 border border-slate-800 rounded-2xl w-full justify-start overflow-x-auto no-scrollbar">
               <TabsTrigger value="storage" className="gap-2 rounded-xl px-6 data-[state=active]:bg-slate-800">
@@ -124,7 +118,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             </TabsList>
 
             <TabsContent value="storage" className="mt-6 space-y-6">
-              <FileList 
+              <FileList
                 files={files}
                 onUpload={async (e) => {
                   const file = e.target.files?.[0];
@@ -141,7 +135,7 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
             </TabsContent>
 
             <TabsContent value="activity" className="mt-6 space-y-6">
-              <LogPanel 
+              <LogPanel
                 logs={logs}
                 page={logPage}
                 totalPages={logTotalPages}
@@ -149,22 +143,9 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
               />
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
+        </section>
+      </main>
 
-      {/* Project Description */}
-      {localProject?.description && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="flex items-center gap-2 text-slate-400">
-            <FileText className="w-5 h-5" />
-            <h2 className="font-bold text-lg">Project Description</h2>
-          </div>
-          <div className="prose prose-invert prose-orange max-w-none">
-            <ReactMarkdown>{localProject.description}</ReactMarkdown>
-          </div>
-        </div>
-      )}
-      
       {inviteModalOpen && localProject && (
         <InviteMemberModal
           projectId={localProject.id}

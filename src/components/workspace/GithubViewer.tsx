@@ -384,8 +384,8 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
             </CardContent>
           </Card>
 
-          <ResizablePanelGroup direction="horizontal" className="border border-slate-800 rounded-2xl overflow-hidden">
-            <ResizablePanel defaultSize={40} minSize={30}>
+          <ResizablePanelGroup direction="horizontal" className="border border-slate-800 rounded-2xl overflow-hidden h-[400px] md:h-[500px]">
+            <ResizablePanel defaultSize={20} minSize={20}>
               <div className="h-full flex flex-col bg-slate-900/30">
                 <div className="p-3 border-b border-slate-800 flex items-center gap-2">
                   <FileCode className="w-4 h-4 text-slate-500" />
@@ -415,7 +415,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
 
             <ResizableHandle />
 
-            <ResizablePanel defaultSize={60} minSize={20}>
+            <ResizablePanel defaultSize={80} minSize={30}>
               <div className="h-full flex flex-col bg-slate-900/30">
                 {selectedFile ? (
                   <>
