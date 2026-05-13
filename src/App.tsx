@@ -11,11 +11,15 @@ import {
   Settings, 
   LogOut, 
   ChevronRight,
-  Folder
+  ChevronLeft,
+  Folder,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/supabase';
 import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
@@ -37,6 +41,7 @@ export default function App() {
   const [configured, setConfigured] = useState(isSupabaseConfigured());
   const [ideationData, setIdeationData] = useState<{ title: string; description: string; mode: string } | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
   const fetchProjects = async () => {
     if (!user) return;
@@ -147,23 +152,44 @@ export default function App() {
         
         {/* Sidebar / Navigation */}
         {view !== 'landing' && view !== 'auth' && view !== 'ideation' && (
-          <aside className="fixed left-0 top-0 bottom-0 w-64 border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-50 flex flex-col">
-            <div 
-              className="p-6 flex items-center gap-3 cursor-pointer group"
-              onClick={() => {
-                setView('landing');
-              }}
-            >
-              <img src="/logo.png" alt="IdeaFrame" className="w-7 h-7 group-hover:scale-105 transition-transform" />
-              <span className="font-bold tracking-tight text-xl group-hover:text-orange-400 transition-colors">IdeaFrame</span>
+          <motion.aside 
+            initial={false}
+            animate={{ width: isSidebarCollapsed ? 80 : 256 }}
+            className="fixed left-0 top-0 bottom-0 border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-50 flex flex-col transition-all duration-300 ease-in-out"
+          >
+            <div className="p-4 flex items-center justify-between border-b border-slate-800/50 mb-2">
+              <div 
+                className={cn(
+                  "flex items-center gap-3 cursor-pointer group overflow-hidden transition-all duration-300",
+                  isSidebarCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                )}
+                onClick={() => setView('dashboard')}
+              >
+                <img src="/logo.png" alt="IdeaFrame" className="w-7 h-7 shrink-0" />
+                <span className="font-bold tracking-tight text-lg truncate text-orange-500">IdeaFrame</span>
+              </div>
+              
+              {isSidebarCollapsed && (
+                <div className="mx-auto">
+                  <img src="/logo.png" alt="IdeaFrame" className="w-8 h-8 cursor-pointer" onClick={() => setView('dashboard')} />
+                </div>
+              )}
+
+              <button
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-500 hover:text-white shrink-0"
+              >
+                {isSidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+              </button>
             </div>
 
-            <nav className="flex-1 px-4 space-y-2 py-4">
+            <nav className="flex-1 px-3 space-y-1 py-4">
               <NavItem 
                 icon={<LayoutDashboard className="w-4 h-4" />} 
                 label="Dashboard" 
                 active={view === 'dashboard'} 
                 onClick={() => setView('dashboard')} 
+                collapsed={isSidebarCollapsed}
               />
               
               <div className="relative group/projects">
@@ -172,10 +198,14 @@ export default function App() {
                   label="Your Projects" 
                   active={view === 'dashboard'}
                   onClick={() => setView('dashboard')} 
+                  collapsed={isSidebarCollapsed}
                 />
                 
                 {/* Dropdown on Hover */}
-                <div className="absolute left-full top-0 ml-2 w-48 opacity-0 invisible group-hover/projects:opacity-100 group-hover/projects:visible transition-all duration-200 z-[60]">
+                <div className={cn(
+                  "absolute left-full top-0 ml-2 w-48 opacity-0 invisible group-hover/projects:opacity-100 group-hover/projects:visible transition-all duration-200 z-[60]",
+                  isSidebarCollapsed ? "ml-4" : "ml-2"
+                )}>
                   <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-2 overflow-hidden backdrop-blur-xl">
                     <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 px-3 py-2 border-b border-slate-800 mb-1">
                       Recent Projects
@@ -208,29 +238,50 @@ export default function App() {
                 label="New Project" 
                 active={view === 'create_project'}
                 onClick={() => setView('create_project')} 
+                collapsed={isSidebarCollapsed}
               />
             </nav>
 
-            <div className="p-4 border-t border-slate-800">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50">
-                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold">
+            <div className="p-3 border-t border-slate-800">
+              <div className={cn(
+                "flex items-center gap-3 p-2 rounded-xl bg-slate-900/50 overflow-hidden transition-all duration-300",
+                isSidebarCollapsed ? "justify-center" : ""
+              )}>
+                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold shrink-0">
                   {user?.email?.[0].toUpperCase() ?? 'U'}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{user?.email}</p>
-                </div>
+                {!isSidebarCollapsed && (
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-medium truncate text-slate-400">{user?.email}</p>
+                  </div>
+                )}
+                {!isSidebarCollapsed && (
+                  <button 
+                    onClick={handleLogout}
+                    className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white shrink-0"
+                  >
+                    <LogOut className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              {isSidebarCollapsed && (
                 <button 
                   onClick={handleLogout}
-                  className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white"
+                  className="w-full mt-2 p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-500 hover:text-white flex justify-center"
+                  title="Logout"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
-              </div>
+              )}
             </div>
-          </aside>
+          </motion.aside>
         )}
 
-        <main className={view === 'landing' || view === 'auth' || view === 'ideation' ? "" : "pl-64"}>
+        <motion.main 
+          initial={false}
+          animate={{ paddingLeft: (view === 'landing' || view === 'auth' || view === 'ideation') ? 0 : (isSidebarCollapsed ? 80 : 256) }}
+          className="min-h-screen transition-all duration-300 ease-in-out"
+        >
           <AnimatePresence mode="wait">
             {view === 'landing' && (
               <motion.div
@@ -325,27 +376,39 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
-        </main>
+        </motion.main>
       </div>
     </TooltipProvider>
   );
 }
 
-function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void }) {
+function NavItem({ icon, label, active, onClick, collapsed }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void, collapsed?: boolean }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+      className={cn(
+        "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative",
         active 
           ? 'bg-orange-500/10 text-orange-500 font-medium' 
-          : 'text-slate-400 hover:text-white hover:bg-slate-900'
-      }`}
+          : 'text-slate-400 hover:text-white hover:bg-slate-900',
+        collapsed ? "justify-center px-0" : ""
+      )}
+      title={collapsed ? label : undefined}
     >
-      <div className={active ? 'text-orange-500' : 'text-slate-500 group-hover:text-white transition-colors'}>
+      <div className={cn(
+        "shrink-0 transition-colors",
+        active ? 'text-orange-500' : 'text-slate-500 group-hover:text-white'
+      )}>
         {icon}
       </div>
-      <span className="text-sm">{label}</span>
-      {active && <ChevronRight className="w-4 h-4 ml-auto" />}
+      {!collapsed && <span className="text-sm truncate">{label}</span>}
+      {!collapsed && active && <ChevronRight className="w-4 h-4 ml-auto shrink-0" />}
+      
+      {collapsed && (
+        <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[70] whitespace-nowrap border border-slate-800">
+          {label}
+        </div>
+      )}
     </button>
   );
 }
