@@ -21,10 +21,6 @@ export function WorkspaceHeader({
           <Badge variant="outline" className="bg-orange-500/5 text-orange-500 border-orange-500/20">
             {project?.mode}
           </Badge>
-          <span>•</span>
-          <span className="text-xs text-slate-500">
-            {project?.description ? project.description : "No project description"}
-          </span>
         </div>
       </div>
       <div className="flex items-center gap-2">

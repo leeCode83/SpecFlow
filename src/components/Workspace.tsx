@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { LayoutGrid, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { HardDrive, Activity } from 'lucide-react';
+import { HardDrive, Activity, FileText } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
 
 // Modular Components
@@ -131,6 +132,19 @@ export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
           </Tabs>
         </div>
       </div>
+
+      {/* Project Description */}
+      {project?.description && (
+        <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="flex items-center gap-2 text-slate-400">
+            <FileText className="w-5 h-5" />
+            <h2 className="font-bold text-lg">Project Description</h2>
+          </div>
+          <div className="prose prose-invert prose-orange max-w-none">
+            <ReactMarkdown>{project.description}</ReactMarkdown>
+          </div>
+        </div>
+      )}
       
       {inviteModalOpen && project && (
         <InviteMemberModal
