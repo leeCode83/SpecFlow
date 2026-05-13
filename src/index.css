@@ -47,6 +47,7 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    --animate-progress-indeterminate: progress-indeterminate 1.5s infinite linear;
 }
 
 :root {
@@ -130,51 +131,6 @@
     }
 }
 
-/* Animation for the pulsing effect */
-@keyframes pulse-ring {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Animation for the ping effect */
-@keyframes ping-ring {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
-  }
-}
-
-/* Custom animations for the orbital timeline */
-.animate-pulse {
-  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.animate-ping {
-  animation: ping-ring 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-/* Transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.duration-300 {
-  transition-duration: 300ms;
-}
-
-.duration-700 {
-  transition-duration: 700ms;
-}
-
-.duration-1000 {
-  transition-duration: 1000ms;
-}
-
 @keyframes progress-indeterminate {
   0% {
     transform: translateX(-100%) scaleX(0.2);
@@ -185,8 +141,4 @@
   100% {
     transform: translateX(100%) scaleX(0.2);
   }
-}
-
-.animate-progress-indeterminate {
-  animation: progress-indeterminate 1.5s infinite linear;
 }

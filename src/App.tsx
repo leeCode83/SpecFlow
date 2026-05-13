@@ -6,7 +6,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Rocket, 
   LayoutDashboard, 
   Plus, 
   Settings, 
@@ -58,41 +57,9 @@ export default function App() {
     if (user) {
       fetchProjects();
     }
-  }, [user, view]); // Re-fetch on view change to keep sync
+  }, [user]); // Re-fetch on user change
 
   useEffect(() => {
-    if (!configured) return;
-    
-    // Popup flow handler: if inside popup with access_token, send to opener and close
-    if (window.opener && window.location.hash.includes('access_token=')) {
-      window.opener.postMessage({ 
-        type: 'OAUTH_AUTH_SUCCESS', 
-        hash: window.location.hash 
-      }, '*');
-      window.close();
-      return;
-    }
-
-    const handleMessage = async (event: MessageEvent) => {
-      if (event.data?.type === 'OAUTH_AUTH_SUCCESS' && event.data.hash) {
-        const hashParams = new URLSearchParams(event.data.hash.substring(1));
-        const access_token = hashParams.get('access_token');
-        const refresh_token = hashParams.get('refresh_token');
-        
-        if (access_token && refresh_token) {
-          const { data, error } = await supabase.auth.setSession({
-            access_token,
-            refresh_token
-          });
-          if (!error && data.session) {
-            setUser(data.session.user);
-            setView(prev => (prev === 'landing' || prev === 'auth') ? 'dashboard' : prev);
-          }
-        }
-      }
-    };
-    window.addEventListener('message', handleMessage);
-
     // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -121,7 +88,6 @@ export default function App() {
 
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener('message', handleMessage);
     };
   }, [configured]);
 

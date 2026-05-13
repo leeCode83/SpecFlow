@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { Project, Spec, Message, GithubRepoData } from '@/lib/types';
+import { Project, Spec, Message } from '@/lib/types';
 import { getProjectById } from '@/lib/supabase/supabase-projects';
 import { updateSpec, getSpecById, getSpecsByProjectId } from '@/lib/supabase/supabase-specs';
 import { generateSpec } from '@/lib/gemini/gemini-specs';
 import { retrieveSimilarSpecs, SimilarSpec } from '@/lib/rag';
 import { authenticatedFetch } from '@/lib/api-client';
 import { toast } from 'sonner';
-import { parseGithubUrl, getRepoFile, getRepoContents, getRepoStatus } from '@/lib/github/github-client';
 
 /**
  * useSpecChat Hook
@@ -31,7 +30,6 @@ export function useSpecChat(specId: string, projectId: string) {
   const currentContentRef = useRef(content);
   const similarSpecsCache = useRef<Record<string, SimilarSpec[]>>({});
   const projectSpecsCache = useRef<Spec[] | null>(null);
-  const repoContextRef = useRef<string>('');
 
   useEffect(() => {
     if (spec) {
@@ -56,53 +54,11 @@ export function useSpecChat(specId: string, projectId: string) {
       setProject(projectData);
       setContent(specData.content);
       setTitle(specData.title || '');
-
-      // Auto-fetch repo context for AI
-      if (projectData?.github_url) {
-        const fullName = parseGithubUrl(projectData.github_url);
-        if (fullName) {
-          fetchRepoContext(fullName);
-        }
-      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to load spec");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchRepoContext = async (fullName: string) => {
-    try {
-      const parts: string[] = [];
-
-      // Fetch README
-      try {
-        const readme = await getRepoFile(fullName, 'README.md');
-        parts.push(`## README\n${readme.content.substring(0, 3000)}`);
-      } catch { /* no README */ }
-
-      // Fetch package.json or pyproject.toml
-      try {
-        const pkg = await getRepoFile(fullName, 'package.json');
-        parts.push(`## package.json\n${pkg.content.substring(0, 2000)}`);
-      } catch {
-        try {
-          const py = await getRepoFile(fullName, 'pyproject.toml');
-          parts.push(`## pyproject.toml\n${py.content.substring(0, 2000)}`);
-        } catch { /* no package manifest */ }
-      }
-
-      // Fetch root-level folder listing for structure
-      try {
-        const contents = await getRepoContents(fullName, '');
-        const structure = contents.map(c => `  ${c.type === 'dir' ? '📁' : '📄'} ${c.name}`).join('\n');
-        parts.push(`## Repository Structure (root level)\n${structure}`);
-      } catch { /* no access */ }
-
-      repoContextRef.current = parts.join('\n\n');
-    } catch {
-      // silently fail - repo context is optional
     }
   };
 
@@ -199,9 +155,7 @@ export function useSpecChat(specId: string, projectId: string) {
         }
       }
 
-      const enrichedContext = repoContextRef.current
-        ? `${project?.description || ''}\n\n## Repository Context\n${repoContextRef.current}`
-        : (project?.description || '');
+      const enrichedContext = project?.description || '';
 
       const response = await generateSpec(
         updatedMessages, 

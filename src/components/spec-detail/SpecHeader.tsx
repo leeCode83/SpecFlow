@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Save, Terminal, Loader2, FileText, Pencil, GitPullRequest } from 'lucide-react';
+import { ChevronLeft, Save, Terminal, Loader2, FileText, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -20,12 +20,9 @@ interface SpecHeaderProps {
   title: string;
   hasUnsavedChanges: boolean;
   saving: boolean;
-  pushingPR: boolean;
-  githubFullName: string | null;
   onBack: () => void;
   onSave: () => void;
   onUpdateTitle: (newTitle: string) => Promise<boolean>;
-  onPushPR: () => void;
   content: string;
 }
 
@@ -35,12 +32,9 @@ export function SpecHeader({
   title,
   hasUnsavedChanges,
   saving,
-  pushingPR,
-  githubFullName,
   onBack,
   onSave,
   onUpdateTitle,
-  onPushPR,
   content
 }: SpecHeaderProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -131,17 +125,6 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
       </Dialog>
 
       <div className="flex items-center gap-2">
-        {githubFullName && (
-          <Button 
-            variant="outline" 
-            onClick={onPushPR}
-            disabled={pushingPR}
-            className="border-slate-800 hover:bg-slate-900 text-xs font-semibold uppercase tracking-wider gap-2 px-4"
-          >
-            {pushingPR ? <Loader2 className="w-4 h-4 animate-spin" /> : <GitPullRequest className="w-4 h-4" />}
-            Push PR
-          </Button>
-        )}
         <Button 
           variant="outline" 
           onClick={copyPrompt}
