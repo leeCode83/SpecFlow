@@ -330,6 +330,8 @@ export default function App() {
                 <Dashboard 
                   onSelectProject={handleSelectProject} 
                   onCreateProject={() => setView('create_project')}
+                  onViewAllProjects={() => setView('allProjects')}
+                  user={user}
                 />
               </motion.div>
             )}

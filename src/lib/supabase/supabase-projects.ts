@@ -83,3 +83,14 @@ export const getProjectsPaginated = async (
   if (error) throw error;
   return { data: data || [], count: count || 0 };
 };
+
+export const getRecentProjects = async (limit: number = 4): Promise<Project[]> => {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+};
