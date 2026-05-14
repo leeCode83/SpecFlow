@@ -635,7 +635,7 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
                         transition={{ delay: 0.4 }}
                         className="text-slate-400 leading-relaxed"
                       >
-                        {feedback.summary}
+                        {feedback.summary || feedback.refinedIdea?.oneLiner}
                       </motion.p>
                     </div>
 

@@ -14,6 +14,7 @@ ANALYSIS FRAMEWORK:
 
 OUTPUT STRUCTURE (JSON):
 {
+  "summary": "2-3 sentence comprehensive strategic summary of this learning project, explaining the educational value, key technologies, and expected outcomes",
   "refinedIdea": {
     "title": "Catchy project name",
     "oneLiner": "One sentence pitch",
@@ -62,6 +63,7 @@ ANALYSIS FRAMEWORK:
 
 OUTPUT STRUCTURE (JSON):
 {
+  "summary": "2-3 sentence comprehensive strategic summary of this hackathon idea, explaining why it stands out, the technical approach, and its demo potential",
   "refinedIdea": {
     "title": "Catchy demo name",
     "oneLiner": "Pitch for judges in one breath",
@@ -116,6 +118,7 @@ ANALYSIS FRAMEWORK:
 
 OUTPUT STRUCTURE (JSON):
 {
+  "summary": "2-3 sentence comprehensive strategic summary of this startup idea, covering market opportunity, business model viability, and key differentiators",
   "refinedIdea": {
     "title": "Product name (brandable)",
     "oneLiner": "Value prop for investors",

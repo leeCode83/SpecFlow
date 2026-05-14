@@ -2,7 +2,7 @@ import { Router } from "express";
 import { geminiController } from "../controllers/geminiController";
 import { requireAuth } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
-import { aiLimiter, embeddingLimiter } from "../middleware/rateLimiter";
+import { aiLimiter, embeddingLimiter, publicAiLimiter } from "../middleware/rateLimiter";
 import { 
   AnalyzeIdeaSchema, 
   ChatWithIdeaSchema, 
@@ -14,12 +14,11 @@ import {
 
 export const geminiRoutes = Router();
 
-// All gemini routes require authentication
-geminiRoutes.use(requireAuth);
-
-geminiRoutes.post("/analyze-idea", aiLimiter, validateBody(AnalyzeIdeaSchema), geminiController.analyzeIdea.bind(geminiController));
-geminiRoutes.post("/chat", aiLimiter, validateBody(ChatWithIdeaSchema), geminiController.chatWithIdea.bind(geminiController));
-geminiRoutes.post("/generate-spec", aiLimiter, validateBody(GenerateSpecSchema), geminiController.generateSpec.bind(geminiController));
-geminiRoutes.post("/simplify-description", aiLimiter, validateBody(SimplifyProjectDescriptionSchema), geminiController.simplifyProjectDescription.bind(geminiController));
-geminiRoutes.post("/embedding", embeddingLimiter, validateBody(GetEmbeddingSchema), geminiController.getEmbedding.bind(geminiController));
-geminiRoutes.post("/embed-spec", embeddingLimiter, validateBody(EmbedSpecSchema), geminiController.embedSpec.bind(geminiController));
+// Public: landing page demo — no auth, strict 5 req/min rate limit
+geminiRoutes.post("/analyze-idea", publicAiLimiter, validateBody(AnalyzeIdeaSchema), geminiController.analyzeIdea.bind(geminiController));
+// Authenticated routes below
+geminiRoutes.post("/chat", requireAuth, aiLimiter, validateBody(ChatWithIdeaSchema), geminiController.chatWithIdea.bind(geminiController));
+geminiRoutes.post("/generate-spec", requireAuth, aiLimiter, validateBody(GenerateSpecSchema), geminiController.generateSpec.bind(geminiController));
+geminiRoutes.post("/simplify-description", requireAuth, aiLimiter, validateBody(SimplifyProjectDescriptionSchema), geminiController.simplifyProjectDescription.bind(geminiController));
+geminiRoutes.post("/embedding", requireAuth, embeddingLimiter, validateBody(GetEmbeddingSchema), geminiController.getEmbedding.bind(geminiController));
+geminiRoutes.post("/embed-spec", requireAuth, embeddingLimiter, validateBody(EmbedSpecSchema), geminiController.embedSpec.bind(geminiController));

@@ -1,7 +1,21 @@
 import rateLimit from 'express-rate-limit';
 
 /**
- * General limiter for AI generation endpoints
+ * Public limiter for unauthenticated AI endpoints (landing page demo)
+ * Stricter: 5 requests per minute per IP to prevent abuse
+ */
+export const publicAiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 5,
+  message: {
+    error: 'Too many requests, please try again later',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * General limiter for authenticated AI generation endpoints
  * Limits each IP to 10 requests per minute
  */
 export const aiLimiter = rateLimit({
