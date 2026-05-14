@@ -12,6 +12,10 @@ export const generateSpec = async (
     method: "POST",
     body: JSON.stringify({ messages, specType, projectContext, similarSpecs, existingProjectSpecs })
   });
+  if (res.status === 429) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || "Rate limit reached. Please wait a moment and try again.");
+  }
   if (!res.ok) throw new Error("Failed to generate spec");
   const data = await res.json();
   return data.text;

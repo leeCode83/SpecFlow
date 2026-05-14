@@ -10,6 +10,10 @@ export const simplifyProjectDescription = async (
     method: "POST",
     body: JSON.stringify({ originalIdea, analysisFeedback, chatMessages })
   });
+  if (res.status === 429) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || "Rate limit reached. Please wait a moment and try again.");
+  }
   if (!res.ok) throw new Error("Failed to simplify project description");
   const data = await res.json();
   return data.text;

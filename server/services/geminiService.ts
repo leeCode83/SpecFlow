@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { IDEATION_PROMPTS } from "../../src/constants/AI-BRIEF";
 import { Message, IdeaFeedback, Mode } from "../../src/lib/types";
+import { ApiError } from "../lib/ApiError";
 
 /**
  * Service to interact with Google Gemini AI models.
@@ -53,7 +54,7 @@ export class GeminiService {
         throw error;
       }
     }
-    throw lastError || new Error("Unknown error during retry");
+    throw new ApiError(429, "AI service is temporarily overloaded. Please try again in a moment.");
   }
 
   async analyzeIdea(idea: string, mode: Mode): Promise<IdeaFeedback> {
