@@ -12,7 +12,8 @@ export const chatWithIdea = async (
   });
   if (res.status === 429) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || "Rate limit reached. Please wait a moment and try again.");
+    const message = typeof body.error === 'string' ? body.error : body.message;
+    throw new Error(message || "Rate limit reached. Please wait a moment and try again.");
   }
   if (!res.ok) throw new Error("Failed to chat with idea");
   const data = await res.json();

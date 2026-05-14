@@ -8,7 +8,8 @@ export const analyzeIdea = async (idea: string, mode: Mode): Promise<IdeaFeedbac
   });
   if (res.status === 429) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || "Rate limit reached. Please wait a moment and try again.");
+    const message = typeof body.error === 'string' ? body.error : body.message;
+    throw new Error(message || "Rate limit reached. Please wait a moment and try again.");
   }
   if (!res.ok) throw new Error("Failed to analyze idea");
   return res.json();
