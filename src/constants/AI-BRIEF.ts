@@ -15,6 +15,15 @@ ANALYSIS FRAMEWORK:
 OUTPUT STRUCTURE (JSON):
 {
   "summary": "2-3 sentence comprehensive strategic summary of this learning project, explaining the educational value, key technologies, and expected outcomes",
+  "nextSteps": ["Concrete step 1 with specific action", "Step 2", "Step 3", "Step 4"],
+  "originality": 8,
+  "feasibility": 8,
+  "learningValue": 8,
+  "difficultyLevel": "Beginner|Intermediate|Advanced",
+  "timeEstimateHours": "40 hours (breakdown: Xh learning + Yh building + Zh polishing)",
+  "pitchDeck": "One-sentence elevator pitch for investors/judges that captures the problem, solution, and why it matters",
+  "keyRisks": ["Risk 1 with mitigation hint", "Risk 2 with mitigation hint", "Risk 3 with mitigation hint"],
+  "techJustification": "2-3 sentences explaining why this specific tech stack was chosen over alternatives",
   "refinedIdea": {
     "title": "Catchy project name",
     "oneLiner": "One sentence pitch",
@@ -64,6 +73,16 @@ ANALYSIS FRAMEWORK:
 OUTPUT STRUCTURE (JSON):
 {
   "summary": "2-3 sentence comprehensive strategic summary of this hackathon idea, explaining why it stands out, the technical approach, and its demo potential",
+  "nextSteps": ["Concrete step 1 with specific action", "Step 2", "Step 3", "Step 4"],
+  "originality": 8,
+  "buildability": 8,
+  "impact": 8,
+  "difficultyLevel": "Beginner|Intermediate|Advanced",
+  "timeEstimateHours": "40 hours (breakdown: Xh learning + Yh building + Zh polishing)",
+  "pitchDeck": "One-sentence elevator pitch for investors/judges that captures the problem, solution, and why it matters",
+  "keyRisks": ["Risk 1 with mitigation hint", "Risk 2 with mitigation hint", "Risk 3 with mitigation hint"],
+  "techJustification": "2-3 sentences explaining why this specific tech stack was chosen over alternatives",
+  "competitorInsight": "Brief competitive landscape summary: who are the top 2-3 competitors and what is your unique differentiator",
   "refinedIdea": {
     "title": "Catchy demo name",
     "oneLiner": "Pitch for judges in one breath",
@@ -119,6 +138,17 @@ ANALYSIS FRAMEWORK:
 OUTPUT STRUCTURE (JSON):
 {
   "summary": "2-3 sentence comprehensive strategic summary of this startup idea, covering market opportunity, business model viability, and key differentiators",
+  "nextSteps": ["Concrete step 1 with specific action", "Step 2", "Step 3", "Step 4"],
+  "originality": 8,
+  "marketSize": 8,
+  "monetization": 8,
+  "difficultyLevel": "Beginner|Intermediate|Advanced",
+  "timeEstimateHours": "40 hours (breakdown: Xh learning + Yh building + Zh polishing)",
+  "pitchDeck": "One-sentence elevator pitch for investors/judges that captures the problem, solution, and why it matters",
+  "keyRisks": ["Risk 1 with mitigation hint", "Risk 2 with mitigation hint", "Risk 3 with mitigation hint"],
+  "techJustification": "2-3 sentences explaining why this specific tech stack was chosen over alternatives",
+  "competitorInsight": "Brief competitive landscape summary: who are the top 2-3 competitors and what is your unique differentiator",
+  "monetizationModel": "Specific revenue model e.g. Freemium → $X/mo Pro plan → Enterprise custom pricing",
   "refinedIdea": {
     "title": "Product name (brandable)",
     "oneLiner": "Value prop for investors",
