@@ -27,7 +27,7 @@ export const GenerateSpecSchema = z.object({
 
 export const SimplifyProjectDescriptionSchema = z.object({
   originalIdea: z.string().min(1),
-  analysisFeedback: z.string().optional(),
+  analysisFeedback: z.any().optional(),
   chatMessages: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),

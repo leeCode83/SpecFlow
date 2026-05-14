@@ -37,7 +37,7 @@ export class GeminiService {
     }
   }
 
-  private async withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3): Promise<T> {
+  private async withRetry<T>(fn: () => Promise<T>, maxRetries: number = 2): Promise<T> {
     let lastError: Error | undefined;
     for (let i = 0; i < maxRetries; i++) {
       try {
@@ -57,12 +57,29 @@ export class GeminiService {
     throw new ApiError(429, "AI service is temporarily overloaded. Please try again in a moment.");
   }
 
+  private async withModelFallback<T>(
+    primaryModel: string,
+    fallbackModel: string,
+    fn: (model: string) => Promise<T>
+  ): Promise<T> {
+    try {
+      return await this.withRetry(() => fn(primaryModel));
+    } catch (primaryError: any) {
+      const status = primaryError?.status || primaryError?.response?.status;
+      console.warn(`Model ${primaryModel} failed (${status}), falling back to ${fallbackModel}`);
+    }
+    return this.withRetry(() => fn(fallbackModel)).catch(() => {
+      throw new ApiError(429, "AI service is temporarily overloaded. Please try again in a moment.");
+    });
+  }
+
   async analyzeIdea(idea: string, mode: Mode): Promise<IdeaFeedback> {
     const model = "gemini-3-flash-preview";
+    const fallbackModel = "gemini-3.1-flash-lite-preview";
     const systemInstruction = IDEATION_PROMPTS[mode.toLowerCase() as keyof typeof IDEATION_PROMPTS];
 
-    const response = await this.withRetry(() => ai.models.generateContent({
-      model,
+    const response = await this.withModelFallback(model, fallbackModel, (m) => ai.models.generateContent({
+      model: m,
       contents: idea,
       config: {
         systemInstruction,
@@ -76,13 +93,14 @@ export class GeminiService {
 
   async chatWithIdea(messages: Message[], idea: string, mode: string): Promise<string> {
     const model = "gemini-3.1-pro-preview";
+    const fallbackModel = "gemini-3.1-flash-lite-preview";
     const history = this.truncateHistory(messages);
     
     const systemInstruction = `You are a helpful product strategist consultant. The user wants to build an app based on this idea: "${idea}" with mode "${mode}".
   Your goal is to help them refine, elaborate, and solidify their project idea. Ask clarifying questions, suggest features, and help them arrive at a clear project title and description.`;
 
-    const response = await this.withRetry(() => ai.models.generateContent({
-      model,
+    const response = await this.withModelFallback(model, fallbackModel, (m) => ai.models.generateContent({
+      model: m,
       contents: JSON.stringify(history),
       config: { systemInstruction },
     }));
@@ -98,6 +116,7 @@ export class GeminiService {
     existingProjectSpecs?: string[]
   ): Promise<string> {
     const model = "gemini-3-flash-preview";
+    const fallbackModel = "gemini-3.1-flash-lite-preview";
     const history = this.truncateHistory(messages);
 
     const systemInstruction = `You are a Technical Architect. Your goal is to DISCUSS and REFINE the ${specType} specification with the user first.
@@ -122,8 +141,8 @@ export class GeminiService {
   Similar past specs from you/others (for reference/ideas): ${similarSpecs?.join('\n\n') || 'None'}
   `;
 
-    const response = await this.withRetry(() => ai.models.generateContent({
-      model,
+    const response = await this.withModelFallback(model, fallbackModel, (m) => ai.models.generateContent({
+      model: m,
       contents: JSON.stringify(history),
       config: { systemInstruction },
     }));
@@ -137,6 +156,7 @@ export class GeminiService {
     chatMessages: Message[]
   ): Promise<string> {
     const model = "gemini-3.1-pro-preview";
+    const fallbackModel = "gemini-3.1-flash-lite-preview";
     const history = this.truncateHistory(chatMessages);
     
     const systemPrompt = `You are an expert product manager and software architect.
@@ -166,8 +186,8 @@ Target User: ${analysisFeedback.refinedIdea?.targetUser || ""}
 ${history.length > 0 ? history.map(m => `**${m.role === 'user' ? 'User' : 'AI Consultant'}**: ${m.content}`).join('\n') : "No elaboration conversation."}
   `;
 
-    const response = await this.withRetry(() => ai.models.generateContent({
-      model: model,
+    const response = await this.withModelFallback(model, fallbackModel, (m) => ai.models.generateContent({
+      model: m,
       contents: inputContext,
       config: {
         systemInstruction: systemPrompt,
