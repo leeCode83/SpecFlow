@@ -15,6 +15,13 @@ export interface BaseModeFeedback {
   learningValue?: string | number;
   marketSize?: string | number;
   monetization?: string | number;
+  difficultyLevel?: string;
+  timeEstimateHours?: string;
+  pitchDeck?: string;
+  keyRisks?: string[];
+  techJustification?: string;
+  competitorInsight?: string;
+  monetizationModel?: string;
   refinedIdea: {
     title: string;
     oneLiner: string;

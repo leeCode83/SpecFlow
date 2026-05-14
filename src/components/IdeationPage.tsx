@@ -13,6 +13,7 @@ import { Mode, IdeaFeedback, Message } from '@/lib/types';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat';
+import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, TechJustification, MonetizationModel, CopyAnalysisButton } from '@/components/ui/ideation-cards';
 
 interface IdeationPageProps {
   onCreateProject: (id?: string, title?: string, description?: string, feedback?: IdeaFeedback, mode?: Mode) => void;
@@ -110,6 +111,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
   const techList = getTechStackList();
   
   const getNextSteps = () => {
+    if (feedback?.nextSteps && feedback.nextSteps.length > 0) return feedback.nextSteps;
     if (feedback?.mode === 'Learning') {
        return feedback.learningPath?.week1 || feedback.mvpScope?.learningMilestones || [];
     }
@@ -225,7 +227,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
                       <BrainCircuit className="w-5 h-5 text-orange-500" />
                       Strategic Summary
                     </h3>
-                    <p className="text-slate-300 leading-relaxed text-lg">{feedback.refinedIdea?.oneLiner || feedback.summary}</p>
+                    <p className="text-slate-300 leading-relaxed text-lg">{feedback.summary || feedback.refinedIdea?.oneLiner}</p>
                     <p className="text-slate-400 mt-2">{feedback.refinedIdea?.problem}</p>
                   </div>
 
@@ -250,42 +252,60 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
                       </ul>
                     </div>
                   </div>
+
+                  <TechJustification text={feedback.techJustification} delay={0.45} />
                 </Card>
+
+                <PitchQuote text={feedback.pitchDeck} delay={0.15} />
+                <DifficultyBadge difficultyLevel={feedback.difficultyLevel} timeEstimateHours={feedback.timeEstimateHours} delay={0.2} />
 
                 <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col h-fit">
                   <h3 className="text-xl font-bold mb-6">Key Insights</h3>
                   <div className="space-y-6">
                     {feedback.mode === 'Hackathon' && (
                       <>
-                        <ScoreItem label="Originality" score={feedback.hackathonAnalysis?.originalityScore || 8} color="orange" />
-                        <StatItem label="Buildability" text={feedback.hackathonAnalysis?.buildability} color="blue" />
-                        <StatItem label="Demo Impact" text={feedback.hackathonAnalysis?.demoImpact?.split(' - ')[0] || 'High'} color="emerald" />
+                        <ScoreItem label="Originality" score={Number(feedback.originality) || Number(feedback.hackathonAnalysis?.originalityScore) || 8} color="orange" />
+                        <ScoreItem label="Buildability" score={Number(feedback.buildability) || 8} color="blue" />
+                        <ScoreItem label="Impact" score={Number(feedback.impact) || 8} color="emerald" />
                         <div className="mt-4 text-sm text-slate-400">
-                          <span className="font-bold text-slate-300">Time estimate:</span> {feedback.hackathonAnalysis?.timeEstimate}
+                          <span className="font-bold text-slate-300">Time estimate:</span> {feedback.timeEstimateHours || feedback.hackathonAnalysis?.timeEstimate}
                         </div>
+                        <CompetitorInsight text={feedback.competitorInsight} delay={0.4} />
                       </>
                     )}
                     {feedback.mode === 'Learning' && (
                       <>
-                        <StatItem label="Complexity" text={feedback.learningAnalysis?.complexityLevel} color="blue" />
+                        <ScoreItem label="Originality" score={Number(feedback.originality) || 8} color="orange" />
+                        <ScoreItem label="Feasibility" score={Number(feedback.feasibility) || 8} color="blue" />
+                        <ScoreItem label="Learning Value" score={Number(feedback.learningValue) || 8} color="emerald" />
                         <div className="mt-4 text-sm text-slate-400 space-y-2">
-                           <div><span className="font-bold text-slate-300">Time Estimate:</span> {feedback.learningAnalysis?.timeEstimate}</div>
+                           <div><span className="font-bold text-slate-300">Time Estimate:</span> {feedback.timeEstimateHours || feedback.learningAnalysis?.timeEstimate}</div>
+                           <div><span className="font-bold text-slate-300">Complexity:</span> {feedback.difficultyLevel || feedback.learningAnalysis?.complexityLevel}</div>
                            <div><span className="font-bold text-slate-300">Complexity Reason:</span> {feedback.learningAnalysis?.complexityReason}</div>
                         </div>
                       </>
                     )}
                     {feedback.mode === 'Startup' && (
                       <>
+                        <ScoreItem label="Originality" score={Number(feedback.originality) || 8} color="orange" />
+                        <ScoreItem label="Market Size" score={Number(feedback.marketSize) || 8} color="blue" />
+                        <ScoreItem label="Monetization" score={Number(feedback.monetization) || 8} color="emerald" />
                         <div className="mt-4 text-sm text-slate-400 space-y-3">
                            <div><span className="font-bold text-slate-300 block mb-1">Market Size</span> {feedback.marketAnalysis?.marketSize}</div>
                            <div><span className="font-bold text-slate-300 block mb-1">Growth Trend</span> {feedback.marketAnalysis?.growthTrend}</div>
                            <div><span className="font-bold text-slate-300 block mb-1">Target Segment</span> {feedback.marketAnalysis?.targetSegment}</div>
                            <div><span className="font-bold text-slate-300 block mb-1">Differentiator</span> {feedback.competitiveLandscape?.yourMoat}</div>
                         </div>
+                        <CompetitorInsight text={feedback.competitorInsight} delay={0.4} />
+                        <MonetizationModel text={feedback.monetizationModel} delay={0.5} />
                       </>
                     )}
                   </div>
                 </Card>
+
+                <RiskCards risks={feedback.keyRisks} delay={0.3} />
+
+                <CopyAnalysisButton feedback={feedback as unknown as Record<string, unknown>} />
             </div>
 
             <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 sticky top-24 h-[100vh] max-h-[85vh]">

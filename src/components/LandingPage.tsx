@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase/supabase';
 import { createProject } from '@/lib/supabase/supabase-projects';
 import { Mode, IdeaFeedback } from '@/lib/types';
 import { toast } from 'sonner';
+import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, TechJustification, MonetizationModel, CopyAnalysisButton } from '@/components/ui/ideation-cards';
 
 interface LandingPageProps {
   onCreateProject: (id: string) => void;
@@ -705,6 +706,8 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
                       </motion.div>
                     </div>
 
+                    <TechJustification text={feedback.techJustification} delay={0.6} />
+
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -779,6 +782,37 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
                     </div>
                   </Card>
                 </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Additional Insights */}
+          <AnimatePresence>
+            {feedback && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="space-y-6 mt-6"
+              >
+                <PitchQuote text={feedback.pitchDeck} delay={0.1} />
+                <DifficultyBadge difficultyLevel={feedback.difficultyLevel} timeEstimateHours={feedback.timeEstimateHours} delay={0.15} />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {feedback.mode !== 'Learning' && (
+                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+                      <CompetitorInsight text={feedback.competitorInsight} delay={0.2} />
+                    </div>
+                  )}
+                  {feedback.mode === 'Startup' && (
+                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+                      <MonetizationModel text={feedback.monetizationModel} delay={0.25} />
+                    </div>
+                  )}
+                </div>
+
+                <RiskCards risks={feedback.keyRisks} delay={0.3} />
+                <CopyAnalysisButton feedback={feedback as unknown as Record<string, unknown>} />
               </motion.div>
             )}
           </AnimatePresence>
