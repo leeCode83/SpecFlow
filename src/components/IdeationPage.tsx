@@ -42,7 +42,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
       toast.success("Analysis complete!");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to analyze idea. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to analyze idea. Please try again.");
     } finally {
       setAnalyzing(false);
     }
@@ -62,7 +62,7 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
       setChatMessages([...newMessages, { role: 'assistant' as const, content: responseText }]);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to get response from AI.");
+      toast.error(error instanceof Error ? error.message : "Failed to get response from AI.");
     } finally {
       setChatting(false);
     }

@@ -192,7 +192,7 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
       toast.success("Analysis complete!");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to analyze idea. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to analyze idea. Please try again.");
     } finally {
       setAnalyzing(false);
     }
