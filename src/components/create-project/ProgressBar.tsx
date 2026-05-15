@@ -10,7 +10,7 @@ export function ProgressBar({ step }: ProgressBarProps) {
   return (
     <div className="fixed top-0 left-0 right-0 h-[2px] bg-white/[0.05] z-50">
       <motion.div
-        className="h-full bg-gradient-to-r from-orange-500 to-amber-400"
+        className="h-full bg-gradient-to-r from-primary to-amber-400"
         initial={{ width: '0%' }}
         animate={{ width: `${progress}%` }}
         transition={{ type: 'spring', stiffness: 100, damping: 20 }}

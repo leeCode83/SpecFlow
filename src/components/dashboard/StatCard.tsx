@@ -16,7 +16,7 @@ export function StatCard({ icon: Icon, label, value, accentClass, delay = 0, onC
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
       <Card
         size="sm"
-        className={`bg-slate-900/50 border-slate-800 ${onClick ? 'cursor-pointer hover:bg-slate-800/50 transition-colors' : ''}`}
+        className={`bg-card border-border ${onClick ? 'cursor-pointer hover:bg-muted/50 transition-colors' : ''}`}
         onClick={onClick}
       >
         <div className="p-4 flex items-center gap-4">
@@ -24,7 +24,7 @@ export function StatCard({ icon: Icon, label, value, accentClass, delay = 0, onC
             <Icon className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500">{label}</p>
+            <p className="text-xs font-medium text-muted-foreground">{label}</p>
             <h3 className="text-2xl font-bold">{value}</h3>
           </div>
         </div>

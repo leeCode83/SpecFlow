@@ -80,7 +80,7 @@ export function CreateProject() {
           <button
             onClick={goToChoice}
             disabled={isLoading}
-            className="flex items-center gap-2 text-slate-500 hover:text-white transition-colors text-sm mb-8 disabled:opacity-40"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm mb-8 disabled:opacity-40"
           >
             <ChevronLeft className="w-4 h-4" />
             Back to Options

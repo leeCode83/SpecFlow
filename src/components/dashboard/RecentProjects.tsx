@@ -12,8 +12,8 @@ interface RecentProjectsProps {
 }
 
 const modeConfig = {
-  Hackathon: { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/20', border: 'border-orange-500/20', label: 'Hackathon' },
-  Startup: { icon: Rocket, color: 'text-emerald-500', bg: 'bg-emerald-500/20', border: 'border-emerald-500/20', label: 'Startup' },
+  Hackathon: { icon: Zap, color: 'text-primary', bg: 'bg-primary/20', border: 'border-orange-500/20', label: 'Hackathon' },
+  Startup: { icon: Rocket, color: 'text-emerald-500', bg: 'bg-success/20', border: 'border-emerald-500/20', label: 'Startup' },
   Learning: { icon: GraduationCap, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/20', label: 'Learning' },
 };
 
@@ -26,7 +26,7 @@ export function RecentProjects({ projects, onSelectProject, onViewAll }: RecentP
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Recent Projects</h2>
-        <Button variant="ghost" size="sm" onClick={onViewAll} className="text-orange-500 hover:text-orange-400 text-xs">
+        <Button variant="ghost" size="sm" onClick={onViewAll} className="text-primary hover:text-primary/80 text-xs">
           View All <ArrowRight className="w-3 h-3 ml-1" />
         </Button>
       </div>
@@ -39,7 +39,7 @@ export function RecentProjects({ projects, onSelectProject, onViewAll }: RecentP
             <Card
               key={project.id}
               size="sm"
-              className="bg-slate-900/50 border-slate-800 cursor-pointer hover:bg-slate-800/50 transition-colors"
+              className="bg-card border-border cursor-pointer hover:bg-muted/50 transition-colors"
               onClick={() => onSelectProject(project.id)}
             >
               <div className="p-4 space-y-3">
@@ -47,9 +47,9 @@ export function RecentProjects({ projects, onSelectProject, onViewAll }: RecentP
                   <ModeIcon className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white truncate">{project.title}</h3>
+                  <h3 className="text-sm font-bold text-foreground truncate">{project.title}</h3>
                   {project.description && (
-                    <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">{project.description}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">{project.description}</p>
                   )}
                 </div>
                 <div className="flex items-center justify-between">

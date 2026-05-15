@@ -12,10 +12,10 @@ interface LogItemProps {
 
 function getLogVisuals(action: string) {
   const act = (action || '').toUpperCase().replace(/_/g, ' ');
-  if (act.includes('CREATE SPEC')) return { icon: PlusCircle, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/20' };
+  if (act.includes('CREATE SPEC')) return { icon: PlusCircle, color: 'text-primary/80', bg: 'bg-primary/20', border: 'border-orange-500/20' };
   if (act.includes('UPDATE GITHUB')) return { icon: GitBranch, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/20' };
   if (act.includes('EDIT SPEC')) return { icon: Edit2, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/20' };
-  if (act.includes('ADD MEMBER')) return { icon: UserPlus, color: 'text-emerald-400', bg: 'bg-emerald-500/20', border: 'border-emerald-500/20' };
+  if (act.includes('ADD MEMBER')) return { icon: UserPlus, color: 'text-success', bg: 'bg-success/20', border: 'border-emerald-500/20' };
   if (act.includes('REMOVE MEMBER')) return { icon: UserMinus, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/20' };
   if (act.includes('UPLOAD FILE')) return { icon: FilePlus, color: 'text-cyan-400', bg: 'bg-cyan-500/20', border: 'border-cyan-500/20' };
   if (act.includes('DELETE FILE')) return { icon: Trash2, color: 'text-rose-400', bg: 'bg-rose-500/20', border: 'border-rose-500/20' };
@@ -23,7 +23,7 @@ function getLogVisuals(action: string) {
   const palettes = [
     { color: 'text-indigo-400', bg: 'bg-indigo-500/20', border: 'border-indigo-500/20' },
     { color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/20' },
-    { color: 'text-amber-400', bg: 'bg-amber-500/20', border: 'border-amber-500/20' },
+    { color: 'text-warning', bg: 'bg-amber-500/20', border: 'border-amber-500/20' },
     { color: 'text-lime-400', bg: 'bg-lime-500/20', border: 'border-lime-500/20' },
     { color: 'text-teal-400', bg: 'bg-teal-500/20', border: 'border-teal-500/20' },
     { color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/20', border: 'border-fuchsia-500/20' },
@@ -45,8 +45,8 @@ function renderLogDetails(log: ProjectLog) {
   if (actUpper.includes('CREATE SPEC')) {
     return (
       <div className="flex flex-col gap-0.5">
-        <p className="text-xs text-slate-300">
-          Generated a new <span className="font-bold text-orange-400">{details.type || 'Custom'}</span> specification
+        <p className="text-xs text-foreground/80">
+          Generated a new <span className="font-bold text-primary/80">{details.type || 'Custom'}</span> specification
         </p>
       </div>
     );
@@ -54,27 +54,27 @@ function renderLogDetails(log: ProjectLog) {
   if (actUpper.includes('UPDATE GITHUB')) {
     return (
       <div className="flex flex-col gap-0.5">
-        <p className="text-xs text-slate-300">Linked a new GitHub repository</p>
+        <p className="text-xs text-foreground/80">Linked a new GitHub repository</p>
         {details.url && <p className="text-[10px] text-blue-400 truncate max-w-xs">{details.url}</p>}
       </div>
     );
   }
   if (actUpper.includes('EDIT SPEC')) {
-    return <p className="text-xs text-slate-300">Updated specification content</p>;
+    return <p className="text-xs text-foreground/80">Updated specification content</p>;
   }
   if (actUpper.includes('ADD MEMBER')) {
     return (
-      <p className="text-xs text-slate-300">
-        Added <span className="text-emerald-400 font-medium">{details.email || details.uuid || 'a new member'}</span> to the team
+      <p className="text-xs text-foreground/80">
+        Added <span className="text-success font-medium">{details.email || details.uuid || 'a new member'}</span> to the team
       </p>
     );
   }
   if (actUpper.includes('REMOVE MEMBER')) {
-    return <p className="text-xs text-slate-300">Revoked teammate access</p>;
+    return <p className="text-xs text-foreground/80">Revoked teammate access</p>;
   }
   if (actUpper.includes('UPLOAD FILE')) {
     return (
-      <p className="text-xs text-slate-300">
+      <p className="text-xs text-foreground/80">
         Uploaded <span className="text-cyan-400 font-medium">{details.filename || 'file'}</span>
         {details.size ? <> ({(details.size / 1024 / 1024).toFixed(2)} MB)</> : null}
       </p>
@@ -82,13 +82,13 @@ function renderLogDetails(log: ProjectLog) {
   }
   if (actUpper.includes('DELETE FILE')) {
     return (
-      <p className="text-xs text-slate-300">
+      <p className="text-xs text-foreground/80">
         Deleted <span className="text-rose-400/80 line-through">{details.filename || 'file'}</span>
       </p>
     );
   }
   const message = details.message || (typeof details === 'string' ? details : null);
-  return <p className="text-xs italic text-slate-400">{message || log.action || 'Performed an action'}</p>;
+  return <p className="text-xs italic text-muted-foreground">{message || log.action || 'Performed an action'}</p>;
 }
 
 export function LogItem({ log, projectName, index }: LogItemProps) {
@@ -111,9 +111,9 @@ export function LogItem({ log, projectName, index }: LogItemProps) {
             <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0 border-transparent ${visuals.bg} ${visuals.color}`}>
               {log.action}
             </Badge>
-            <span className="text-xs font-semibold text-slate-300">{projectName}</span>
+            <span className="text-xs font-semibold text-foreground/80">{projectName}</span>
           </div>
-          <span className="text-[10px] text-slate-500 flex items-center gap-1 shrink-0">
+          <span className="text-[10px] text-muted-foreground flex items-center gap-1 shrink-0">
             <Clock className="w-3 h-3" />
             {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
           </span>

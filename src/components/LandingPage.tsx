@@ -112,7 +112,7 @@ const features = [
     icon: BrainCircuit,
     title: "AI Ideation Engine",
     description: "Describe your idea in plain text. Our AI generates a complete technical blueprint with tech stack recommendations, strategic scores, and a refined product vision.",
-    iconBg: "bg-orange-500/10 text-orange-500",
+    iconBg: "bg-primary/10 text-primary",
     span: "lg" as const,
   },
   {
@@ -133,21 +133,21 @@ const features = [
     icon: Github,
     title: "GitHub Sync",
     description: "Link any GitHub repository, browse the complete file tree, and preview code with full syntax highlighting powered by Shiki.",
-    iconBg: "bg-slate-500/10 text-slate-300",
+    iconBg: "bg-muted-foreground/10 text-foreground/80",
     span: "lg" as const,
   },
   {
     icon: Users,
     title: "Team Collaboration",
     description: "Invite teammates to your workspace with email invitations. Accept/decline workflow with automatic expiration tracking.",
-    iconBg: "bg-emerald-500/10 text-emerald-400",
+    iconBg: "bg-success/10 text-success",
     span: "lg" as const,
   },
   {
     icon: LayoutDashboard,
     title: "Smart Dashboard",
     description: "Get a bird's-eye view of all your projects with stats, activity logs, recent projects, and quick access to any workspace.",
-    iconBg: "bg-orange-500/10 text-orange-500",
+    iconBg: "bg-primary/10 text-primary",
     span: "sm" as const,
   },
 ];
@@ -226,24 +226,24 @@ export function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col bg-slate-950 font-sans text-slate-50">
+    <div className="min-h-screen relative overflow-hidden flex flex-col bg-background font-sans text-foreground">
       {/* Background blobs */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] left-[20%] w-[40%] h-[60%] bg-orange-500/10 blur-[120px] rounded-full animate-pulse" />
+        <div className="absolute top-[-10%] left-[20%] w-[40%] h-[60%] bg-primary/10 blur-[120px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-10%] right-[20%] w-[40%] h-[60%] bg-blue-500/10 blur-[120px] rounded-full" />
       </div>
 
       {/* Navigation Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <img src="/logo.png" alt="IdeaFrame" className="w-7 h-7" />
           <span className="font-bold tracking-tight text-xl italic">IdeaFrame</span>
         </div>
         <div className="flex gap-4">
-          <Button variant="ghost" className="text-slate-300 hover:text-white" onClick={onSignIn}>
+          <Button variant="ghost" className="text-foreground/80 hover:text-foreground" onClick={onSignIn}>
             Log In
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold" onClick={onStartIdeation}>
+          <Button className="bg-primary hover:bg-primary/90 text-foreground font-bold" onClick={onStartIdeation}>
             Get Started
           </Button>
         </div>
@@ -331,7 +331,7 @@ export function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut", delay: 0.3 }}
             >
-              <span className="bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">Idea to</span>
+              <span className="bg-gradient-to-b from-white to-muted-foreground bg-clip-text text-transparent">Idea to</span>
               <LayoutGroup>
                 <motion.span layout className="flex whitespace-pre flex-col md:flex-row items-center gap-1 md:gap-4 mt-2">
                   <TextRotate
@@ -342,7 +342,7 @@ export function LandingPage() {
                       "Roadmap",
                       "Code",
                     ]}
-                    mainClassName="overflow-hidden text-orange-500 py-0"
+                    mainClassName="overflow-hidden text-primary py-0"
                     splitLevelClassName="overflow-hidden"
                     staggerDuration={0.03}
                     staggerFrom="last"
@@ -351,7 +351,7 @@ export function LandingPage() {
                   />
                   <motion.span
                     layout
-                    className="flex whitespace-pre bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent"
+                    className="flex whitespace-pre bg-gradient-to-b from-white to-muted-foreground bg-clip-text text-transparent"
                     transition={{ type: "spring", damping: 30, stiffness: 400 }}
                   >
                     in Seconds.
@@ -360,7 +360,7 @@ export function LandingPage() {
               </LayoutGroup>
             </motion.h1>
             <motion.p
-              className="text-sm sm:text-lg md:text-xl lg:text-2xl text-center text-slate-400 pt-6 sm:pt-8 md:pt-10 lg:pt-12 max-w-2xl"
+              className="text-sm sm:text-lg md:text-xl lg:text-2xl text-center text-muted-foreground pt-6 sm:pt-8 md:pt-10 lg:pt-12 max-w-2xl"
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut", delay: 0.5 }}
@@ -372,7 +372,7 @@ export function LandingPage() {
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 items-center mt-10 md:mt-16 w-full">
               <motion.button
                 onClick={onStartIdeation}
-                className="w-full sm:w-auto text-base md:text-lg font-bold tracking-tight text-white bg-orange-500 px-8 py-4 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.4)]"
+                className="w-full sm:w-auto text-base md:text-lg font-bold tracking-tight text-foreground bg-primary px-8 py-4 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.4)]"
                 animate={{ opacity: 1, y: 0 }}
                 initial={{ opacity: 0, y: 20 }}
                 transition={{
@@ -389,7 +389,7 @@ export function LandingPage() {
               </motion.button>
               <motion.button
                 onClick={onSignIn}
-                className="w-full sm:w-auto flex justify-center items-center gap-2 text-base md:text-lg font-bold tracking-tight text-slate-300 bg-slate-900 border border-slate-700 px-8 py-4 rounded-full shadow-xl"
+                className="w-full sm:w-auto flex justify-center items-center gap-2 text-base md:text-lg font-bold tracking-tight text-foreground/80 bg-card border border-border/70 px-8 py-4 rounded-full shadow-xl"
                 animate={{ opacity: 1, y: 0 }}
                 initial={{ opacity: 0, y: 20 }}
                 transition={{
@@ -410,7 +410,7 @@ export function LandingPage() {
         </section>
 
         {/* Features Section - Animated Card Grid */}
-        <section className="w-full bg-slate-900/30 border-y border-slate-800/50 py-24 overflow-hidden">
+        <section className="w-full bg-card/60 border-y border-border/50 py-24 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -420,9 +420,9 @@ export function LandingPage() {
               className="text-center space-y-4 mb-16"
             >
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                <span className="bg-gradient-to-r from-orange-500 to-orange-200 bg-clip-text text-transparent">Features</span>
+                <span className="bg-gradient-to-r from-primary to-primary/30 bg-clip-text text-transparent">Features</span>
               </h2>
-              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                 Everything you need to turn raw ideas into production-ready specifications.
               </p>
             </motion.div>
@@ -447,7 +447,7 @@ export function LandingPage() {
         <section className="relative w-full max-w-5xl mx-auto px-6 py-24 z-10 overflow-hidden">
           {/* Gradient Mesh Background */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
-            <div className="absolute top-[-5%] left-[20%] w-80 h-80 bg-orange-500/5 blur-[120px] rounded-full animate-[slow-drift_20s_ease-in-out_infinite]" />
+            <div className="absolute top-[-5%] left-[20%] w-80 h-80 bg-primary/5 blur-[120px] rounded-full animate-[slow-drift_20s_ease-in-out_infinite]" />
             <div className="absolute bottom-[-5%] right-[20%] w-96 h-96 bg-blue-500/5 blur-[140px] rounded-full animate-[slow-drift-reverse_25s_ease-in-out_infinite]" />
             <div className="absolute top-[40%] left-[45%] w-64 h-64 bg-purple-500/5 blur-[100px] rounded-full animate-[slow-drift_30s_ease-in-out_infinite_reverse]" />
           </div>
@@ -464,13 +464,13 @@ export function LandingPage() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm font-semibold mb-4"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary/80 text-sm font-semibold mb-4"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Live Demo
             </motion.div>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-orange-500 to-orange-200 bg-clip-text text-transparent">Try the Ideation Engine</span>
+              <span className="bg-gradient-to-r from-primary to-primary/30 bg-clip-text text-transparent">Try the Ideation Engine</span>
             </h2>
             <div className="h-8">
               <AnimatePresence mode="wait">
@@ -480,7 +480,7 @@ export function LandingPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.3 }}
-                  className="text-slate-400 text-lg max-w-2xl mx-auto"
+                  className="text-muted-foreground text-lg max-w-2xl mx-auto"
                 >
                   {subtitles[subtitleIdx]}
                 </motion.p>
@@ -494,9 +494,9 @@ export function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1, duration: 0.5 }}
-            className="relative bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 md:p-10 shadow-2xl"
+            className="relative bg-card/60 backdrop-blur-xl border border-border/80 rounded-3xl p-6 md:p-10 shadow-2xl"
           >
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-500/[0.02] to-transparent pointer-events-none" />
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
 
             {/* Zone 2: Mode Selector */}
             <motion.div
@@ -508,8 +508,8 @@ export function LandingPage() {
             >
               {[
                 { value: 'Learning' as Mode, icon: <BrainCircuit className="w-4 h-4" />, activeClass: 'bg-blue-500 border-blue-500 text-white shadow-lg' },
-                { value: 'Hackathon' as Mode, icon: <Zap className="w-4 h-4" />, activeClass: 'bg-orange-500 border-orange-500 text-white shadow-lg' },
-                { value: 'Startup' as Mode, icon: <Target className="w-4 h-4" />, activeClass: 'bg-emerald-500 border-emerald-500 text-white shadow-lg' },
+                { value: 'Hackathon' as Mode, icon: <Zap className="w-4 h-4" />, activeClass: 'bg-primary border-primary text-foreground shadow-lg' },
+                { value: 'Startup' as Mode, icon: <Target className="w-4 h-4" />, activeClass: 'bg-brand-secondary border-brand-secondary text-foreground shadow-lg' },
               ].map((m) => (
                 <motion.button
                   key={m.value}
@@ -517,7 +517,7 @@ export function LandingPage() {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl border text-sm font-bold transition-all duration-300 ${
-                    mode === m.value ? m.activeClass : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-orange-500/50 hover:text-slate-200'
+                    mode === m.value ? m.activeClass : 'bg-background/60 border-border text-muted-foreground hover:border-primary/50 hover:text-foreground/90'
                   }`}
                 >
                   {m.icon}
@@ -525,7 +525,7 @@ export function LandingPage() {
                   {mode === m.value && (
                     <motion.div
                       layoutId="modeGlow"
-                      className="absolute inset-0 rounded-xl bg-orange-500/10 blur-sm -z-10"
+                      className="absolute inset-0 rounded-xl bg-primary/10 blur-sm -z-10"
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     />
                   )}
@@ -537,7 +537,7 @@ export function LandingPage() {
             <div className="relative">
               <Textarea
                 placeholder="Describe your project idea..."
-                className="min-h-[140px] bg-slate-950/50 border-slate-800 focus:border-orange-500/50 text-lg p-6 rounded-xl resize-none transition-all duration-300"
+                className="min-h-[140px] bg-background/50 border-border focus:border-primary/50 text-lg p-6 rounded-xl resize-none transition-all duration-300"
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
               />
@@ -554,9 +554,9 @@ export function LandingPage() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setIdea(prompt)}
-                    className="px-3 py-1.5 text-xs rounded-full bg-slate-800/40 border border-slate-700/50 text-slate-500 hover:text-slate-200 hover:border-orange-500/30 hover:bg-slate-800/60 transition-all duration-200 truncate max-w-[240px]"
+                    className="px-3 py-1.5 text-xs rounded-full bg-muted/40 border border-border/70 text-muted-foreground hover:text-foreground/90 hover:border-primary/30 hover:bg-muted/60 transition-all duration-200 truncate max-w-[240px]"
                   >
-                    <Lightbulb className="w-3 h-3 inline mr-1.5 text-orange-500/70" />
+                    <Lightbulb className="w-3 h-3 inline mr-1.5 text-primary/70" />
                     {prompt}
                   </motion.button>
                 ))}
@@ -572,10 +572,10 @@ export function LandingPage() {
               className="mt-6 flex justify-end"
             >
               <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 rounded-xl opacity-0 group-hover:opacity-75 blur transition-all duration-500 group-hover:duration-300" />
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-primary/80 to-primary rounded-xl opacity-0 group-hover:opacity-75 blur transition-all duration-500 group-hover:duration-300" />
                 <Button
                   size="lg"
-                  className="relative bg-orange-500 hover:bg-orange-600 text-white gap-2 px-10 rounded-xl font-bold h-12 shadow-lg transition-all duration-300"
+                  className="relative bg-primary hover:bg-primary/90 text-foreground gap-2 px-10 rounded-xl font-bold h-12 shadow-lg transition-all duration-300"
                   onClick={handleAnalyze}
                   disabled={analyzing}
                 >
@@ -617,7 +617,7 @@ export function LandingPage() {
                   transition={{ delay: 0.2, duration: 0.4 }}
                   className="md:col-span-2"
                 >
-                  <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl space-y-6 h-full">
+                  <Card className="bg-card border-border p-8 rounded-2xl space-y-6 h-full">
                     <div className="space-y-2">
                       <motion.h3
                         initial={{ opacity: 0, y: 10 }}
@@ -625,14 +625,14 @@ export function LandingPage() {
                         transition={{ delay: 0.3 }}
                         className="text-xl font-bold flex items-center gap-2"
                       >
-                        <BrainCircuit className="w-5 h-5 text-orange-500" />
+                        <BrainCircuit className="w-5 h-5 text-primary" />
                         Strategic Summary
                       </motion.h3>
                       <motion.p
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
-                        className="text-slate-400 leading-relaxed"
+                        className="text-muted-foreground leading-relaxed"
                       >
                         {feedback.summary || feedback.refinedIdea?.oneLiner}
                       </motion.p>
@@ -645,7 +645,7 @@ export function LandingPage() {
                         transition={{ delay: 0.5 }}
                         className="space-y-2"
                       >
-                        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Tech Stack</h4>
+                        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Tech Stack</h4>
                         <div className="flex flex-wrap gap-2">
                           {feedback.techStack.frontend?.map((t, i) => (
                             <motion.span
@@ -674,7 +674,7 @@ export function LandingPage() {
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: 0.6 + ((feedback.techStack.frontend?.length ?? 0) + (feedback.techStack.backend?.length ?? 0) + i) * 0.05 }}
                             >
-                              <Badge variant="outline" className="bg-emerald-500/5 border-emerald-500/20 text-emerald-400">{t.tech}</Badge>
+                              <Badge variant="outline" className="bg-success/5 border-success/20 text-success">{t.tech}</Badge>
                             </motion.span>
                           ))}
                         </div>
@@ -686,8 +686,8 @@ export function LandingPage() {
                         transition={{ delay: 0.55 }}
                         className="space-y-2"
                       >
-                        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Next Steps</h4>
-                        <ul className="text-sm text-slate-400 space-y-2">
+                        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Next Steps</h4>
+                        <ul className="text-sm text-muted-foreground space-y-2">
                           {feedback.nextSteps?.map((step, i) => (
                             <motion.li
                               key={i}
@@ -696,7 +696,7 @@ export function LandingPage() {
                               transition={{ delay: 0.65 + i * 0.08 }}
                               className="flex gap-2 items-start"
                             >
-                              <CheckCircle2 className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
+                              <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                               <span>{step}</span>
                             </motion.li>
                           ))}
@@ -710,17 +710,17 @@ export function LandingPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.7 }}
-                      className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-800"
+                      className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border"
                     >
                       <Button
                         onClick={onSignIn}
-                        className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold h-14 rounded-xl transition-all duration-200"
+                        className="flex-1 bg-muted hover:bg-muted/80 text-foreground font-bold h-14 rounded-xl transition-all duration-200"
                       >
                         Log In to Elaborate
                       </Button>
                       <Button
                         onClick={handleSaveProject}
-                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl transition-all duration-200"
+                        className="flex-1 bg-primary hover:bg-primary/90 text-foreground font-bold h-14 rounded-xl transition-all duration-200"
                       >
                         Sign In & Create Project
                         <ArrowRight className="w-5 h-5 ml-2" />
@@ -735,7 +735,7 @@ export function LandingPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.25, duration: 0.4 }}
                 >
-                  <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col h-full">
+                  <Card className="bg-card border-border p-8 rounded-2xl flex flex-col h-full">
                     <motion.h3
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -753,11 +753,11 @@ export function LandingPage() {
                         className="flex flex-col items-center"
                       >
                         <ScoreDonut score={Number(feedback.originality) || 8} color="orange" size="lg" />
-                        <span className="text-sm font-bold text-slate-400 mt-2">Originality</span>
+                        <span className="text-sm font-bold text-muted-foreground mt-2">Originality</span>
                       </motion.div>
 
                       {/* Bars: mode-specific scores */}
-                      <div className="space-y-4 pt-2 border-t border-slate-800/60">
+                      <div className="space-y-4 pt-2 border-t border-border/60">
                         {mode === 'Hackathon' && (
                           <>
                             <ScoreItem label="Buildability" score={Number(feedback.buildability) || 8} color="blue" />
@@ -798,12 +798,12 @@ export function LandingPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {feedback.mode !== 'Learning' && (
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+                    <div className="bg-card border border-border rounded-2xl p-6">
                       <CompetitorInsight text={feedback.competitorInsight} delay={0.2} />
                     </div>
                   )}
                   {feedback.mode === 'Startup' && (
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+                    <div className="bg-card border border-border rounded-2xl p-6">
                       <MonetizationModel text={feedback.monetizationModel} delay={0.25} />
                     </div>
                   )}
@@ -816,10 +816,10 @@ export function LandingPage() {
           </AnimatePresence>
         </section>
 
-        <section className="w-full bg-slate-900/30 border-y border-slate-800/50 py-24 overflow-hidden">
+        <section className="w-full bg-card/60 border-y border-border/50 py-24 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 text-center space-y-12">
             <div className="space-y-4">
-              <MessageSquareQuote className="w-12 h-12 text-orange-500 mx-auto opacity-50" />
+              <MessageSquareQuote className="w-12 h-12 text-primary mx-auto opacity-50" />
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight">What Builders Say</h2>
             </div>
             
@@ -833,16 +833,16 @@ export function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-950/80 border-t border-slate-800/80 relative h-fit overflow-hidden mt-24">
+      <footer className="bg-background/80 border-t border-border/80 relative h-fit overflow-hidden mt-24">
         <div className="max-w-7xl mx-auto p-14 z-40 relative">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
             {/* Brand section */}
             <div className="flex flex-col space-y-4">
               <div className="flex items-center space-x-2">
-                <Rocket className="w-8 h-8 text-orange-500" />
-                <span className="text-white text-3xl font-bold tracking-tight italic">IdeaFrame</span>
+                <Rocket className="w-8 h-8 text-primary" />
+                <span className="text-foreground text-3xl font-bold tracking-tight italic">IdeaFrame</span>
               </div>
-              <p className="text-sm leading-relaxed text-slate-400">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 The spec-driven development workspace for high-speed hackers and founders.
               </p>
             </div>
@@ -873,7 +873,7 @@ export function LandingPage() {
               },
             ].map((section) => (
               <div key={section.title}>
-                <h4 className="text-white text-lg font-semibold mb-6">
+                <h4 className="text-foreground text-lg font-semibold mb-6">
                   {section.title}
                 </h4>
                 <ul className="space-y-3">
@@ -881,12 +881,12 @@ export function LandingPage() {
                     <li key={link.label} className="relative">
                       <a
                         href={link.href}
-                        className="text-slate-400 hover:text-orange-500 transition-colors"
+                        className="text-muted-foreground hover:text-primary transition-colors"
                       >
                         {link.label}
                       </a>
                       {link.pulse && (
-                        <span className="absolute top-0 right-[40px] w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                        <span className="absolute top-0 right-[40px] w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                       )}
                     </li>
                   ))}
@@ -896,18 +896,18 @@ export function LandingPage() {
 
             {/* Contact section */}
             <div>
-              <h4 className="text-white text-lg font-semibold mb-6">
+              <h4 className="text-foreground text-lg font-semibold mb-6">
                 Contact Us
               </h4>
               <ul className="space-y-4">
                 {[
                   {
-                    icon: <Mail size={18} className="text-orange-500" />,
+                    icon: <Mail size={18} className="text-primary" />,
                     text: "hello@ideaframe.dev",
                     href: "mailto:hello@ideaframe.dev",
                   },
                   {
-                    icon: <Github size={18} className="text-orange-500" />,
+                    icon: <Github size={18} className="text-primary" />,
                     text: "ideaframe-dev",
                     href: "#",
                   },
@@ -917,12 +917,12 @@ export function LandingPage() {
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="text-slate-400 hover:text-orange-500 transition-colors"
+                        className="text-muted-foreground hover:text-primary transition-colors"
                       >
                         {item.text}
                       </a>
                     ) : (
-                      <span className="text-slate-400 hover:text-orange-500 transition-colors">
+                      <span className="text-muted-foreground hover:text-primary transition-colors">
                         {item.text}
                       </span>
                     )}
@@ -932,12 +932,12 @@ export function LandingPage() {
             </div>
           </div>
 
-          <hr className="border-t border-slate-800 my-8" />
+          <hr className="border-t border-border my-8" />
 
           {/* Footer bottom */}
           <div className="flex flex-col md:flex-row justify-between items-center text-sm space-y-4 md:space-y-0">
             {/* Social icons */}
-            <div className="flex space-x-6 text-slate-400">
+            <div className="flex space-x-6 text-muted-foreground">
               {[
                 { icon: <Facebook size={20} />, label: "Facebook", href: "#" },
                 { icon: <Instagram size={20} />, label: "Instagram", href: "#" },
@@ -947,7 +947,7 @@ export function LandingPage() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="hover:text-orange-500 transition-colors"
+                  className="hover:text-primary transition-colors"
                 >
                   {icon}
                 </a>
@@ -955,7 +955,7 @@ export function LandingPage() {
             </div>
 
             {/* Copyright */}
-            <p className="text-center md:text-left text-slate-500">
+            <p className="text-center md:text-left text-muted-foreground">
               &copy; {new Date().getFullYear()} IdeaFrame. All rights reserved.
             </p>
           </div>
@@ -1019,18 +1019,18 @@ function ScoreDonut({ score, color, size = 'md' }: { score: number; color: 'oran
 
 function ScoreItem({ label, score, color }: { label: string, score: number, color: 'orange' | 'blue' | 'emerald' }) {
   const colorMap = {
-    orange: 'bg-orange-500',
+    orange: 'bg-primary',
     blue: 'bg-blue-500',
-    emerald: 'bg-emerald-500'
+    emerald: 'bg-brand-secondary'
   };
 
   return (
     <div className="space-y-2">
-      <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
+      <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground">
         <span>{label}</span>
-        <span className="text-slate-200">{score}/10</span>
+        <span className="text-foreground/90">{score}/10</span>
       </div>
-      <div className="h-2.5 bg-slate-950 border border-slate-800 rounded-full overflow-hidden">
+      <div className="h-2.5 bg-background border border-border rounded-full overflow-hidden">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${score * 10}%` }}
@@ -1051,22 +1051,22 @@ function FeatureCard({ feature, span }: { feature: typeof features[0]; span: "sm
         visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
       }}
       whileHover={{ y: -6, transition: { type: "spring", stiffness: 300, damping: 20 } }}
-      className={`group relative bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl transition-all duration-300 hover:border-orange-500/30 hover:shadow-[0_0_30px_rgba(249,115,22,0.08)] ${lg ? 'md:col-span-2 p-8 md:p-10' : 'p-6 md:p-8'}`}
+      className={`group relative bg-card/40 backdrop-blur-xl border border-border/60 rounded-2xl transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_30px_rgba(249,115,22,0.08)] ${lg ? 'md:col-span-2 p-8 md:p-10' : 'p-6 md:p-8'}`}
     >
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-orange-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       <div className={`${lg ? 'w-14 h-14' : 'w-12 h-12'} rounded-xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg ${feature.iconBg}`}>
         <Icon className={lg ? 'w-7 h-7' : 'w-6 h-6'} />
       </div>
 
-      <h3 className={`font-bold text-slate-100 mb-3 group-hover:text-orange-400 transition-colors duration-300 ${lg ? 'text-xl' : 'text-lg'}`}>
+      <h3 className={`font-bold text-foreground/95 mb-3 group-hover:text-primary/80 transition-colors duration-300 ${lg ? 'text-xl' : 'text-lg'}`}>
         {feature.title}
       </h3>
-      <p className={`text-slate-400 leading-relaxed ${lg ? 'text-base max-w-2xl' : 'text-sm'}`}>
+      <p className={`text-muted-foreground leading-relaxed ${lg ? 'text-base max-w-2xl' : 'text-sm'}`}>
         {feature.description}
       </p>
 
-      <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     </motion.div>
   );
 }

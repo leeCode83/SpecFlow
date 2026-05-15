@@ -238,16 +238,16 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
           onClick={() => isFolder ? toggleFolder(node.path) : handleFileClick(node.path)}
           className={cn(
             'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors text-left',
-            selectedFile === node.path ? 'bg-slate-800 text-orange-400' : 'hover:bg-slate-800/50 text-slate-300',
+            selectedFile === node.path ? 'bg-muted text-primary/80' : 'hover:bg-muted/50 text-foreground/80',
           )}
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
         >
           {isFolder ? (
             <>
               {isExpanded ? (
-                <FolderOpenIcon className="w-4 h-4 text-slate-500" />
+                <FolderOpenIcon className="w-4 h-4 text-muted-foreground" />
               ) : (
-                <FolderIcon className="w-4 h-4 text-slate-500" />
+                <FolderIcon className="w-4 h-4 text-muted-foreground" />
               )}
               <span className="truncate">{node.name}</span>
             </>
@@ -275,21 +275,21 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
             placeholder="https://github.com/owner/repo"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            className="bg-slate-900/50 border-slate-800"
+            className="bg-card border-border"
           />
           <Button
             onClick={handleConnect}
             disabled={!urlInput.trim() || loading}
-            className={connected ? 'bg-green-600 hover:bg-green-700 font-bold gap-2' : 'bg-orange-500 hover:bg-orange-600 font-bold gap-2'}
+            className={connected ? 'bg-green-600 hover:bg-green-700 font-bold gap-2' : 'bg-primary hover:bg-primary/90 font-bold gap-2'}
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             {connected ? 'Connected ✓' : 'Connect'}
           </Button>
         </div>
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-card border-border">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <Github className="w-12 h-12 text-slate-700 mb-4" />
-            <p className="text-slate-400 mb-2">No repository connected</p>
+            <p className="text-muted-foreground mb-2">No repository connected</p>
             <p className="text-slate-600 text-sm">
               Paste a public GitHub repository URL above to browse its files
             </p>
@@ -306,12 +306,12 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
           placeholder="https://github.com/owner/repo"
           value={urlInput}
           onChange={(e) => setUrlInput(e.target.value)}
-          className="bg-slate-900/50 border-slate-800"
+          className="bg-card border-border"
         />
         <Button
           onClick={handleConnect}
           disabled={!urlInput.trim() || loading}
-          className="bg-orange-500 hover:bg-orange-600 font-bold gap-2"
+          className="bg-primary hover:bg-primary/90 font-bold gap-2"
         >
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
           Connect
@@ -320,45 +320,45 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
 
       {loading && (
         <div className="space-y-4">
-          <Skeleton className="h-24 w-full bg-slate-900/50" />
+          <Skeleton className="h-24 w-full bg-card" />
           <div className="grid grid-cols-2 gap-4">
-            <Skeleton className="h-64 w-full bg-slate-900/50" />
-            <Skeleton className="h-64 w-full bg-slate-900/50" />
+            <Skeleton className="h-64 w-full bg-card" />
+            <Skeleton className="h-64 w-full bg-card" />
           </div>
         </div>
       )}
 
       {!loading && repoInfo && (
         <>
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Github className="w-5 h-5 text-orange-500" />
-                    <h3 className="font-bold text-lg text-slate-200 truncate">
+                    <Github className="w-5 h-5 text-primary" />
+                    <h3 className="font-bold text-lg text-foreground/90 truncate">
                       {repoInfo.fullName}
                     </h3>
                   </div>
                   {repoInfo.description && (
-                    <p className="text-sm text-slate-400 mb-3 line-clamp-2">
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {repoInfo.description}
                     </p>
                   )}
                   <div className="flex flex-wrap items-center gap-3">
                     {repoInfo.stars > 0 && (
-                      <div className="flex items-center gap-1 text-sm text-slate-400">
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Star className="w-4 h-4 text-yellow-500" />
                         {repoInfo.stars.toLocaleString()}
                       </div>
                     )}
                     {repoInfo.language && (
-                      <Badge variant="outline" className="text-xs border-slate-700">
+                      <Badge variant="outline" className="text-xs border-border/70">
                         {repoInfo.language}
                       </Badge>
                     )}
                     {repoInfo.topics.slice(0, 3).map(topic => (
-                      <Badge key={topic} variant="secondary" className="text-xs bg-slate-800">
+                      <Badge key={topic} variant="secondary" className="text-xs bg-muted">
                         {topic}
                       </Badge>
                     ))}
@@ -368,7 +368,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
                   variant="ghost"
                   size="sm"
                   asChild
-                  className="text-slate-400 hover:text-slate-200"
+                  className="text-muted-foreground hover:text-foreground/90"
                 >
                   <a
                     href={`https://github.com/${repoInfo.fullName}`}
@@ -382,25 +382,25 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
             </CardContent>
           </Card>
 
-          <ResizablePanelGroup direction="horizontal" className="border border-slate-800 rounded-2xl overflow-hidden h-[400px] md:h-[500px]">
+          <ResizablePanelGroup direction="horizontal" className="border border-border rounded-2xl overflow-hidden h-[400px] md:h-[500px]">
             <ResizablePanel defaultSize={20} minSize={20}>
-              <div className="h-full flex flex-col bg-slate-900/30">
-                <div className="p-3 border-b border-slate-800 flex items-center gap-2">
-                  <FileCode className="w-4 h-4 text-slate-500" />
-                  <span className="text-sm font-medium text-slate-400">Files</span>
+              <div className="h-full flex flex-col bg-card/60">
+                <div className="p-3 border-b border-border flex items-center gap-2">
+                  <FileCode className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">Files</span>
                 </div>
                 <ScrollArea className="flex-1">
                   <div className="p-2">
                     {loadingTree ? (
                       <div className="space-y-2">
                         {[...Array(8)].map((_, i) => (
-                          <Skeleton key={i} className="h-8 w-full bg-slate-800/50" />
+                          <Skeleton key={i} className="h-8 w-full bg-muted/50" />
                         ))}
                       </div>
                     ) : treeError ? (
                       <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
                         <AlertTriangle className="w-8 h-8 text-red-500 mb-2" />
-                        <p className="text-sm text-slate-400 mb-1">Failed to load files</p>
+                        <p className="text-sm text-muted-foreground mb-1">Failed to load files</p>
                         <p className="text-xs text-slate-600">{treeError}</p>
                       </div>
                     ) : (
@@ -414,15 +414,15 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
             <ResizableHandle />
 
             <ResizablePanel defaultSize={80} minSize={30}>
-              <div className="h-full flex flex-col bg-slate-900/30">
+              <div className="h-full flex flex-col bg-card/60">
                 {selectedFile ? (
                   <>
-                    <div className="p-3 border-b border-slate-800 flex items-center justify-between">
+                    <div className="p-3 border-b border-border flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
-                        <Badge variant="outline" className="text-xs border-slate-700 uppercase">
+                        <Badge variant="outline" className="text-xs border-border/70 uppercase">
                           {selectedFile.split('.').pop()}
                         </Badge>
-                        <span className="text-sm text-slate-400 truncate">
+                        <span className="text-sm text-muted-foreground truncate">
                           {selectedFile}
                         </span>
                       </div>
@@ -430,7 +430,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
                         variant="ghost"
                         size="sm"
                         onClick={handleCopy}
-                        className="h-8 w-8 p-0 text-slate-400 hover:text-slate-200"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground/90"
                       >
                         {copied ? (
                           <Check className="w-4 h-4 text-green-500" />
@@ -444,12 +444,12 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
                         {loadingContent || highlighting ? (
                           <div className="space-y-2">
                             {[...Array(10)].map((_, i) => (
-                              <Skeleton key={i} className="h-5 w-full bg-slate-800/50" />
+                              <Skeleton key={i} className="h-5 w-full bg-muted/50" />
                             ))}
                           </div>
                         ) : highlightedHtml ? (
                           <div
-                            className="shiki-gh bg-slate-950 rounded-xl text-sm"
+                            className="shiki-gh bg-background rounded-xl text-sm"
                             dangerouslySetInnerHTML={{ __html: highlightedHtml }}
                           />
                         ) : null}
@@ -459,7 +459,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
                 ) : (
                   <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
                     <FileCode className="w-12 h-12 text-slate-700 mb-4" />
-                    <p className="text-slate-500">Select a file to preview</p>
+                    <p className="text-muted-foreground">Select a file to preview</p>
                   </div>
                 )}
               </div>

@@ -29,14 +29,14 @@ export function ConfirmProposal({
 }: ConfirmProposalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-lg">
+      <DialogContent className="bg-card border-border text-foreground max-w-lg">
         <DialogHeader>
-          <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mb-4">
-            <BrainCircuit className="w-6 h-6 text-orange-500" />
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <BrainCircuit className="w-6 h-6 text-primary" />
           </div>
           <DialogTitle className="text-xl">Apply AI Proposal?</DialogTitle>
-          <DialogDescription className="text-slate-400 mt-2">
-            The AI has generated a new draft for your <span className="text-orange-500 font-bold">{specType || 'Custom'}</span> specification. 
+          <DialogDescription className="text-muted-foreground mt-2">
+            The AI has generated a new draft for your <span className="text-primary font-bold">{specType || 'Custom'}</span> specification. 
             Review the chat for details. This will update your current editor content.
           </DialogDescription>
         </DialogHeader>
@@ -44,13 +44,13 @@ export function ConfirmProposal({
           <Button 
             variant="ghost" 
             onClick={() => onOpenChange(false)} 
-            className="flex-1 sm:flex-none text-slate-400 hover:bg-slate-800"
+            className="flex-1 sm:flex-none text-muted-foreground hover:bg-muted"
           >
             Cancel
           </Button>
           <Button 
             onClick={onApply} 
-            className="flex-1 sm:flex-none bg-orange-500 hover:bg-orange-600 font-bold"
+            className="flex-1 sm:flex-none bg-primary hover:bg-orange-600 font-bold"
           >
             Process & Apply
           </Button>

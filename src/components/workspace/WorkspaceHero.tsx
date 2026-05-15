@@ -28,11 +28,11 @@ export function WorkspaceHero({ project, specs, files, teamCount }: WorkspaceHer
       <div>
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-3xl sm:text-4xl font-bold">{project?.title}</h1>
-          <Badge variant="outline" className="bg-orange-500/5 text-orange-500 border-orange-500/20 text-xs px-3 py-1">
+          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-xs px-3 py-1">
             {project?.mode}
           </Badge>
         </div>
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Calendar className="w-3 h-3" />
             Created {project?.created_at ? new Date(project.created_at).toLocaleDateString() : ''}
@@ -53,8 +53,8 @@ export function WorkspaceHero({ project, specs, files, teamCount }: WorkspaceHer
       </div>
 
       {project?.description && (
-        <div className="bg-slate-900/30 border border-slate-800/50 rounded-2xl p-6">
-          <div className="flex items-center gap-2 text-slate-400 mb-3">
+        <div className="bg-card/60 border border-border/50 rounded-2xl p-6">
+          <div className="flex items-center gap-2 text-muted-foreground mb-3">
             <FileText className="w-4 h-4" />
             <h2 className="font-bold text-sm">Description</h2>
           </div>
@@ -75,7 +75,7 @@ export function WorkspaceHero({ project, specs, files, teamCount }: WorkspaceHer
             {isOverflowing && (
               <button
                 onClick={() => setExpanded(!expanded)}
-                className="flex items-center gap-1 text-xs text-orange-500 hover:text-orange-400 transition-colors mt-2"
+                className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors mt-2"
               >
                 <motion.span
                   animate={{ rotate: expanded ? 180 : 0 }}

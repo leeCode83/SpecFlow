@@ -79,7 +79,7 @@ export function TeamList({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Team</h2>
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-muted-foreground">
           {(project?.teammates?.length || 0) + 1} member{(project?.teammates?.length || 0) + 1 !== 1 ? 's' : ''}
         </span>
       </div>
@@ -88,24 +88,24 @@ export function TeamList({
         <div className="flex flex-wrap items-center gap-3">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 border-2 border-orange-500/30 shrink-0 cursor-default">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border-2 border-primary/30 shrink-0 cursor-default">
                 <User className="w-5 h-5" />
               </div>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="bg-slate-900 border-slate-800 text-xs">
-              <p className="font-medium text-orange-400">Owner</p>
-              <p className="text-slate-400">{currentUserId ? 'You' : 'Founder'}</p>
+            <TooltipContent side="bottom" className="bg-card border-border text-xs">
+              <p className="font-medium text-primary/80">Owner</p>
+              <p className="text-muted-foreground">{currentUserId ? 'You' : 'Founder'}</p>
             </TooltipContent>
           </Tooltip>
 
           {loadingEmails && project?.teammates?.length ? (
-            <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
           ) : (
             project?.teammates?.map(teammateId => (
               <Tooltip key={teammateId}>
                 <TooltipTrigger asChild>
                   <div className="relative group/avatar">
-                    <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 border-2 border-slate-700/50 shrink-0 cursor-default">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground border-2 border-border/70 shrink-0 cursor-default">
                       <User className="w-5 h-5" />
                     </div>
                     {isOwner && (
@@ -118,9 +118,9 @@ export function TeamList({
                     )}
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="bg-slate-900 border-slate-800 text-xs">
+                <TooltipContent side="bottom" className="bg-card border-border text-xs">
                   <p>{displayName(teammateId)}</p>
-                  <p className="text-slate-500 text-[10px]">Member</p>
+                  <p className="text-muted-foreground text-[10px]">Member</p>
                 </TooltipContent>
               </Tooltip>
             ))
@@ -131,12 +131,12 @@ export function TeamList({
               <TooltipTrigger asChild>
                 <button
                   onClick={onOpenInviteModal}
-                  className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-orange-400 border-2 border-dashed border-slate-700 shrink-0 transition-colors"
+                  className="w-10 h-10 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-primary/80 border-2 border-dashed border-border/70 shrink-0 transition-colors"
                 >
                   <UserPlus className="w-4 h-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="bg-slate-900 border-slate-800 text-xs">
+              <TooltipContent side="bottom" className="bg-card border-border text-xs">
                 Invite member
               </TooltipContent>
             </Tooltip>
@@ -148,12 +148,12 @@ export function TeamList({
         <div className="flex gap-2 pt-2">
           <Input
             placeholder="Email address..."
-            className="h-8 text-xs bg-slate-950 border-slate-800 rounded-lg flex-1"
+            className="h-8 text-xs bg-background border-border rounded-lg flex-1"
             value={newMemberEmail}
             onChange={(e) => setNewMemberEmail(e.target.value)}
           />
-          <Button onClick={handleAdd} size="icon" className="h-8 w-8 shrink-0 bg-slate-800 hover:bg-slate-700">
-            <UserPlus className="w-3.5 h-3.5 text-orange-500" />
+          <Button onClick={handleAdd} size="icon" className="h-8 w-8 shrink-0 bg-muted hover:bg-muted/80">
+            <UserPlus className="w-3.5 h-3.5 text-primary" />
           </Button>
         </div>
       )}

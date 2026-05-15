@@ -13,7 +13,7 @@ export function QuickActions({ onCreateProject, onViewAllProjects, onStartIdeati
       <Button
         variant="default"
         size="sm"
-        className="bg-orange-500 hover:bg-orange-600 text-white"
+        className="bg-primary hover:bg-orange-600 text-white"
         onClick={onCreateProject}
       >
         <Plus className="w-4 h-4 mr-1.5" />
@@ -22,7 +22,7 @@ export function QuickActions({ onCreateProject, onViewAllProjects, onStartIdeati
       <Button
         variant="outline"
         size="sm"
-        className="border-slate-800 text-slate-400 hover:text-white"
+        className="border-border text-muted-foreground hover:text-foreground"
         onClick={onViewAllProjects}
       >
         <LayoutDashboard className="w-4 h-4 mr-1.5" />
@@ -32,7 +32,7 @@ export function QuickActions({ onCreateProject, onViewAllProjects, onStartIdeati
         <Button
           variant="outline"
           size="sm"
-          className="border-slate-800 text-slate-400 hover:text-white"
+        className="border-border text-muted-foreground hover:text-foreground"
           onClick={onStartIdeation}
         >
           <Lightbulb className="w-4 h-4 mr-1.5" />

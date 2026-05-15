@@ -45,22 +45,22 @@ function NavItem({
       className={cn(
         'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative',
         active
-          ? 'bg-orange-500/[0.12] text-orange-400 font-medium border border-orange-500/20 shadow-[0_0_20px_-12px_rgba(249,115,22,0.25)]'
-          : 'text-slate-400 hover:text-white hover:bg-white/[0.04] border border-transparent',
+          ? 'bg-primary/12 text-primary/80 font-medium border border-primary/20 shadow-[0_0_20px_-12px_rgba(249,115,22,0.25)]'
+          : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent',
         collapsed ? 'justify-center px-0' : '',
       )}
     >
       {active && (
         <motion.div
           layoutId="activeIndicator"
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-orange-500 rounded-r-full shadow-[0_0_8px_rgba(249,115,22,0.5)]"
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full shadow-[0_0_8px_rgba(249,115,22,0.5)]"
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
         />
       )}
       <motion.div
         className={cn(
           'shrink-0 transition-colors',
-          active ? 'text-orange-500' : 'text-slate-500 group-hover:text-white',
+          active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground',
         )}
         whileHover={{ scale: 1.1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
@@ -93,7 +93,7 @@ function NavItem({
         )}
       </AnimatePresence>
       {collapsed && (
-        <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-950/80 backdrop-blur-xl text-slate-300 text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[70] whitespace-nowrap border border-white/[0.08] shadow-xl">
+        <div className="absolute left-full ml-3 px-3 py-1.5 bg-background/80 backdrop-blur-xl text-foreground/80 text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[70] whitespace-nowrap border border-white/[0.08] shadow-xl">
           {label}
         </div>
       )}
@@ -133,11 +133,11 @@ export function ProtectedLayout() {
         initial={false}
         animate={{ width: isSidebarCollapsed ? 80 : 256 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="fixed left-0 top-0 bottom-0 border-r border-white/[0.06] bg-slate-950/[0.7] backdrop-blur-2xl z-50 flex flex-col overflow-hidden"
+        className="fixed left-0 top-0 bottom-0 border-r border-white/[0.06] bg-background/70 backdrop-blur-2xl z-50 flex flex-col overflow-hidden"
       >
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
-            className="absolute -top-24 -left-24 w-48 h-48 bg-orange-500/[0.08] rounded-full blur-[80px]"
+            className="absolute -top-24 -left-24 w-48 h-48 bg-primary/8 rounded-full blur-[80px]"
             animate={{ x: [0, 16, 0], y: [0, 12, 0] }}
             transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
           />
@@ -161,7 +161,7 @@ export function ProtectedLayout() {
                 onClick={() => navigate('/dashboard')}
               >
                 <img src="/logo.png" alt="IdeaFrame" className="w-7 h-7 shrink-0" />
-                <span className="font-bold tracking-tight text-lg truncate text-orange-500 whitespace-nowrap">
+                <span className="font-bold tracking-tight text-lg truncate text-primary whitespace-nowrap">
                   IdeaFrame
                 </span>
               </motion.div>
@@ -188,7 +188,7 @@ export function ProtectedLayout() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="p-2 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] rounded-xl transition-colors text-slate-400 hover:text-white shrink-0 backdrop-blur-sm"
+            className="p-2 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] rounded-xl transition-colors text-muted-foreground hover:text-foreground shrink-0 backdrop-blur-sm"
           >
             {isSidebarCollapsed ? (
               <PanelLeftOpen className="w-4 h-4" />
@@ -226,9 +226,9 @@ export function ProtectedLayout() {
               <motion.div
                 initial={{ opacity: 0, x: -4, scale: 0.96 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                className="bg-slate-950/60 backdrop-blur-2xl border border-white/[0.06] rounded-2xl shadow-2xl p-3 overflow-hidden"
+                className="bg-background/60 backdrop-blur-2xl border border-white/[0.06] rounded-2xl shadow-2xl p-3 overflow-hidden"
               >
-                <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 px-3 py-2 border-b border-white/[0.06] mb-2">
+                <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground px-3 py-2 border-b border-white/[0.06] mb-2">
                   Recent Projects
                 </p>
                 <div className="space-y-1 max-h-64 overflow-y-auto">
@@ -240,7 +240,7 @@ export function ProtectedLayout() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.03 }}
                         onClick={() => navigate(`/projects/${project.id}`)}
-                        className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors flex items-center justify-between group/item"
+                        className="w-full text-left px-3 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors flex items-center justify-between group/item"
                       >
                         <span className="truncate flex-1">{project.title}</span>
                         <ChevronRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
@@ -274,10 +274,10 @@ export function ProtectedLayout() {
             )}
           >
             <div className="relative shrink-0">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-xs font-bold text-white">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center text-xs font-bold text-white">
                 {user?.email?.[0].toUpperCase() ?? 'U'}
               </div>
-              <div className="absolute inset-0 rounded-full ring-2 ring-orange-500/30 ring-offset-2 ring-offset-slate-950" />
+              <div className="absolute inset-0 rounded-full ring-2 ring-primary/30 ring-offset-2 ring-offset-background" />
             </div>
             <AnimatePresence>
               {!isSidebarCollapsed && (
@@ -288,10 +288,10 @@ export function ProtectedLayout() {
                   transition={{ duration: 0.2 }}
                   className="flex-1 min-w-0"
                 >
-                  <p className="text-xs font-medium truncate text-slate-200">
+                  <p className="text-xs font-medium truncate text-foreground/90">
                     {user?.email}
                   </p>
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-orange-500/10 text-orange-400 border border-orange-500/20 mt-1">
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-primary/10 text-primary/80 border border-primary/20 mt-1">
                     Creator
                   </span>
                 </motion.div>
@@ -305,7 +305,7 @@ export function ProtectedLayout() {
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.2 }}
                   onClick={handleLogout}
-                  className="p-1.5 hover:bg-white/[0.08] rounded-lg transition-colors text-slate-400 hover:text-white shrink-0"
+                  className="p-1.5 hover:bg-white/[0.08] rounded-lg transition-colors text-muted-foreground hover:text-foreground shrink-0"
                 >
                   <LogOut className="w-4 h-4" />
                 </motion.button>
@@ -320,7 +320,7 @@ export function ProtectedLayout() {
                 exit={{ opacity: 0, y: 4 }}
                 transition={{ duration: 0.2 }}
                 onClick={handleLogout}
-                className="w-full mt-2 p-2 hover:bg-white/[0.06] rounded-xl transition-colors text-slate-500 hover:text-white flex justify-center border border-transparent hover:border-white/[0.06]"
+                className="w-full mt-2 p-2 hover:bg-white/[0.06] rounded-xl transition-colors text-muted-foreground hover:text-foreground flex justify-center border border-transparent hover:border-white/[0.06]"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />

@@ -21,7 +21,7 @@ export function Workspace() {
   const onSelectSpec = (id: string) => navigate(`/projects/${projectId}/spec/${id}`);
 
   if (!projectId) {
-    return <div className="min-h-screen bg-slate-950" />;
+    return <div className="min-h-screen bg-background" />;
   }
   const {
     project,
@@ -57,13 +57,13 @@ export function Workspace() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <LayoutGrid className="w-8 h-8 animate-pulse text-orange-500" />
+        <LayoutGrid className="w-8 h-8 animate-pulse text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-background">
       <WorkspaceHeader
         project={localProject}
         onBack={onBack}
@@ -105,16 +105,16 @@ export function Workspace() {
 
         <section>
           <Tabs defaultValue="storage" className="w-full">
-            <TabsList className="bg-slate-900/50 p-1 border border-slate-800 rounded-2xl w-full justify-start overflow-x-auto no-scrollbar">
-              <TabsTrigger value="storage" className="gap-2 rounded-xl px-6 data-[state=active]:bg-slate-800">
+            <TabsList className="bg-card p-1 border border-border rounded-2xl w-full justify-start overflow-x-auto no-scrollbar">
+              <TabsTrigger value="storage" className="gap-2 rounded-xl px-6 data-[state=active]:bg-muted">
                 <HardDrive className="w-4 h-4" />
                 Storage
               </TabsTrigger>
-              <TabsTrigger value="github" className="gap-2 rounded-xl px-6 data-[state=active]:bg-slate-800">
+              <TabsTrigger value="github" className="gap-2 rounded-xl px-6 data-[state=active]:bg-muted">
                 <Github className="w-4 h-4" />
                 GitHub
               </TabsTrigger>
-              <TabsTrigger value="activity" className="gap-2 rounded-xl px-6 data-[state=active]:bg-slate-800">
+              <TabsTrigger value="activity" className="gap-2 rounded-xl px-6 data-[state=active]:bg-muted">
                 <Activity className="w-4 h-4" />
                 Activity Log
               </TabsTrigger>

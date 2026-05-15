@@ -38,7 +38,7 @@ function getStatusBadge(status: string) {
       );
     case 'declined':
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-500/10 text-slate-400 border border-slate-500/20">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-500/10 text-muted-foreground border border-slate-500/20">
           Declined
         </span>
       );
@@ -94,20 +94,20 @@ export function InviteMemberModal({ projectId, isOwner, onClose }: InviteMemberM
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-md mx-4 bg-slate-950 border border-slate-800 rounded-2xl shadow-xl">
+      <div className="relative w-full max-w-md mx-4 bg-background border border-border rounded-2xl shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
-              <UserPlus className="w-4 h-4 text-orange-500" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <UserPlus className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-100">Invite Team Member</h2>
-              <p className="text-[10px] text-slate-500">Invite someone to collaborate on this project</p>
+              <h2 className="text-sm font-bold text-foreground">Invite Team Member</h2>
+              <p className="text-[10px] text-muted-foreground">Invite someone to collaborate on this project</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
-            <X className="w-4 h-4 text-slate-400" />
+            <X className="w-4 h-4 text-muted-foreground" />
           </Button>
         </div>
 
@@ -121,14 +121,14 @@ export function InviteMemberModal({ projectId, isOwner, onClose }: InviteMemberM
                 placeholder="Enter email address..."
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-slate-900 border-slate-800 text-slate-100 placeholder:text-slate-500"
+                className="bg-card border-border text-foreground placeholder:text-muted-foreground"
                 disabled={sending}
               />
             </div>
             <Button
               type="submit"
               disabled={sending || !email.trim()}
-              className="bg-orange-500 hover:bg-orange-600 text-white"
+              className="bg-primary hover:bg-orange-600 text-foreground"
             >
               {sending ? 'Sending...' : 'Send'}
             </Button>
@@ -137,10 +137,10 @@ export function InviteMemberModal({ projectId, isOwner, onClose }: InviteMemberM
           {/* Invitation List */}
           <div className="space-y-3">
             {loading ? (
-              <div className="py-4 text-center text-xs text-slate-500">Loading invitations...</div>
+              <div className="py-4 text-center text-xs text-muted-foreground">Loading invitations...</div>
             ) : invitations.length === 0 ? (
               <div className="py-4 text-center">
-                <p className="text-xs text-slate-500">No invitations yet</p>
+                <p className="text-xs text-muted-foreground">No invitations yet</p>
                 <p className="text-[10px] text-slate-600 mt-1">Enter an email above to invite someone</p>
               </div>
             ) : (
@@ -148,7 +148,7 @@ export function InviteMemberModal({ projectId, isOwner, onClose }: InviteMemberM
                 {/* Pending Invitations */}
                 {pendingInvitations.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pending</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Pending</p>
                     {pendingInvitations.map((invitation) => (
                       <InvitationItem
                         key={invitation.id}
@@ -163,7 +163,7 @@ export function InviteMemberModal({ projectId, isOwner, onClose }: InviteMemberM
                 {/* Processed Invitations */}
                 {processedInvitations.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-4">History</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-4">History</p>
                     {processedInvitations.map((invitation) => (
                       <InvitationItem
                         key={invitation.id}
@@ -191,13 +191,13 @@ interface InvitationItemProps {
 
 function InvitationItem({ invitation, onDelete, showDelete }: InvitationItemProps) {
   return (
-    <div className="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl border border-slate-800/50 group">
+    <div className="flex items-center justify-between p-3 bg-card rounded-xl border border-border/50 group">
       <div className="flex items-center gap-3 min-w-0">
-        <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 shrink-0">
+        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground shrink-0">
           <Mail className="w-3.5 h-3.5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium text-slate-200 truncate">{invitation.email}</p>
+          <p className="text-xs font-medium text-foreground/90 truncate">{invitation.email}</p>
           <div className="flex items-center gap-2 mt-0.5">
             {getStatusBadge(invitation.status)}
             <span className="text-[9px] text-slate-600">
@@ -211,7 +211,7 @@ function InvitationItem({ invitation, onDelete, showDelete }: InvitationItemProp
           variant="ghost"
           size="icon"
           onClick={() => onDelete(invitation.id)}
-          className="opacity-0 group-hover:opacity-100 h-7 w-7 shrink-0 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
+          className="opacity-0 group-hover:opacity-100 h-7 w-7 shrink-0 text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
         >
           <Trash2 className="w-3.5 h-3.5" />
         </Button>

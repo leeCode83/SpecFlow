@@ -19,7 +19,7 @@ export function SpecDetail() {
   const onBack = () => navigate(`/projects/${projectId}`);
 
   if (!specId || !projectId) {
-    return <div className="h-screen bg-slate-950" />;
+    return <div className="h-screen bg-background" />;
   }
   const {
     spec,
@@ -55,13 +55,13 @@ export function SpecDetail() {
   };
 
   if (loading) return (
-    <div className="h-screen flex items-center justify-center bg-slate-950 text-slate-500">
+    <div className="h-screen flex items-center justify-center bg-background text-muted-foreground">
       Loading specification...
     </div>
   );
 
   return (
-    <div className="h-screen flex flex-col bg-slate-950 overflow-hidden">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header */}
       <SpecHeader 
         spec={spec}

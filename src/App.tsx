@@ -2,6 +2,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from 'sonner';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute';
 import { ProtectedLayout } from '@/components/routing/ProtectedLayout';
 import { AuthCallback } from '@/components/routing/AuthCallback';
@@ -29,16 +30,16 @@ function SupabaseGate({ children }: { children: React.ReactNode }) {
 
   if (!configured) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-6">
-          <div className="inline-flex p-4 bg-orange-500/10 rounded-full">
-            <Settings className="w-8 h-8 text-orange-500" />
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-card border border-border rounded-2xl p-8 text-center space-y-6">
+          <div className="inline-flex p-4 bg-primary/10 rounded-full">
+            <Settings className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-bold">Supabase Required</h1>
-          <p className="text-slate-400">
+          <p className="text-muted-foreground">
             Please configure <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in the Secrets panel to use IdeaFrame MVP.
           </p>
-          <div className="p-4 bg-slate-800 rounded-lg text-left text-xs font-mono overflow-auto">
+          <div className="p-4 bg-muted rounded-lg text-left text-xs font-mono overflow-auto">
             <p># Example .env</p>
             <p>VITE_SUPABASE_URL=&quot;https://your-proj.supabase.co&quot;</p>
             <p>VITE_SUPABASE_ANON_KEY=&quot;your-anon-key&quot;</p>
@@ -57,8 +58,9 @@ function SupabaseGate({ children }: { children: React.ReactNode }) {
 function AppShell() {
   return (
     <SupabaseGate>
+      <ThemeProvider>
       <TooltipProvider>
-        <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-orange-500/30">
+        <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
           <Toaster position="top-right" theme="dark" />
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -80,6 +82,7 @@ function AppShell() {
           </Routes>
         </div>
       </TooltipProvider>
+      </ThemeProvider>
     </SupabaseGate>
   );
 }

@@ -11,8 +11,8 @@ interface ProjectCardProps {
 }
 
 const modeConfig: Record<Mode, { icon: typeof Zap; label: string; color: string; bg: string }> = {
-  Hackathon: { icon: Zap, label: 'Hackathon', color: 'text-orange-500', bg: 'bg-orange-500/20' },
-  Startup: { icon: Rocket, label: 'Startup', color: 'text-emerald-500', bg: 'bg-emerald-500/20' },
+  Hackathon: { icon: Zap, label: 'Hackathon', color: 'text-primary', bg: 'bg-primary/20' },
+  Startup: { icon: Rocket, label: 'Startup', color: 'text-emerald-500', bg: 'bg-success/20' },
   Learning: { icon: GraduationCap, label: 'Learning', color: 'text-purple-400', bg: 'bg-purple-500/20' },
 };
 
@@ -28,7 +28,7 @@ export function ProjectCard({ project, onClick, index }: ProjectCardProps) {
     >
       <Card
         size="sm"
-        className="cursor-pointer border-slate-800 bg-slate-900/50 transition-all duration-200 hover:-translate-y-1 hover:border-slate-700 hover:shadow-xl hover:shadow-slate-900/50"
+        className="cursor-pointer border-border bg-card transition-all duration-200 hover:-translate-y-1 hover:border-border/70 hover:shadow-xl hover:shadow-slate-900/50"
         onClick={() => onClick(project.id)}
       >
         <CardContent className="flex flex-col gap-4 pt-4">
@@ -44,7 +44,7 @@ export function ProjectCard({ project, onClick, index }: ProjectCardProps) {
               {project.title}
             </h3>
             {project.description && (
-              <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed">
+              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                 {project.description}
               </p>
             )}

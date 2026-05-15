@@ -65,20 +65,20 @@ export function AllProjects() {
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
-            <LayoutDashboard className="w-5 h-5 text-orange-500" />
-            <h1 className="text-2xl font-extrabold tracking-tight text-white">
+            <LayoutDashboard className="w-5 h-5 text-primary" />
+            <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
               All Projects
             </h1>
           </div>
           {!loading && (
-            <p className="text-sm text-slate-500 ml-8">
+            <p className="text-sm text-muted-foreground ml-8">
               {count} {count === 1 ? 'project' : 'projects'} total
             </p>
           )}
         </div>
         <Button
           variant="default"
-          className="bg-orange-500 hover:bg-orange-600 text-white"
+          className="bg-primary hover:bg-primary/90 text-white"
           onClick={onCreateProject}
         >
           <Plus className="w-4 h-4 mr-1.5" />
@@ -96,17 +96,17 @@ export function AllProjects() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} size="sm" className="border-slate-800 bg-slate-900/50">
+            <Card key={i} size="sm" className="border-border bg-card">
               <div className="p-4 flex flex-col gap-4">
-                <Skeleton className="w-10 h-10 rounded-xl bg-slate-800" />
+                <Skeleton className="w-10 h-10 rounded-xl bg-muted" />
                 <div className="space-y-2">
-                  <Skeleton className="h-5 w-3/4 bg-slate-800" />
-                  <Skeleton className="h-4 w-full bg-slate-800" />
-                  <Skeleton className="h-4 w-2/3 bg-slate-800" />
+                  <Skeleton className="h-5 w-3/4 bg-muted" />
+                  <Skeleton className="h-4 w-full bg-muted" />
+                  <Skeleton className="h-4 w-2/3 bg-muted" />
                 </div>
                 <div className="flex justify-between">
-                  <Skeleton className="h-5 w-20 rounded-full bg-slate-800" />
-                  <Skeleton className="h-4 w-24 bg-slate-800" />
+                  <Skeleton className="h-5 w-20 rounded-full bg-muted" />
+                  <Skeleton className="h-4 w-24 bg-muted" />
                 </div>
               </div>
             </Card>
@@ -134,8 +134,8 @@ export function AllProjects() {
           )}
 
           {totalPages > 1 && projects.length > 0 && (
-            <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
-              <span className="text-sm text-slate-500">
+            <div className="flex items-center justify-between pt-4 border-t border-border/50">
+              <span className="text-sm text-muted-foreground">
                 Page {page} of {totalPages}
               </span>
               <div className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export function AllProjects() {
                   size="sm"
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="border-slate-800 text-slate-400 hover:text-white"
+                  className="border-border text-muted-foreground hover:text-foreground"
                 >
                   <ChevronLeft className="w-4 h-4 mr-1" />
                   Prev
@@ -154,7 +154,7 @@ export function AllProjects() {
                   size="sm"
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="border-slate-800 text-slate-400 hover:text-white"
+                  className="border-border text-muted-foreground hover:text-foreground"
                 >
                   Next
                   <ChevronRight className="w-4 h-4 ml-1" />

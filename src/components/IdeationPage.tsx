@@ -127,16 +127,16 @@ export function IdeationPage() {
   const nextSteps = getNextSteps();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 relative">
+    <div className="min-h-screen bg-background text-foreground relative">
       {/* Background blobs */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[500px] bg-orange-500/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-      <header className="flex items-center gap-4 px-6 py-4 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
-        <Button variant="ghost" size="icon" onClick={onBack} className="text-slate-400 hover:text-white">
+      <header className="flex items-center gap-4 px-6 py-4 border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-50">
+        <Button variant="ghost" size="icon" onClick={onBack} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex items-center gap-2">
-          <div className="bg-orange-500 rounded-lg p-1.5">
+          <div className="bg-primary rounded-lg p-1.5">
             <BrainCircuit className="w-5 h-5 text-white" />
           </div>
           <span className="font-bold tracking-tight text-lg">Ideation Engine</span>
@@ -152,12 +152,12 @@ export function IdeationPage() {
           >
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight">What are you building?</h1>
-              <p className="text-slate-400 text-lg">
+              <p className="text-muted-foreground text-lg">
                 Describe your idea and let IdeaFrame generate a complete technical blueprint and feature roadmap.
               </p>
             </div>
 
-            <div className="relative bg-slate-900/80 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-xl">
+            <div className="relative bg-card/80 border border-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-xl">
               <div className="flex flex-wrap gap-4 mb-6">
                 <ModeButton 
                   active={mode === 'Learning'} 
@@ -184,7 +184,7 @@ export function IdeationPage() {
 
               <Textarea 
                 placeholder="Describe your project idea... (e.g. A real-time collaborative code editor for technical interviews with built-in AI debugging)"
-                className="min-h-[200px] bg-slate-950/50 border-slate-800 focus:border-orange-500/50 text-lg p-6 rounded-xl resize-none"
+                className="min-h-[200px] bg-background/50 border-border focus:border-primary/50 text-lg p-6 rounded-xl resize-none"
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
               />
@@ -192,7 +192,7 @@ export function IdeationPage() {
               <div className="mt-8 flex justify-end">
                 <Button 
                   size="lg" 
-                  className="bg-orange-500 hover:bg-orange-600 text-white gap-2 px-8 rounded-xl font-bold h-12"
+                  className="bg-primary hover:bg-primary/90 text-white gap-2 px-8 rounded-xl font-bold h-12"
                   onClick={handleAnalyze}
                   disabled={analyzing}
                 >
@@ -218,31 +218,31 @@ export function IdeationPage() {
             className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
           >
             <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-6">
-                <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl space-y-6">
+                <Card className="bg-card border-border p-8 rounded-2xl space-y-6">
                   <div className="space-y-2">
                     <h3 className="text-xl font-bold flex items-center gap-2">
-                      <BrainCircuit className="w-5 h-5 text-orange-500" />
+                      <BrainCircuit className="w-5 h-5 text-primary" />
                       Strategic Summary
                     </h3>
-                    <p className="text-slate-300 leading-relaxed text-lg">{feedback.summary || feedback.refinedIdea?.oneLiner}</p>
-                    <p className="text-slate-400 mt-2">{feedback.refinedIdea?.problem}</p>
+                    <p className="text-foreground/80 leading-relaxed text-lg">{feedback.summary || feedback.refinedIdea?.oneLiner}</p>
+                    <p className="text-muted-foreground mt-2">{feedback.refinedIdea?.problem}</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-800/50">
+                  <div className="grid grid-cols-2 gap-6 pt-4 border-t border-border/50">
                     <div className="space-y-3">
-                      <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Tech Stack</h4>
+                      <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Tech Stack</h4>
                       <div className="flex flex-wrap gap-2">
                         {techList.slice(0, 10).map((t, i) => (
-                           <Badge key={i} variant="outline" className={`h-auto whitespace-normal break-words text-left py-1 text-xs max-w-full ${i % 3 === 0 ? 'bg-blue-500/5 border-blue-500/20 text-blue-400' : i % 3 === 1 ? 'bg-purple-500/5 border-purple-500/20 text-purple-400' : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400'}`}>{t}</Badge>
+                           <Badge key={i} variant="outline" className={`h-auto whitespace-normal break-words text-left py-1 text-xs max-w-full ${i % 3 === 0 ? 'bg-blue-500/5 border-blue-500/20 text-blue-400' : i % 3 === 1 ? 'bg-purple-500/5 border-purple-500/20 text-purple-400' : 'bg-brand-secondary/5 border-emerald-500/20 text-success'}`}>{t}</Badge>
                         ))}
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Next Steps</h4>
-                      <ul className="text-sm text-slate-400 space-y-2">
+                      <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Next Steps</h4>
+                      <ul className="text-sm text-muted-foreground space-y-2">
                         {nextSteps.map((step, i) => (
                           <li key={i} className="flex gap-3">
-                            <span className="text-orange-500 font-bold">0{i+1}.</span>
+                            <span className="text-primary font-bold">0{i+1}.</span>
                             <span className="leading-tight">{step}</span>
                           </li>
                         ))}
@@ -256,7 +256,7 @@ export function IdeationPage() {
                 <PitchQuote text={feedback.pitchDeck} delay={0.15} />
                 <DifficultyBadge difficultyLevel={feedback.difficultyLevel} timeEstimateHours={feedback.timeEstimateHours} delay={0.2} />
 
-                <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-2xl flex flex-col h-fit">
+                <Card className="bg-card border-border p-8 rounded-2xl flex flex-col h-fit">
                   <h3 className="text-xl font-bold mb-6">Key Insights</h3>
                   <div className="space-y-6">
                     {feedback.mode === 'Hackathon' && (
@@ -264,8 +264,8 @@ export function IdeationPage() {
                         <ScoreItem label="Originality" score={Number(feedback.originality) || Number(feedback.hackathonAnalysis?.originalityScore) || 8} color="orange" />
                         <ScoreItem label="Buildability" score={Number(feedback.buildability) || 8} color="blue" />
                         <ScoreItem label="Impact" score={Number(feedback.impact) || 8} color="emerald" />
-                        <div className="mt-4 text-sm text-slate-400">
-                          <span className="font-bold text-slate-300">Time estimate:</span> {feedback.timeEstimateHours || feedback.hackathonAnalysis?.timeEstimate}
+                        <div className="mt-4 text-sm text-muted-foreground">
+                          <span className="font-bold text-foreground/80">Time estimate:</span> {feedback.timeEstimateHours || feedback.hackathonAnalysis?.timeEstimate}
                         </div>
                         <CompetitorInsight text={feedback.competitorInsight} delay={0.4} />
                       </>
@@ -275,10 +275,10 @@ export function IdeationPage() {
                         <ScoreItem label="Originality" score={Number(feedback.originality) || 8} color="orange" />
                         <ScoreItem label="Feasibility" score={Number(feedback.feasibility) || 8} color="blue" />
                         <ScoreItem label="Learning Value" score={Number(feedback.learningValue) || 8} color="emerald" />
-                        <div className="mt-4 text-sm text-slate-400 space-y-2">
-                           <div><span className="font-bold text-slate-300">Time Estimate:</span> {feedback.timeEstimateHours || feedback.learningAnalysis?.timeEstimate}</div>
-                           <div><span className="font-bold text-slate-300">Complexity:</span> {feedback.difficultyLevel || feedback.learningAnalysis?.complexityLevel}</div>
-                           <div><span className="font-bold text-slate-300">Complexity Reason:</span> {feedback.learningAnalysis?.complexityReason}</div>
+                        <div className="mt-4 text-sm text-muted-foreground space-y-2">
+                           <div><span className="font-bold text-foreground/80">Time Estimate:</span> {feedback.timeEstimateHours || feedback.learningAnalysis?.timeEstimate}</div>
+                           <div><span className="font-bold text-foreground/80">Complexity:</span> {feedback.difficultyLevel || feedback.learningAnalysis?.complexityLevel}</div>
+                           <div><span className="font-bold text-foreground/80">Complexity Reason:</span> {feedback.learningAnalysis?.complexityReason}</div>
                         </div>
                       </>
                     )}
@@ -287,11 +287,11 @@ export function IdeationPage() {
                         <ScoreItem label="Originality" score={Number(feedback.originality) || 8} color="orange" />
                         <ScoreItem label="Market Size" score={Number(feedback.marketSize) || 8} color="blue" />
                         <ScoreItem label="Monetization" score={Number(feedback.monetization) || 8} color="emerald" />
-                        <div className="mt-4 text-sm text-slate-400 space-y-3">
-                           <div><span className="font-bold text-slate-300 block mb-1">Market Size</span> {feedback.marketAnalysis?.marketSize}</div>
-                           <div><span className="font-bold text-slate-300 block mb-1">Growth Trend</span> {feedback.marketAnalysis?.growthTrend}</div>
-                           <div><span className="font-bold text-slate-300 block mb-1">Target Segment</span> {feedback.marketAnalysis?.targetSegment}</div>
-                           <div><span className="font-bold text-slate-300 block mb-1">Differentiator</span> {feedback.competitiveLandscape?.yourMoat}</div>
+                        <div className="mt-4 text-sm text-muted-foreground space-y-3">
+                           <div><span className="font-bold text-foreground/80 block mb-1">Market Size</span> {feedback.marketAnalysis?.marketSize}</div>
+                           <div><span className="font-bold text-foreground/80 block mb-1">Growth Trend</span> {feedback.marketAnalysis?.growthTrend}</div>
+                           <div><span className="font-bold text-foreground/80 block mb-1">Target Segment</span> {feedback.marketAnalysis?.targetSegment}</div>
+                           <div><span className="font-bold text-foreground/80 block mb-1">Differentiator</span> {feedback.competitiveLandscape?.yourMoat}</div>
                         </div>
                         <CompetitorInsight text={feedback.competitorInsight} delay={0.4} />
                         <MonetizationModel text={feedback.monetizationModel} delay={0.5} />
@@ -306,15 +306,15 @@ export function IdeationPage() {
             </div>
 
             <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 sticky top-24 h-[100vh] max-h-[85vh]">
-                <div className="flex-1 min-h-0 bg-slate-900/80 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative w-full">
-                   <div className="p-4 border-b border-slate-800 bg-slate-950/50 flex flex-col gap-1 z-10 shrink-0">
+                <div className="flex-1 min-h-0 bg-card/80 border border-border rounded-3xl overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative w-full">
+                   <div className="p-4 border-b border-border bg-background/50 flex flex-col gap-1 z-10 shrink-0">
                       <div className="flex flex-row gap-3 items-center">
-                        <div className="p-2 bg-orange-500/20 rounded-lg">
-                          <MessageSquare className="w-5 h-5 text-orange-500" />
+                        <div className="p-2 bg-primary/20 rounded-lg">
+                          <MessageSquare className="w-5 h-5 text-primary" />
                         </div>
-                        <span className="font-bold text-slate-200">Idea Elaboration Consultant</span>
+                        <span className="font-bold text-foreground/90">Idea Elaboration Consultant</span>
                       </div>
-                      <p className="text-xs text-slate-400 pl-[44px]">Refine features, MVP scope or architecture</p>
+                      <p className="text-xs text-muted-foreground pl-[44px]">Refine features, MVP scope or architecture</p>
                    </div>
                    <div className="flex-1 overflow-hidden">
                        <AnimatedAIChat 
@@ -332,7 +332,7 @@ export function IdeationPage() {
                 <Button 
                     onClick={handleCreateProject} 
                     disabled={isStructuring}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-lg shrink-0"
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-xl shadow-lg shrink-0"
                 >
                     {isStructuring ? (
                         <>
@@ -356,9 +356,9 @@ export function IdeationPage() {
 
 function ModeButton({ active, onClick, icon, label, color }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, color: string }) {
   const colorMap: Record<string, string> = {
-    orange: active ? 'bg-orange-500 border-orange-500 text-white' : 'bg-slate-950 border-slate-800 hover:border-orange-500/50 text-slate-400',
-    blue: active ? 'bg-blue-500 border-blue-500 text-white' : 'bg-slate-950 border-slate-800 hover:border-blue-500/50 text-slate-400',
-    emerald: active ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-slate-950 border-slate-800 hover:border-emerald-500/50 text-slate-400',
+    orange: active ? 'bg-primary border-primary text-white' : 'bg-background border-border hover:border-primary/50 text-muted-foreground',
+    blue: active ? 'bg-blue-500 border-blue-500 text-white' : 'bg-background border-border hover:border-blue-500/50 text-muted-foreground',
+    emerald: active ? 'bg-brand-secondary border-emerald-500 text-white' : 'bg-background border-border hover:border-emerald-500/50 text-muted-foreground',
   };
 
   return (
@@ -374,18 +374,18 @@ function ModeButton({ active, onClick, icon, label, color }: { active: boolean, 
 
 function ScoreItem({ label, score, color }: { label: string, score: number, color: 'orange' | 'blue' | 'emerald' }) {
   const colorMap = {
-    orange: 'bg-orange-500',
+    orange: 'bg-primary',
     blue: 'bg-blue-500',
-    emerald: 'bg-emerald-500'
+    emerald: 'bg-brand-secondary'
   };
 
   return (
     <div className="space-y-2">
-      <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
+      <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground">
         <span>{label}</span>
-        <span className="text-slate-200">{score}/10</span>
+        <span className="text-foreground/90">{score}/10</span>
       </div>
-      <div className="h-2.5 bg-slate-950 border border-slate-800 rounded-full overflow-hidden">
+      <div className="h-2.5 bg-background border border-border rounded-full overflow-hidden">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${score * 10}%` }}
@@ -398,13 +398,13 @@ function ScoreItem({ label, score, color }: { label: string, score: number, colo
 
 function StatItem({ label, text, color }: { label: string, text?: string, color: 'orange' | 'blue' | 'emerald' }) {
   const textMap = {
-    orange: 'text-orange-400',
+    orange: 'text-primary/80',
     blue: 'text-blue-400',
-    emerald: 'text-emerald-400'
+    emerald: 'text-success'
   };
   return (
-    <div className="flex justify-between items-center bg-slate-950/50 p-3 rounded-lg border border-slate-800/80">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</span>
+    <div className="flex justify-between items-center bg-background/50 p-3 rounded-lg border border-border/80">
+      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
       <span className={`text-sm font-bold ${textMap[color]}`}>{text || '-'}</span>
     </div>
   );

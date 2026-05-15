@@ -114,10 +114,10 @@ export function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-orange-500/10 blur-[120px] rounded-full" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full" />
       </div>
 
       <motion.div 
@@ -127,33 +127,33 @@ export function Auth() {
       >
         <button 
           onClick={onBack}
-          className="absolute -top-12 left-0 flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium"
+          className="absolute -top-12 left-0 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
         >
           ← Back to Home
         </button>
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3 bg-orange-500 rounded-2xl mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={onBack}>
-            <Rocket className="w-8 h-8 text-white" />
+          <div className="inline-flex p-3 bg-primary rounded-2xl mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={onBack}>
+            <Rocket className="w-8 h-8 text-foreground" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white italic cursor-pointer hover:text-slate-200 transition-colors" onClick={onBack}>IdeaFrame MVP</h1>
-          <p className="text-slate-400">Sign in to start building technical blueprints.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground italic cursor-pointer hover:text-foreground/90 transition-colors" onClick={onBack}>IdeaFrame MVP</h1>
+          <p className="text-muted-foreground">Sign in to start building technical blueprints.</p>
         </div>
 
-        <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-xl p-8 rounded-3xl shadow-2xl">
+        <Card className="bg-card border-border backdrop-blur-xl p-8 rounded-3xl shadow-2xl">
           <Tabs defaultValue="login" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 bg-slate-950/50 p-1 rounded-xl h-12">
-              <TabsTrigger value="login" className="rounded-lg data-[state=active]:bg-slate-800">Login</TabsTrigger>
-              <TabsTrigger value="signup" className="rounded-lg data-[state=active]:bg-slate-800">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-background/50 p-1 rounded-xl h-12">
+              <TabsTrigger value="login" className="rounded-lg data-[state=active]:bg-muted">Login</TabsTrigger>
+              <TabsTrigger value="signup" className="rounded-lg data-[state=active]:bg-muted">Sign Up</TabsTrigger>
             </TabsList>
 
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input 
                     type="email" 
                     placeholder="name@company.com" 
-                    className="pl-10 bg-slate-950/50 border-slate-800 focus:border-orange-500/50 h-12 rounded-xl"
+                    className="pl-10 bg-background/50 border-border focus:border-primary/50 h-12 rounded-xl"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -161,11 +161,11 @@ export function Auth() {
               </div>
               <div className="space-y-2">
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input 
                     type="password" 
                     placeholder="••••••••" 
-                    className="pl-10 bg-slate-950/50 border-slate-800 focus:border-orange-500/50 h-12 rounded-xl"
+                    className="pl-10 bg-background/50 border-border focus:border-primary/50 h-12 rounded-xl"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -174,7 +174,7 @@ export function Auth() {
 
               <TabsContent value="login" className="m-0">
                 <Button 
-                  className="w-full bg-orange-500 hover:bg-orange-600 h-12 rounded-xl font-bold gap-2"
+                  className="w-full bg-primary hover:bg-primary/90 h-12 rounded-xl font-bold gap-2"
                   onClick={() => handleEmailAuth('login')}
                   disabled={loading}
                 >
@@ -185,7 +185,7 @@ export function Auth() {
 
               <TabsContent value="signup" className="m-0">
                 <Button 
-                  className="w-full bg-orange-500 hover:bg-orange-600 h-12 rounded-xl font-bold gap-2"
+                  className="w-full bg-primary hover:bg-primary/90 h-12 rounded-xl font-bold gap-2"
                   onClick={() => handleEmailAuth('signup')}
                   disabled={loading}
                 >
@@ -197,17 +197,17 @@ export function Auth() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-slate-800" />
+                <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-[#0b0e14] px-2 text-slate-500 font-bold tracking-widest">Or continue with</span>
+                <span className="bg-[#0b0e14] px-2 text-muted-foreground font-bold tracking-widest">Or continue with</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-3">
               <Button 
                 variant="outline" 
-                className="w-full h-12 rounded-xl border-slate-800 hover:bg-slate-900 gap-3 font-semibold"
+                className="w-full h-12 rounded-xl border-border hover:bg-card gap-3 font-semibold"
                 onClick={signInWithGoogle}
                 disabled={loading}
               >
@@ -217,25 +217,25 @@ export function Auth() {
 
               <Button 
                 variant="outline" 
-                className="w-full h-12 rounded-xl border-slate-800 hover:bg-slate-900 gap-3 font-semibold"
+                className="w-full h-12 rounded-xl border-border hover:bg-card gap-3 font-semibold"
                 onClick={signInWithGithub}
                 disabled={loading}
               >
-                <Github className="w-5 h-5 text-white" />
+                <Github className="w-5 h-5 text-foreground" />
                 Github
               </Button>
             </div>
           </Tabs>
 
-          <p className="mt-8 text-center text-xs text-slate-500 leading-relaxed">
+          <p className="mt-8 text-center text-xs text-muted-foreground leading-relaxed">
             By continuing, you agree to our Terms of Service and Privacy Policy. 
             All specs are stored securely in Supabase.
           </p>
         </Card>
 
-        <div className="flex items-center gap-2 justify-center p-4 bg-orange-500/5 rounded-2xl border border-orange-500/10">
-          <AlertCircle className="w-4 h-4 text-orange-500" />
-          <p className="text-[10px] text-slate-400 font-medium leading-tight">
+        <div className="flex items-center gap-2 justify-center p-4 bg-primary/5 rounded-2xl border border-primary/10">
+          <AlertCircle className="w-4 h-4 text-primary" />
+          <p className="text-[10px] text-muted-foreground font-medium leading-tight">
             Pro Tip: Use Google Login with your hackathon email for instant workspace access.
           </p>
         </div>
