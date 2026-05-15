@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Plus, Shield, Database, Monitor, Brain, Server, Zap } from 'lucide-react';
+import { ChevronLeft, Plus, Pencil, Shield, Database, Monitor, Brain, Server, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Project, SpecType } from '@/lib/types';
@@ -19,9 +19,10 @@ interface WorkspaceHeaderProps {
   project: Project | null;
   onBack: () => void;
   onCreateSpec: (type: SpecType) => void;
+  onRenameProject: () => void;
 }
 
-export function WorkspaceHeader({ project, onBack, onCreateSpec }: WorkspaceHeaderProps) {
+export function WorkspaceHeader({ project, onBack, onCreateSpec, onRenameProject }: WorkspaceHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -33,6 +34,9 @@ export function WorkspaceHeader({ project, onBack, onCreateSpec }: WorkspaceHead
               <ChevronLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-lg font-bold truncate">{project?.title}</h1>
+            <button onClick={onRenameProject} className="p-1 hover:bg-muted rounded-lg transition-colors shrink-0">
+              <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[10px] px-2 hidden sm:inline-flex">
               {project?.mode}
             </Badge>

@@ -4,6 +4,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
 import { Project } from '@/lib/types';
 import { useParams, useNavigate } from 'react-router-dom';
+import { updateProject } from '@/lib/supabase/supabase-projects';
+import { toast } from 'sonner';
 
 import { WorkspaceHeader } from './workspace/WorkspaceHeader';
 import { WorkspaceHero } from './workspace/WorkspaceHero';
@@ -13,6 +15,7 @@ import { LogPanel } from './workspace/LogPanel';
 import { FileList } from './workspace/FileList';
 import { InviteMemberModal } from './workspace/InviteMemberModal';
 import { GithubViewer } from './workspace/GithubViewer';
+import { RenameProjectDialog } from './workspace/RenameProjectDialog';
 
 export function Workspace() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -43,8 +46,21 @@ export function Workspace() {
   } = useWorkspaceData(projectId);
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [localProject, setLocalProject] = useState<Project | null>(project);
   const isOwner = (localProject?.user_id ?? project?.user_id) === currentUser?.id;
+
+  const handleRenameProject = async (newTitle: string) => {
+    if (!localProject) return;
+    try {
+      await updateProject(localProject.id, { title: newTitle });
+      setLocalProject({ ...localProject, title: newTitle });
+      toast.success('Project renamed successfully');
+    } catch {
+      toast.error('Failed to rename project');
+      throw new Error('Failed to rename');
+    }
+  };
 
   const handleProjectUpdate = useCallback((updated: Project) => {
     setLocalProject(updated);
@@ -68,6 +84,7 @@ export function Workspace() {
         project={localProject}
         onBack={onBack}
         onCreateSpec={(type) => handleCreateSpec(type, onSelectSpec)}
+        onRenameProject={() => setRenameDialogOpen(true)}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 pb-20">
@@ -154,6 +171,15 @@ export function Workspace() {
           projectId={localProject.id}
           isOwner={isOwner}
           onClose={() => setInviteModalOpen(false)}
+        />
+      )}
+
+      {localProject && (
+        <RenameProjectDialog
+          open={renameDialogOpen}
+          onOpenChange={setRenameDialogOpen}
+          currentTitle={localProject.title}
+          onRename={handleRenameProject}
         />
       )}
     </div>
