@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Zap, Rocket, GraduationCap, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Project, Mode } from '@/lib/types';
@@ -10,15 +10,14 @@ interface ProjectCardProps {
   index: number;
 }
 
-const modeConfig: Record<Mode, { icon: typeof Zap; label: string; color: string; bg: string }> = {
-  Hackathon: { icon: Zap, label: 'Hackathon', color: 'text-primary', bg: 'bg-primary/20' },
-  Startup: { icon: Rocket, label: 'Startup', color: 'text-emerald-500', bg: 'bg-success/20' },
-  Learning: { icon: GraduationCap, label: 'Learning', color: 'text-purple-400', bg: 'bg-purple-500/20' },
+const modeConfig: Record<Mode, { label: string; color: string; bg: string; borderClass: string }> = {
+  Hackathon: { label: 'Hackathon', color: 'text-primary', bg: 'bg-primary/20', borderClass: 'border-t-primary/30' },
+  Startup: { label: 'Startup', color: 'text-emerald-500', bg: 'bg-success/20', borderClass: 'border-t-emerald-500/30' },
+  Learning: { label: 'Learning', color: 'text-purple-400', bg: 'bg-purple-500/20', borderClass: 'border-t-purple-500/30' },
 };
 
 export function ProjectCard({ project, onClick, index }: ProjectCardProps) {
   const mode = modeConfig[project.mode];
-  const Icon = mode.icon;
 
   return (
     <motion.div
@@ -28,33 +27,28 @@ export function ProjectCard({ project, onClick, index }: ProjectCardProps) {
     >
       <Card
         size="sm"
-        className="cursor-pointer border-border bg-card transition-all duration-200 hover:-translate-y-1 hover:border-border/70 hover:shadow-xl hover:shadow-slate-900/50"
+        className={`group/card cursor-pointer border-border bg-card transition-all duration-200 hover:-translate-y-1 hover:border-border/70 hover:shadow-xl hover:shadow-black/20 border-t-2 ${mode.borderClass}`}
         onClick={() => onClick(project.id)}
       >
-        <CardContent className="flex flex-col gap-4 pt-4">
-          <div className="flex items-start justify-between">
-            <div className={`w-10 h-10 rounded-xl ${mode.bg} flex items-center justify-center shrink-0`}>
-              <Icon className={`w-5 h-5 ${mode.color}`} />
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-600 opacity-0 transition-opacity group-hover/card:opacity-100" />
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="font-semibold text-base text-slate-100 leading-snug">
+        <CardContent className="flex flex-col gap-3 pt-5">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-semibold text-base text-foreground leading-snug">
               {project.title}
             </h3>
-            {project.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                {project.description}
-              </p>
-            )}
+            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5 opacity-0 transition-all group-hover/card:opacity-100 group-hover/card:translate-x-0.5" />
           </div>
+
+          {project.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+              {project.description}
+            </p>
+          )}
 
           <div className="flex items-center justify-between pt-1">
             <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 border-transparent ${mode.bg} ${mode.color}`}>
               {mode.label}
             </Badge>
-            <span className="text-[10px] text-slate-600 font-mono">
+            <span className="text-[10px] text-muted-foreground font-mono">
               {new Date(project.created_at).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',

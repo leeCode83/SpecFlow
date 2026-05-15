@@ -1,4 +1,4 @@
-import { Zap, Rocket, GraduationCap, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,9 +12,9 @@ interface RecentProjectsProps {
 }
 
 const modeConfig = {
-  Hackathon: { icon: Zap, color: 'text-primary', bg: 'bg-primary/20', border: 'border-orange-500/20', label: 'Hackathon' },
-  Startup: { icon: Rocket, color: 'text-emerald-500', bg: 'bg-success/20', border: 'border-emerald-500/20', label: 'Startup' },
-  Learning: { icon: GraduationCap, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/20', label: 'Learning' },
+  Hackathon: { color: 'text-primary', bg: 'bg-primary/20', border: 'border-l-primary/40', label: 'Hackathon' },
+  Startup: { color: 'text-emerald-500', bg: 'bg-success/20', border: 'border-l-emerald-500/40', label: 'Startup' },
+  Learning: { color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-l-purple-500/40', label: 'Learning' },
 };
 
 export function RecentProjects({ projects, onSelectProject, onViewAll }: RecentProjectsProps) {
@@ -25,7 +25,7 @@ export function RecentProjects({ projects, onSelectProject, onViewAll }: RecentP
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold">Recent Projects</h2>
+        <h2 className="text-lg font-bold text-foreground">Recent Projects</h2>
         <Button variant="ghost" size="sm" onClick={onViewAll} className="text-primary hover:text-primary/80 text-xs">
           View All <ArrowRight className="w-3 h-3 ml-1" />
         </Button>
@@ -34,29 +34,25 @@ export function RecentProjects({ projects, onSelectProject, onViewAll }: RecentP
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {recent.map((project) => {
           const mode = modeConfig[project.mode] || modeConfig.Learning;
-          const ModeIcon = mode.icon;
           return (
             <Card
               key={project.id}
               size="sm"
-              className="bg-card border-border cursor-pointer hover:bg-muted/50 transition-colors"
+              className={`bg-card border-border border-l-[3px] cursor-pointer hover:bg-muted/50 transition-all ${mode.border}`}
               onClick={() => onSelectProject(project.id)}
             >
-              <div className="p-4 space-y-3">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${mode.bg} ${mode.color}`}>
-                  <ModeIcon className="w-4 h-4" />
-                </div>
+              <div className="p-4 space-y-2.5">
                 <div>
                   <h3 className="text-sm font-bold text-foreground truncate">{project.title}</h3>
                   {project.description && (
-                    <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">{project.description}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{project.description}</p>
                   )}
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-1">
                   <Badge variant="outline" className={`text-[9px] uppercase font-bold tracking-widest px-2 py-0 border-transparent ${mode.bg} ${mode.color}`}>
                     {mode.label}
                   </Badge>
-                  <span className="text-[9px] text-slate-600">
+                  <span className="text-[9px] text-muted-foreground">
                     {formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}
                   </span>
                 </div>
