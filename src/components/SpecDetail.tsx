@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSpecChat } from '@/hooks/useSpecChat';
 import { toast } from 'sonner';
 
@@ -8,17 +9,18 @@ import { EditorPanel } from './spec-detail/EditorPanel';
 import { ChatPanel } from './spec-detail/ChatPanel';
 import { ConfirmProposal } from './spec-detail/ConfirmProposal';
 
-interface SpecDetailProps {
-  specId: string;
-  projectId: string;
-  onBack: () => void;
-}
-
 /**
  * SpecDetail Component
  * Main interface for editing a specific technical specification.
  */
-export function SpecDetail({ specId, projectId, onBack }: SpecDetailProps) {
+export function SpecDetail() {
+  const { specId, projectId } = useParams<{ specId: string; projectId: string }>();
+  const navigate = useNavigate();
+  const onBack = () => navigate(`/projects/${projectId}`);
+
+  if (!specId || !projectId) {
+    return <div className="h-screen bg-slate-950" />;
+  }
   const {
     spec,
     project,

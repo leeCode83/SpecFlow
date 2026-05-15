@@ -8,15 +8,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Mode } from '@/lib/types';
 import { supabase } from '@/lib/supabase/supabase';
 import { toast } from 'sonner';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-interface CreateProjectProps {
-  onBack: () => void;
-  onCreateProject: (id: string) => void;
-  onStartIdeation: () => void;
-  initialData?: { title: string; description: string; mode: string } | null;
-}
-
-export function CreateProject({ onBack, onCreateProject, onStartIdeation, initialData }: CreateProjectProps) {
+export function CreateProject() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const initialData = (location.state as { initialData?: { title: string; description: string; mode: string } })?.initialData;
+  const onBack = () => navigate('/dashboard');
+  const onStartIdeation = () => navigate('/ideation');
   const [step, setStep] = useState<'choice' | 'form'>(initialData ? 'form' : 'choice');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -51,7 +50,7 @@ export function CreateProject({ onBack, onCreateProject, onStartIdeation, initia
 
       if (error) throw error;
       toast.success("Project created successfully");
-      onCreateProject(data.id);
+      navigate('/projects/' + data.id);
     } catch (error: any) {
       console.error(error);
       toast.error(error.message || "Failed to create project");

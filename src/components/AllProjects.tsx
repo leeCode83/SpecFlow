@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { LayoutDashboard, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,15 +8,14 @@ import { Project } from '@/lib/types';
 import { ProjectCard } from './all-projects/ProjectCard';
 import { ProjectFilters } from './all-projects/ProjectFilters';
 import { ProjectEmptyState } from './all-projects/ProjectEmptyState';
-
-interface AllProjectsProps {
-  onSelectProject: (id: string) => void;
-  onCreateProject: () => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 const ITEMS_PER_PAGE = 20;
 
-export function AllProjects({ onSelectProject, onCreateProject }: AllProjectsProps) {
+export function AllProjects() {
+  const navigate = useNavigate();
+  const onSelectProject = (id: string) => navigate('/projects/' + id);
+  const onCreateProject = () => navigate('/projects/new');
   const [projects, setProjects] = useState<Project[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);

@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, MessageSquare, Send, ArrowLeft } from 'lucide-react';
+import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import ReactMarkdown from 'react-markdown';
 import { analyzeIdea } from '@/lib/gemini/gemini-ideation';
 import { chatWithIdea } from '@/lib/gemini/gemini-chat';
 import { simplifyProjectDescription } from '@/lib/gemini/gemini-simplify';
@@ -14,13 +13,11 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat';
 import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, TechJustification, MonetizationModel, CopyAnalysisButton } from '@/components/ui/ideation-cards';
+import { useNavigate } from 'react-router-dom';
 
-interface IdeationPageProps {
-  onCreateProject: (id?: string, title?: string, description?: string, feedback?: IdeaFeedback, mode?: Mode) => void;
-  onBack: () => void;
-}
-
-export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
+export function IdeationPage() {
+  const navigate = useNavigate();
+  const onBack = () => navigate('/');
   const [idea, setIdea] = useState('');
   const [mode, setMode] = useState<Mode>('Hackathon');
   const [analyzing, setAnalyzing] = useState(false);
@@ -77,14 +74,14 @@ export function IdeationPage({ onCreateProject, onBack }: IdeationPageProps) {
       if (chatMessages.length > 0) {
         fullDescription = await simplifyProjectDescription(idea, feedback, chatMessages);
       }
-        
-      onCreateProject(undefined, feedback.refinedIdea?.title || idea.split(' ').slice(0, 5).join(' ') + '...', fullDescription, feedback, mode);
+
+      navigate('/projects/new', { state: { initialData: { title: feedback.refinedIdea?.title || idea.split(' ').slice(0, 5).join(' ') + '...', description: fullDescription, mode } } });
     } catch (e) {
       toast.error('Failed to simplify description. Creating anyway with raw data.');
       if (chatMessages.length > 0) {
         fullDescription += '\n\nElaboration History:\n' + chatMessages.map(m => `${m.role === 'user' ? 'You' : 'AI'}: ${m.content}`).join('\n');
       }
-      onCreateProject(undefined, feedback.refinedIdea?.title || idea.split(' ').slice(0, 5).join(' ') + '...', fullDescription, feedback, mode);
+      navigate('/projects/new', { state: { initialData: { title: feedback.refinedIdea?.title || idea.split(' ').slice(0, 5).join(' ') + '...', description: fullDescription, mode } } });
     } finally {
       setIsStructuring(false);
     }

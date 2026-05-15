@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { 
   Rocket, 
   Mail, 
@@ -16,8 +16,17 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { supabase } from '@/lib/supabase/supabase';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
-export function Auth({ onBack }: { onBack?: () => void }) {
+export function Auth() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const onBack = () => navigate('/');
+
+  useEffect(() => {
+    if (user) navigate('/dashboard', { replace: true });
+  }, [user, navigate]);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,13 +69,12 @@ export function Auth({ onBack }: { onBack?: () => void }) {
           queryParams: {
             access_type: 'offline',
           },
-          redirectTo: process.env.APP_URL || window.location.origin,
+          redirectTo: (process.env.APP_URL || window.location.origin) + '/auth/callback',
         },
       });
       if (error) throw error;
       
       if (data?.url) {
-        // Open the authorization URL in a new popup window to avoid iframe restrictions
         const popup = window.open(data.url, 'google-oauth', 'width=500,height=600');
         if (!popup) {
           toast.error("Popup blocked! Please allow popups for this site to sign in with Google.");
@@ -87,7 +95,7 @@ export function Auth({ onBack }: { onBack?: () => void }) {
         options: {
           skipBrowserRedirect: true,
           scopes: 'public_repo',
-          redirectTo: process.env.APP_URL || window.location.origin,
+          redirectTo: (process.env.APP_URL || window.location.origin) + '/auth/callback',
         },
       });
       if (error) throw error;
@@ -117,14 +125,12 @@ export function Auth({ onBack }: { onBack?: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full space-y-8 relative"
       >
-        {onBack && (
-          <button 
-            onClick={onBack}
-            className="absolute -top-12 left-0 flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium"
-          >
-            ← Back to Home
-          </button>
-        )}
+        <button 
+          onClick={onBack}
+          className="absolute -top-12 left-0 flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium"
+        >
+          ← Back to Home
+        </button>
         <div className="text-center space-y-2">
           <div className="inline-flex p-3 bg-orange-500 rounded-2xl mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={onBack}>
             <Rocket className="w-8 h-8 text-white" />

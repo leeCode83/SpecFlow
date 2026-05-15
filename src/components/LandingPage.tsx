@@ -13,12 +13,7 @@ import { createProject } from '@/lib/supabase/supabase-projects';
 import { Mode, IdeaFeedback } from '@/lib/types';
 import { toast } from 'sonner';
 import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, TechJustification, MonetizationModel, CopyAnalysisButton } from '@/components/ui/ideation-cards';
-
-interface LandingPageProps {
-  onCreateProject: (id: string) => void;
-  onSignIn?: () => void;
-  onStartIdeation?: () => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 import { TestimonialsColumn, Testimonial } from "@/components/ui/testimonials-columns-1";
 
@@ -171,7 +166,10 @@ const subtitles = [
   "Refine your blueprint with AI-powered suggestions.",
 ];
 
-export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: LandingPageProps) {
+export function LandingPage() {
+  const navigate = useNavigate();
+  const onSignIn = () => navigate('/auth');
+  const onStartIdeation = () => navigate('/ideation');
   const [idea, setIdea] = useState('');
   const [mode, setMode] = useState<Mode>('Hackathon');
   const [analyzing, setAnalyzing] = useState(false);
@@ -202,11 +200,11 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
     if (!feedback) return;
     
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Please sign in to save your project.");
-      if (onSignIn) onSignIn();
-      return;
-    }
+      if (!user) {
+        toast.error("Please sign in to save your project.");
+        onSignIn();
+        return;
+      }
 
     try {
       const data = await createProject({
@@ -219,7 +217,7 @@ export function LandingPage({ onCreateProject, onSignIn, onStartIdeation }: Land
 
       if (data) {
         toast.success("Project saved!");
-        onCreateProject(data.id);
+        navigate('/projects/' + data.id);
       }
     } catch (error) {
       console.error(error);

@@ -3,6 +3,7 @@ import { LayoutGrid, HardDrive, Activity, Github } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
 import { Project } from '@/lib/types';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { WorkspaceHeader } from './workspace/WorkspaceHeader';
 import { WorkspaceHero } from './workspace/WorkspaceHero';
@@ -13,13 +14,15 @@ import { FileList } from './workspace/FileList';
 import { InviteMemberModal } from './workspace/InviteMemberModal';
 import { GithubViewer } from './workspace/GithubViewer';
 
-interface WorkspaceProps {
-  projectId: string;
-  onSelectSpec: (id: string) => void;
-  onBack: () => void;
-}
+export function Workspace() {
+  const { projectId } = useParams<{ projectId: string }>();
+  const navigate = useNavigate();
+  const onBack = () => navigate('/dashboard');
+  const onSelectSpec = (id: string) => navigate(`/projects/${projectId}/spec/${id}`);
 
-export function Workspace({ projectId, onSelectSpec, onBack }: WorkspaceProps) {
+  if (!projectId) {
+    return <div className="min-h-screen bg-slate-950" />;
+  }
   const {
     project,
     specs,

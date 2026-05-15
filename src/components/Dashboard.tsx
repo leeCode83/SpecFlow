@@ -13,14 +13,8 @@ import { LogItem } from './dashboard/LogItem';
 import { RecentProjects } from './dashboard/RecentProjects';
 import { QuickActions } from './dashboard/QuickActions';
 import { toast } from 'sonner';
-import { User } from '@supabase/supabase-js';
-
-interface DashboardProps {
-  onSelectProject: (id: string) => void;
-  onCreateProject: () => void;
-  onViewAllProjects: () => void;
-  user?: User | null;
-}
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 function getGreeting(email?: string): { greeting: string; name: string } {
   const hour = new Date().getHours();
@@ -37,7 +31,12 @@ const statCards = [
   { icon: GraduationCap, label: 'Learning', key: 'learning' as const, accentClass: 'bg-purple-500/20 text-purple-400' },
 ];
 
-export function Dashboard({ onSelectProject, onCreateProject, onViewAllProjects, user }: DashboardProps) {
+export function Dashboard() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const onSelectProject = (id: string) => navigate('/projects/' + id);
+  const onCreateProject = () => navigate('/projects/new');
+  const onViewAllProjects = () => navigate('/projects');
   const [projects, setProjects] = useState<Project[]>([]);
   const [logs, setLogs] = useState<ProjectLog[]>([]);
   const [loading, setLoading] = useState(true);
