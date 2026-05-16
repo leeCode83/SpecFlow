@@ -86,7 +86,7 @@ export function FormStep({
                 key="submit"
                 type="submit"
                 disabled={loading}
-                className="relative w-full h-12 rounded-xl bg-primary hover:bg-orange-600 disabled:opacity-60 font-bold text-base text-foreground transition-colors overflow-hidden"
+                className="relative w-full h-12 rounded-xl bg-primary hover:bg-brand/90 disabled:opacity-60 font-bold text-base text-foreground transition-colors overflow-hidden"
                 whileHover={{ scale: loading ? 1 : 1.01 }}
                 whileTap={{ scale: loading ? 1 : 0.99 }}
               >
@@ -135,7 +135,7 @@ function FloatingField({
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder={active ? '' : placeholder}
-          className="bg-white/[0.03] border-white/[0.06] focus:border-primary/50 focus:ring-2 focus:ring-primary/10 min-h-[120px] pt-6 resize-none placeholder:text-slate-600"
+          className="bg-foreground/[0.03] border-foreground/[0.06] focus:border-primary/50 focus:ring-2 focus:ring-primary/10 min-h-[120px] pt-6 resize-none placeholder:text-muted-foreground"
         />
       ) : (
         <Input
@@ -144,7 +144,7 @@ function FloatingField({
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder={active ? '' : placeholder}
-          className="bg-white/[0.03] border-white/[0.06] focus:border-primary/50 focus:ring-2 focus:ring-primary/10 h-12 pt-5 placeholder:text-slate-600"
+          className="bg-foreground/[0.03] border-foreground/[0.06] focus:border-primary/50 focus:ring-2 focus:ring-primary/10 h-12 pt-5 placeholder:text-muted-foreground"
         />
       )}
     </div>

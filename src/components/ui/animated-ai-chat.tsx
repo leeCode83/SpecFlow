@@ -93,7 +93,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         
         {showRing && isFocused && (
           <motion.span 
-            className="absolute inset-0 rounded-md pointer-events-none ring-2 ring-offset-0 ring-orange-500/30"
+            className="absolute inset-0 rounded-md pointer-events-none ring-2 ring-offset-0 ring-brand/30"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -146,10 +146,10 @@ export function AnimatedAIChat({
     };
 
     return (
-        <div className={cn("flex flex-col w-full h-full relative overflow-hidden rounded-2xl bg-slate-900/50 border border-slate-800 shadow-xl", compact ? "" : "min-h-[500px]")}>
+        <div className={cn("flex flex-col w-full h-full relative overflow-hidden rounded-2xl bg-muted border border-border shadow-xl", compact ? "" : "min-h-[500px]")}>
             {/* Background elements */}
             <div className="absolute inset-0 w-full h-full overflow-hidden top-0 left-0">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full mix-blend-normal filter blur-[80px] animate-pulse" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full mix-blend-normal filter blur-[80px] animate-pulse" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full mix-blend-normal filter blur-[80px] animate-pulse delay-700" />
             </div>
 
@@ -165,16 +165,16 @@ export function AnimatedAIChat({
                      >
                        <div className={cn(
                            "py-3 px-4 max-w-[85%] rounded-2xl text-sm leading-relaxed", 
-                           m.role === 'user' 
-                              ? "bg-orange-500/20 text-orange-50 border border-orange-500/30 rounded-br-sm" 
-                              : "bg-slate-800/80 text-slate-300 border border-slate-700 rounded-bl-sm"
+m.role === 'user' 
+                               ? "bg-brand/20 text-foreground border border-brand/30 rounded-br-sm" 
+                               : "bg-muted/80 text-foreground/80 border border-border rounded-bl-sm"
                          )}
                          style={m.role === 'user' ? { whiteSpace: "pre-wrap" } : {}}
                        >
                          {m.role === 'user' ? (
                            m.content
                          ) : (
-                           <div className="prose prose-invert prose-orange prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800">
+                           <div className="prose prose-invert prose-orange prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-card prose-pre:border prose-pre:border-border">
                              <ReactMarkdown>{m.content}</ReactMarkdown>
                            </div>
                          )}
@@ -188,8 +188,8 @@ export function AnimatedAIChat({
                        exit={{ opacity: 0, scale: 0.95 }}
                        className="flex justify-start w-full"
                      >
-                       <div className="py-3 px-4 rounded-2xl bg-slate-800/80 border border-slate-700 rounded-bl-sm flex items-center gap-2">
-                         <div className="text-sm text-slate-400">Thinking</div>
+<div className="py-3 px-4 rounded-2xl bg-muted/80 border border-border rounded-bl-sm flex items-center gap-2">
+                          <div className="text-sm text-muted-foreground">Thinking</div>
                          <TypingDots />
                        </div>
                      </motion.div>
@@ -198,7 +198,7 @@ export function AnimatedAIChat({
                  <div ref={messagesEndRef} />
                </div>
 
-                <div className={cn("p-4 sticky bottom-0 bg-slate-900/90 backdrop-blur-md border-t border-slate-800", compact ? "px-3 py-3" : "")}>
+                <div className={cn("p-4 sticky bottom-0 bg-card/90 backdrop-blur-md border-t border-border", compact ? "px-3 py-3" : "")}>
                     <div className="relative flex items-end">
                         <Textarea
                             ref={textareaRef}
@@ -213,12 +213,12 @@ export function AnimatedAIChat({
                             className={cn(
                                 "w-full px-4 py-2",
                                 "resize-none",
-                                "bg-slate-950/50",
-                                "border border-slate-800",
-                                "text-slate-200 text-sm",
+                                "bg-background/50",
+                                "border border-border",
+                                "text-foreground text-sm",
                                 "rounded-xl",
-                                "focus-visible:ring-1 focus-visible:ring-orange-500/50 focus:border-orange-500/50",
-                                "placeholder:text-slate-500",
+                                "focus-visible:ring-1 focus-visible:ring-brand/50 focus:border-brand/50",
+                                "placeholder:text-muted-foreground",
                                 compact ? "min-h-[40px]" : "min-h-[60px]"
                             )}
                             showRing={false}
@@ -230,12 +230,12 @@ export function AnimatedAIChat({
                             className={cn(
                                 "p-3 rounded-xl transition-all flex-shrink-0 h-fit",
                                 value.trim() && !isTyping
-                                    ? "bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20"
-                                    : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                                    ? "bg-brand hover:bg-brand/90 text-white shadow-lg shadow-brand/20"
+                                    : "bg-muted text-muted-foreground cursor-not-allowed"
                             )}
                         >
                             {isTyping ? (
-                                <LoaderIcon className="w-4 h-4 animate-spin text-slate-400" />
+                                <LoaderIcon className="w-4 h-4 animate-spin text-muted-foreground" />
                             ) : (
                                 <SendIcon className="w-4 h-4" />
                             )}
@@ -253,7 +253,7 @@ function TypingDots() {
             {[1, 2, 3].map((dot) => (
                 <motion.div
                     key={dot}
-                    className="w-1.5 h-1.5 bg-slate-400 rounded-full mx-0.5"
+                    className="w-1.5 h-1.5 bg-muted-foreground rounded-full mx-0.5"
                     initial={{ opacity: 0.3 }}
                     animate={{ 
                         opacity: [0.3, 0.9, 0.3],

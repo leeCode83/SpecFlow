@@ -127,7 +127,7 @@ export function LogPanel({
           </div>
         ))}
         {logs.length === 0 && (
-          <div className="h-full flex flex-col items-center justify-center text-slate-600 italic">
+          <div className="h-full flex flex-col items-center justify-center text-muted-foreground italic">
             <Activity className="w-8 h-8 mb-2 opacity-20" />
             <p className="text-xs">No activity yet</p>
           </div>

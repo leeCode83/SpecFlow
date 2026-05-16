@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import { PageTransition } from '@/components/ui/page-transition';
 import { LayoutDashboard, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { getProjectsPaginated } from '@/lib/supabase/supabase-projects';
 import { Project } from '@/lib/types';
 import { ProjectCard } from './all-projects/ProjectCard';
@@ -61,7 +63,7 @@ export function AllProjects() {
   }, [fetchProjects]);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
+    <PageTransition className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
@@ -94,6 +96,7 @@ export function AllProjects() {
       />
 
       {loading ? (
+        <PageSkeleton>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} size="sm" className="border-border bg-card">
@@ -112,6 +115,7 @@ export function AllProjects() {
             </Card>
           ))}
         </div>
+        </PageSkeleton>
       ) : (
         <>
           {projects.length > 0 ? (
@@ -164,6 +168,6 @@ export function AllProjects() {
           )}
         </>
       )}
-    </div>
+    </PageTransition>
   );
 }

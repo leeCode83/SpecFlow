@@ -101,7 +101,7 @@ export function SpecList({
           <div className="sm:col-span-2 xl:col-span-3 py-16 text-center border-2 border-dashed border-border rounded-2xl">
             <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground text-sm">No specifications yet</p>
-            <p className="text-slate-600 text-xs mt-1">Click "New Spec" in the header to create one</p>
+            <p className="text-muted-foreground text-xs mt-1">Click "New Spec" in the header to create one</p>
           </div>
         )}
       </div>

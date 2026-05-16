@@ -40,7 +40,7 @@ export function ProjectFilters({ searchQuery, onSearchChange, activeFilter, onFi
             className={cn(
               'px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
               activeFilter === filter
-                ? 'bg-primary/10 text-primary border border-orange-500/30'
+                ? 'bg-primary/10 text-primary border border-brand/30'
                 : 'bg-card text-muted-foreground border border-border hover:text-foreground hover:border-border/70'
             )}
           >

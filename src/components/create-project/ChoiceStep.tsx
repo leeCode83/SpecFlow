@@ -32,7 +32,7 @@ export function ChoiceStep({ onIdeation, onDirect }: ChoiceStepProps) {
           onClick={onIdeation}
         >
           <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-b from-primary/20 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
-          <div className="relative h-full rounded-3xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-8 space-y-6 flex flex-col items-center text-center group-hover:border-orange-500/30 transition-colors">
+          <div className="relative h-full rounded-3xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-8 space-y-6 flex flex-col items-center text-center group-hover:border-brand/30 transition-colors">
             <div className="p-4 rounded-2xl bg-primary/10 text-primary">
               <Sparkles className="h-12 w-12" />
             </div>

@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
+import { PageTransition } from '@/components/ui/page-transition';
 import { Activity, LayoutDashboard, Zap, Rocket, GraduationCap, ChevronLeft, ChevronRight, Code } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyActivityIllustration } from '@/components/ui/illustrations';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { Button } from '@/components/ui/button';
 import { getRecentProjects } from '@/lib/supabase/supabase-projects';
 import { getAllRecentLogs } from '@/lib/supabase/supabase-logs';
@@ -81,7 +85,8 @@ export function Dashboard() {
 
   if (loading) {
     return (
-      <div className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
+      <PageTransition className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
+        <PageSkeleton>
         <div className="space-y-2">
           <Skeleton className="h-8 w-72 bg-muted" />
           <Skeleton className="h-5 w-48 bg-muted" />
@@ -131,12 +136,13 @@ export function Dashboard() {
             ))}
           </div>
         </div>
-      </div>
+        </PageSkeleton>
+      </PageTransition>
     );
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
+    <PageTransition className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
@@ -191,10 +197,7 @@ export function Dashboard() {
             ))}
 
             {logs.length === 0 && (
-              <div className="py-16 text-center space-y-3">
-                <Code className="w-8 h-8 text-muted-foreground/20 mx-auto" />
-                <p className="text-muted-foreground text-sm">No activity records found yet. Start building something awesome!</p>
-              </div>
+              <EmptyState icon={<Code className="w-8 h-8" />} title="No activity yet" description="No activity records found yet. Start building something awesome!" illustration={<EmptyActivityIllustration className="w-32 h-32" />} />
             )}
           </div>
 
@@ -227,6 +230,6 @@ export function Dashboard() {
           )}
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

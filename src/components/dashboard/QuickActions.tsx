@@ -13,7 +13,7 @@ export function QuickActions({ onCreateProject, onViewAllProjects, onStartIdeati
       <Button
         variant="default"
         size="sm"
-        className="bg-primary hover:bg-orange-600 text-white"
+        className="bg-primary hover:bg-brand/90 text-white"
         onClick={onCreateProject}
       >
         <Plus className="w-4 h-4 mr-1.5" />

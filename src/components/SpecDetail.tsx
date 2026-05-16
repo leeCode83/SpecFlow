@@ -2,6 +2,9 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSpecChat } from '@/hooks/useSpecChat';
 import { toast } from 'sonner';
+import { PageTransition } from '@/components/ui/page-transition';
+
+import { PageSkeleton, SkeletonBlock } from '@/components/ui/page-skeleton';
 
 // Modular Components
 import { SpecHeader } from './spec-detail/SpecHeader';
@@ -55,13 +58,19 @@ export function SpecDetail() {
   };
 
   if (loading) return (
-    <div className="h-screen flex items-center justify-center bg-background text-muted-foreground">
-      Loading specification...
-    </div>
+    <PageTransition className="h-screen flex flex-col bg-background overflow-hidden p-8 gap-6">
+      <PageSkeleton className="flex flex-col gap-6 h-full">
+        <SkeletonBlock width="100%" height="56px" />
+        <div className="flex gap-4 flex-1 min-h-0">
+          <SkeletonBlock width="60%" height="100%" />
+          <SkeletonBlock width="40%" height="100%" />
+        </div>
+      </PageSkeleton>
+    </PageTransition>
   );
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
+    <PageTransition className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header */}
       <SpecHeader 
         spec={spec}
@@ -104,6 +113,6 @@ export function SpecDetail() {
           toast.success("Draft updated! Don't forget to save.");
         }}
       />
-    </div>
+    </PageTransition>
   );
 }

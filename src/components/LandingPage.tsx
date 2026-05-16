@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, TechJustification, MonetizationModel, CopyAnalysisButton } from '@/components/ui/ideation-cards';
 import { useNavigate } from 'react-router-dom';
 
+import { HeroDecoration } from '@/components/ui/illustrations';
 import { TestimonialsColumn, Testimonial } from "@/components/ui/testimonials-columns-1";
 
 interface ModeButtonProps { }
@@ -226,12 +227,13 @@ export function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col bg-background font-sans text-foreground">
+    <main className="min-h-screen relative overflow-hidden flex flex-col bg-background font-sans text-foreground">
       {/* Background blobs */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none">
         <div className="absolute top-[-10%] left-[20%] w-[40%] h-[60%] bg-primary/10 blur-[120px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-10%] right-[20%] w-[40%] h-[60%] bg-blue-500/10 blur-[120px] rounded-full" />
       </div>
+      <HeroDecoration className="absolute inset-0 w-full h-full -z-20 pointer-events-none opacity-40" />
 
       {/* Navigation Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-50">
@@ -249,9 +251,9 @@ export function LandingPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center w-full">
+      <div className="flex-1 flex flex-col items-center w-full">
         {/* Hero Section */}
-        <section className="w-full h-screen overflow-hidden md:overflow-visible flex flex-col items-center justify-center relative py-20 pb-0 md:pb-20">
+        <section aria-label="Hero" className="w-full h-screen overflow-hidden md:overflow-visible flex flex-col items-center justify-center relative py-20 pb-0 md:pb-20">
           <Floating sensitivity={-0.5} className="h-full z-0 pointer-events-none">
             <FloatingElement
               depth={0.5}
@@ -372,7 +374,7 @@ export function LandingPage() {
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 items-center mt-10 md:mt-16 w-full">
               <motion.button
                 onClick={onStartIdeation}
-                className="w-full sm:w-auto text-base md:text-lg font-bold tracking-tight text-foreground bg-primary px-8 py-4 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.4)]"
+                className="w-full sm:w-auto text-base md:text-lg font-bold tracking-tight text-foreground bg-primary px-8 py-4 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 animate={{ opacity: 1, y: 0 }}
                 initial={{ opacity: 0, y: 20 }}
                 transition={{
@@ -389,7 +391,7 @@ export function LandingPage() {
               </motion.button>
               <motion.button
                 onClick={onSignIn}
-                className="w-full sm:w-auto flex justify-center items-center gap-2 text-base md:text-lg font-bold tracking-tight text-foreground/80 bg-card border border-border/70 px-8 py-4 rounded-full shadow-xl"
+                className="w-full sm:w-auto flex justify-center items-center gap-2 text-base md:text-lg font-bold tracking-tight text-foreground/80 bg-card border border-border/70 px-8 py-4 rounded-full shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 animate={{ opacity: 1, y: 0 }}
                 initial={{ opacity: 0, y: 20 }}
                 transition={{
@@ -410,7 +412,7 @@ export function LandingPage() {
         </section>
 
         {/* Features Section - Animated Card Grid */}
-        <section className="w-full bg-card/60 border-y border-border/50 py-24 overflow-hidden">
+        <section aria-label="Features" className="w-full bg-card/60 border-y border-border/50 py-24 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -444,7 +446,7 @@ export function LandingPage() {
         </section>
 
         {/* Try Ideation Section */}
-        <section className="relative w-full max-w-5xl mx-auto px-6 py-24 z-10 overflow-hidden">
+        <section aria-label="Try Ideation" className="relative w-full max-w-5xl mx-auto px-6 py-24 z-10 overflow-hidden">
           {/* Gradient Mesh Background */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
             <div className="absolute top-[-5%] left-[20%] w-80 h-80 bg-primary/5 blur-[120px] rounded-full animate-[slow-drift_20s_ease-in-out_infinite]" />
@@ -816,25 +818,49 @@ export function LandingPage() {
           </AnimatePresence>
         </section>
 
-        <section className="w-full bg-card/60 border-y border-border/50 py-24 overflow-hidden">
-          <div className="max-w-6xl mx-auto px-6 text-center space-y-12">
-            <div className="space-y-4">
+        <section aria-label="Testimonials" className="w-full bg-card/60 border-y border-border/50 py-24 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="max-w-6xl mx-auto px-6 text-center space-y-12"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="space-y-4"
+            >
               <MessageSquareQuote className="w-12 h-12 text-primary mx-auto opacity-50" />
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight">What Builders Say</h2>
-            </div>
+            </motion.div>
             
-            <div className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)] max-h-[740px] overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)] max-h-[740px] overflow-hidden"
+            >
               <TestimonialsColumn testimonials={firstColumn} duration={25} />
               <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={35} />
               <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={30} />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
-      </main>
+      </div>
 
       {/* Footer */}
       <footer className="bg-background/80 border-t border-border/80 relative h-fit overflow-hidden mt-24">
-        <div className="max-w-7xl mx-auto p-14 z-40 relative">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="max-w-7xl mx-auto p-14 z-40 relative"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
             {/* Brand section */}
             <div className="flex flex-col space-y-4">
@@ -959,7 +985,7 @@ export function LandingPage() {
               &copy; {new Date().getFullYear()} IdeaFrame. All rights reserved.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Text hover effect */}
         <div className="lg:flex hidden h-[20rem] -mt-32 -mb-20 overflow-hidden pointer-events-none">
@@ -973,7 +999,7 @@ export function LandingPage() {
 
         <FooterBackgroundGradient />
       </footer>
-    </div>
+    </main>
   );
 }
 

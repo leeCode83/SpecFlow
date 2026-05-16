@@ -254,7 +254,7 @@ function TreeIndicator({
   return (
     <div
       className={cn(
-        "absolute left-1.5 h-full w-px rounded-md bg-muted py-3 transition-colors hover:bg-slate-300 rtl:right-1.5",
+        "absolute left-1.5 h-full w-px rounded-md bg-muted py-3 transition-colors hover:bg-muted rtl:right-1.5",
         className
       )}
       {...props}

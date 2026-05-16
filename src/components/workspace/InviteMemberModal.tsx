@@ -38,7 +38,7 @@ function getStatusBadge(status: string) {
       );
     case 'declined':
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-500/10 text-muted-foreground border border-slate-500/20">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted/10 text-muted-foreground border border-muted/20">
           Declined
         </span>
       );
@@ -128,7 +128,7 @@ export function InviteMemberModal({ projectId, isOwner, onClose }: InviteMemberM
             <Button
               type="submit"
               disabled={sending || !email.trim()}
-              className="bg-primary hover:bg-orange-600 text-foreground"
+              className="bg-primary hover:bg-brand/90 text-foreground"
             >
               {sending ? 'Sending...' : 'Send'}
             </Button>
@@ -141,7 +141,7 @@ export function InviteMemberModal({ projectId, isOwner, onClose }: InviteMemberM
             ) : invitations.length === 0 ? (
               <div className="py-4 text-center">
                 <p className="text-xs text-muted-foreground">No invitations yet</p>
-                <p className="text-[10px] text-slate-600 mt-1">Enter an email above to invite someone</p>
+                <p className="text-[10px] text-muted-foreground mt-1">Enter an email above to invite someone</p>
               </div>
             ) : (
               <>
@@ -200,7 +200,7 @@ function InvitationItem({ invitation, onDelete, showDelete }: InvitationItemProp
           <p className="text-xs font-medium text-foreground/90 truncate">{invitation.email}</p>
           <div className="flex items-center gap-2 mt-0.5">
             {getStatusBadge(invitation.status)}
-            <span className="text-[9px] text-slate-600">
+            <span className="text-[9px] text-muted-foreground">
               Expires {formatExpiryDate(invitation.expires_at)}
             </span>
           </div>

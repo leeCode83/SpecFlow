@@ -119,7 +119,7 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setIsEditingTitle(false)} className="text-muted-foreground">Cancel</Button>
-            <Button onClick={handleTitleSubmit} disabled={saving} className="bg-primary hover:bg-orange-600">Save Changes</Button>
+            <Button onClick={handleTitleSubmit} disabled={saving} className="bg-primary hover:bg-brand/90">Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -136,7 +136,7 @@ Instructions: Strictly follow the technical decisions, folder structure, and rat
         <Button 
           onClick={onSave} 
           disabled={saving}
-          className="bg-primary hover:bg-orange-600 font-bold gap-2"
+          className="bg-primary hover:bg-brand/90 font-bold gap-2"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Save Spec

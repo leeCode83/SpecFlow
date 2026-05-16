@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { PageTransition } from '@/components/ui/page-transition';
 import { ChevronLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/lib/supabase/supabase';
@@ -72,7 +73,7 @@ export function CreateProject() {
   const isLoading = loading || celebrating;
 
   return (
-    <div className="relative min-h-screen">
+    <PageTransition className="relative min-h-screen">
       <AnimatedBackground />
       <ProgressBar step={step} />
       <div className="relative z-10 p-8 max-w-4xl mx-auto">
@@ -126,6 +127,6 @@ export function CreateProject() {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </PageTransition>
   );
 }

@@ -99,7 +99,7 @@ export function ChatPanel({
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
-                m.role === 'user' ? 'bg-orange-600 text-foreground rounded-tr-none' : 'bg-card text-foreground/80 rounded-tl-none border border-border'
+                m.role === 'user' ? 'bg-brand text-foreground rounded-tr-none' : 'bg-card text-foreground/80 rounded-tl-none border border-border'
               }`}>
                 {m.role === 'user' ? (
                   m.content
@@ -138,7 +138,7 @@ export function ChatPanel({
             />
             <Button 
               size="icon" 
-              className="h-auto aspect-square bg-primary hover:bg-orange-600 self-stretch"
+              className="h-auto aspect-square bg-primary hover:bg-brand/90 self-stretch"
               onClick={handleSend}
               disabled={chatLoading}
             >

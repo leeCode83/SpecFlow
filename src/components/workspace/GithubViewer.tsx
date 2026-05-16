@@ -288,9 +288,9 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
         </div>
         <Card className="bg-card border-border">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <Github className="w-12 h-12 text-slate-700 mb-4" />
+            <Github className="w-12 h-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground mb-2">No repository connected</p>
-            <p className="text-slate-600 text-sm">
+            <p className="text-muted-foreground text-sm">
               Paste a public GitHub repository URL above to browse its files
             </p>
           </CardContent>
@@ -401,7 +401,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
                       <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
                         <AlertTriangle className="w-8 h-8 text-red-500 mb-2" />
                         <p className="text-sm text-muted-foreground mb-1">Failed to load files</p>
-                        <p className="text-xs text-slate-600">{treeError}</p>
+                        <p className="text-xs text-muted-foreground">{treeError}</p>
                       </div>
                     ) : (
                       fileTree.map(node => renderTreeNode(node))
@@ -458,7 +458,7 @@ export function GithubViewer({ project, onProjectUpdate }: GithubViewerProps) {
                   </>
                 ) : (
                   <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                    <FileCode className="w-12 h-12 text-slate-700 mb-4" />
+                    <FileCode className="w-12 h-12 text-muted-foreground mb-4" />
                     <p className="text-muted-foreground">Select a file to preview</p>
                   </div>
                 )}

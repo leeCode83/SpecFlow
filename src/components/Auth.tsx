@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { PageTransition } from '@/components/ui/page-transition';
 import { 
   Rocket, 
   Mail, 
@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase/supabase';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthIllustration } from '@/components/ui/illustrations';
 
 export function Auth() {
   const navigate = useNavigate();
@@ -116,26 +117,24 @@ export function Auth() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 flex items-center justify-center">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full" />
+        <AuthIllustration className="w-full max-w-lg opacity-60" />
       </div>
 
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-8 relative"
-      >
+      <PageTransition className="max-w-md w-full space-y-8 relative">
         <button 
           onClick={onBack}
-          className="absolute -top-12 left-0 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
+          aria-label="Back to home page"
+          className="absolute -top-12 left-0 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg"
         >
           ← Back to Home
         </button>
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3 bg-primary rounded-2xl mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={onBack}>
-            <Rocket className="w-8 h-8 text-foreground" />
+          <div role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') onBack(); }} className="inline-flex p-3 bg-primary rounded-2xl mb-4 cursor-pointer hover:scale-105 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" onClick={onBack}>
+            <Rocket className="w-8 h-8 text-foreground" aria-hidden="true" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground italic cursor-pointer hover:text-foreground/90 transition-colors" onClick={onBack}>IdeaFrame MVP</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground italic">IdeaFrame MVP</h1>
           <p className="text-muted-foreground">Sign in to start building technical blueprints.</p>
         </div>
 
@@ -146,54 +145,60 @@ export function Auth() {
               <TabsTrigger value="signup" className="rounded-lg data-[state=active]:bg-muted">Sign Up</TabsTrigger>
             </TabsList>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input 
-                    type="email" 
-                    placeholder="name@company.com" 
-                    className="pl-10 bg-background/50 border-border focus:border-primary/50 h-12 rounded-xl"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+            <form onSubmit={(e) => { e.preventDefault(); }}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+                    <Input 
+                      type="email" 
+                      placeholder="name@company.com" 
+                      aria-label="Email address"
+                      className="pl-10 bg-background/50 border-border focus:border-primary/50 h-12 rounded-xl"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input 
-                    type="password" 
-                    placeholder="••••••••" 
-                    className="pl-10 bg-background/50 border-border focus:border-primary/50 h-12 rounded-xl"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+                    <Input 
+                      type="password" 
+                      placeholder="••••••••" 
+                      aria-label="Password"
+                      className="pl-10 bg-background/50 border-border focus:border-primary/50 h-12 rounded-xl"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
                 </div>
+
+                <TabsContent value="login" className="m-0">
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90 h-12 rounded-xl font-bold gap-2"
+                    onClick={() => handleEmailAuth('login')}
+                    disabled={loading}
+                    type="submit"
+                  >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : "Sign In"}
+                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                </TabsContent>
+
+                <TabsContent value="signup" className="m-0">
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90 h-12 rounded-xl font-bold gap-2"
+                    onClick={() => handleEmailAuth('signup')}
+                    disabled={loading}
+                    type="submit"
+                  >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : "Create Account"}
+                    <Rocket className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                </TabsContent>
               </div>
-
-              <TabsContent value="login" className="m-0">
-                <Button 
-                  className="w-full bg-primary hover:bg-primary/90 h-12 rounded-xl font-bold gap-2"
-                  onClick={() => handleEmailAuth('login')}
-                  disabled={loading}
-                >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </TabsContent>
-
-              <TabsContent value="signup" className="m-0">
-                <Button 
-                  className="w-full bg-primary hover:bg-primary/90 h-12 rounded-xl font-bold gap-2"
-                  onClick={() => handleEmailAuth('signup')}
-                  disabled={loading}
-                >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Account"}
-                  <Rocket className="w-4 h-4" />
-                </Button>
-              </TabsContent>
-            </div>
+            </form>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -211,7 +216,7 @@ export function Auth() {
                 onClick={signInWithGoogle}
                 disabled={loading}
               >
-                <Chrome className="w-5 h-5 text-red-500" />
+                <Chrome className="w-5 h-5 text-red-500" aria-hidden="true" />
                 Google
               </Button>
 
@@ -221,7 +226,7 @@ export function Auth() {
                 onClick={signInWithGithub}
                 disabled={loading}
               >
-                <Github className="w-5 h-5 text-foreground" />
+                <Github className="w-5 h-5 text-foreground" aria-hidden="true" />
                 Github
               </Button>
             </div>
@@ -234,12 +239,12 @@ export function Auth() {
         </Card>
 
         <div className="flex items-center gap-2 justify-center p-4 bg-primary/5 rounded-2xl border border-primary/10">
-          <AlertCircle className="w-4 h-4 text-primary" />
+          <AlertCircle className="w-4 h-4 text-primary" aria-hidden="true" />
           <p className="text-[10px] text-muted-foreground font-medium leading-tight">
             Pro Tip: Use Google Login with your hackathon email for instant workspace access.
           </p>
         </div>
-      </motion.div>
+      </PageTransition>
     </div>
   );
 }

@@ -12,7 +12,7 @@ interface LogItemProps {
 
 function getLogVisuals(action: string) {
   const act = (action || '').toUpperCase().replace(/_/g, ' ');
-  if (act.includes('CREATE SPEC')) return { icon: PlusCircle, color: 'text-primary/80', bg: 'bg-primary/20', border: 'border-orange-500/20' };
+  if (act.includes('CREATE SPEC')) return { icon: PlusCircle, color: 'text-primary/80', bg: 'bg-primary/20', border: 'border-brand/20' };
   if (act.includes('UPDATE GITHUB')) return { icon: GitBranch, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/20' };
   if (act.includes('EDIT SPEC')) return { icon: Edit2, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/20' };
   if (act.includes('ADD MEMBER')) return { icon: UserPlus, color: 'text-success', bg: 'bg-success/20', border: 'border-emerald-500/20' };
@@ -99,7 +99,7 @@ export function LogItem({ log, projectName, index }: LogItemProps) {
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="p-4 flex items-start gap-3 hover:bg-slate-800/30 transition-colors group"
+      className="p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors group"
     >
       <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center border shadow-inner transition-transform group-hover:scale-105 ${visuals.bg} ${visuals.color} ${visuals.border}`}>
         <visuals.icon className="w-4 h-4" />

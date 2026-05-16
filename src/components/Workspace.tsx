@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { LayoutGrid, HardDrive, Activity, Github } from 'lucide-react';
+import { PageTransition } from '@/components/ui/page-transition';
+import { HardDrive, Activity, Github } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
 import { Project } from '@/lib/types';
@@ -7,6 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { updateProject } from '@/lib/supabase/supabase-projects';
 import { toast } from 'sonner';
 
+import { PageSkeleton, SkeletonBlock } from '@/components/ui/page-skeleton';
 import { WorkspaceHeader } from './workspace/WorkspaceHeader';
 import { WorkspaceHero } from './workspace/WorkspaceHero';
 import { SpecList } from './workspace/SpecList';
@@ -72,14 +74,22 @@ export function Workspace() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <LayoutGrid className="w-8 h-8 animate-pulse text-primary" />
-      </div>
+      <PageTransition className="flex items-center justify-center min-h-[60vh] p-8">
+        <PageSkeleton className="w-full max-w-7xl space-y-8">
+          <SkeletonBlock width="100%" height="48px" />
+          <SkeletonBlock width="100%" height="200px" />
+          <div className="flex gap-3">
+            <SkeletonBlock width="120px" height="36px" />
+            <SkeletonBlock width="120px" height="36px" />
+            <SkeletonBlock width="120px" height="36px" />
+          </div>
+        </PageSkeleton>
+      </PageTransition>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageTransition className="min-h-screen bg-background">
       <WorkspaceHeader
         project={localProject}
         onBack={onBack}
@@ -182,6 +192,6 @@ export function Workspace() {
           onRename={handleRenameProject}
         />
       )}
-    </div>
+    </PageTransition>
   );
 }

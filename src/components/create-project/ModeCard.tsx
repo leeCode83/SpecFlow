@@ -25,7 +25,7 @@ export function ModeCard({ mode, selected, onClick }: ModeCardProps) {
       onClick={onClick}
       className={`relative flex flex-col items-center gap-2 rounded-xl border p-4 text-sm font-medium transition-colors ${
         selected
-          ? 'border-orange-500 bg-primary/10 text-primary shadow-[0_0_15px_rgba(251,146,60,0.15)]'
+          ? 'border-brand bg-primary/10 text-primary shadow-lg shadow-brand/15'
           : 'border-white/[0.06] bg-white/[0.03] text-muted-foreground hover:border-white/[0.12] hover:text-foreground/80'
       }`}
       whileHover={{ y: -2 }}

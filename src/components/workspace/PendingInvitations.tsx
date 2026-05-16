@@ -52,7 +52,7 @@ export function PendingInvitations({ onInvitationAccepted }: PendingInvitationsP
   }
 
   return (
-    <div className="bg-orange-500/5 border border-orange-500/20 rounded-2xl p-4 space-y-3">
+    <div className="bg-brand/5 border border-brand/20 rounded-2xl p-4 space-y-3">
       <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
             <Mail className="w-3 h-3 text-primary" />
@@ -89,7 +89,7 @@ function InvitationCard({ invitation, onAccept, onDecline }: InvitationCardProps
   return (
     <div className="bg-card rounded-xl border border-border/50 p-3 space-y-3">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-amber-500/20 flex items-center justify-center text-primary border border-orange-500/20 shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand/20 to-warning/20 flex items-center justify-center text-primary border border-brand/20 shrink-0">
           <Mail className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
@@ -97,7 +97,7 @@ function InvitationCard({ invitation, onAccept, onDecline }: InvitationCardProps
           <p className="text-[10px] text-muted-foreground mt-0.5">
             Invited by <span className="text-muted-foreground">Project Owner</span>
           </p>
-          <p className="text-[10px] text-slate-600 mt-0.5 flex items-center gap-1">
+          <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
             <Clock className="w-2.5 h-2.5" />
             Expires {new Date(invitation.expires_at).toLocaleDateString('en-US', {
               month: 'short',

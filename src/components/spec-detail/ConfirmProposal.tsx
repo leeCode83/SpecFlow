@@ -50,7 +50,7 @@ export function ConfirmProposal({
           </Button>
           <Button 
             onClick={onApply} 
-            className="flex-1 sm:flex-none bg-primary hover:bg-orange-600 font-bold"
+            className="flex-1 sm:flex-none bg-primary hover:bg-brand/90 font-bold"
           >
             Process & Apply
           </Button>

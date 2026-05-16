@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { PageTransition } from '@/components/ui/page-transition';
 import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -127,7 +128,7 @@ export function IdeationPage() {
   const nextSteps = getNextSteps();
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative">
+    <PageTransition className="min-h-screen bg-background text-foreground relative">
       {/* Background blobs */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
 
@@ -350,7 +351,7 @@ export function IdeationPage() {
           </motion.div>
         )}
       </main>
-    </div>
+    </PageTransition>
   );
 }
 

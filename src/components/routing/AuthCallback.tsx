@@ -37,7 +37,7 @@ export function AuthCallback() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <div
         style={{
           display: 'flex',
