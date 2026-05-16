@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageTransition } from '@/components/ui/page-transition';
-import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Rocket, Sparkles, BrainCircuit, Target, Zap, ArrowRight, Loader2, MessageSquare, ArrowLeft, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -13,7 +13,7 @@ import { Mode, IdeaFeedback, Message } from '@/lib/types';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat';
-import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, TechJustification, MonetizationModel, CopyAnalysisButton } from '@/components/ui/ideation-cards';
+import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, MetricCard, MonetizationModel, CopyAnalysisButton, type MetricType } from '@/components/ui/ideation-cards';
 import { useNavigate } from 'react-router-dom';
 
 export function IdeationPage() {
@@ -24,8 +24,6 @@ export function IdeationPage() {
   const [analyzing, setAnalyzing] = useState(false);
   const [feedback, setFeedback] = useState<IdeaFeedback | null>(null);
 
-  // Chat states
-  // Remove elaboration mode state if present
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatting, setChatting] = useState(false);
@@ -70,7 +68,7 @@ export function IdeationPage() {
     if (!feedback) return;
     setIsStructuring(true);
     let fullDescription = (feedback.refinedIdea?.oneLiner || '') + '\n\n' + (feedback.refinedIdea?.problem || '') + '\n\nTarget User: ' + (feedback.refinedIdea?.targetUser || '');
-    
+
     try {
       if (chatMessages.length > 0) {
         fullDescription = await simplifyProjectDescription(idea, feedback, chatMessages);
@@ -88,26 +86,31 @@ export function IdeationPage() {
     }
   };
 
-  const getTechStackList = () => {
-    if (!feedback?.techStack) return [];
-    const list: string[] = [];
-    Object.values(feedback.techStack).forEach((techArray) => {
-      if (Array.isArray(techArray)) {
-        techArray.forEach(t => {
-          if (typeof t === 'string') list.push(t);
-          else if (typeof t === 'object' && t !== null) {
-            if ('tech' in t) list.push((t as any).tech);
-            else if ('lib' in t) list.push((t as any).lib);
-            else list.push(JSON.stringify(t));
-          }
-        });
+  const getTechStackByCategory = () => {
+    if (!feedback?.techStack) return [] as { category: string; items: string[]; color: string }[];
+    const result: { category: string; items: string[]; color: string }[] = [];
+    const colorCycle = ['text-blue-400 border-blue-500/20 bg-blue-500/5', 'text-purple-400 border-purple-500/20 bg-purple-500/5', 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5', 'text-amber-400 border-amber-500/20 bg-amber-500/5', 'text-rose-400 border-rose-500/20 bg-rose-500/5', 'text-cyan-400 border-cyan-500/20 bg-cyan-500/5'];
+    let ci = 0;
+    Object.entries(feedback.techStack).forEach(([category, techArray]) => {
+      if (!Array.isArray(techArray) || techArray.length === 0) return;
+      const items: string[] = [];
+      techArray.forEach(t => {
+        if (typeof t === 'string') items.push(t);
+        else if (typeof t === 'object' && t !== null) {
+          if ('tech' in t) items.push((t as any).tech);
+          else if ('lib' in t) items.push((t as any).lib);
+        }
+      });
+      if (items.length > 0) {
+        result.push({ category, items: items.slice(0, 4), color: colorCycle[ci % colorCycle.length] });
+        ci++;
       }
     });
-    return list;
+    return result;
   };
 
-  const techList = getTechStackList();
-  
+  const techCategories = getTechStackByCategory();
+
   const getNextSteps = () => {
     if (feedback?.nextSteps && feedback.nextSteps.length > 0) return feedback.nextSteps;
     if (feedback?.mode === 'Learning') {
@@ -127,26 +130,53 @@ export function IdeationPage() {
 
   const nextSteps = getNextSteps();
 
+  const getMetrics = (): { type: MetricType; score: number }[] => {
+    if (!feedback) return [];
+    if (feedback.mode === 'Hackathon') {
+      return [
+        { type: 'originality' as MetricType, score: Number(feedback.originality) || Number(feedback.hackathonAnalysis?.originalityScore) || 8 },
+        { type: 'buildability' as MetricType, score: Number(feedback.buildability) || 8 },
+        { type: 'impact' as MetricType, score: Number(feedback.impact) || 8 },
+      ];
+    }
+    if (feedback.mode === 'Learning') {
+      return [
+        { type: 'originality' as MetricType, score: Number(feedback.originality) || 8 },
+        { type: 'feasibility' as MetricType, score: Number(feedback.feasibility) || 8 },
+        { type: 'learningValue' as MetricType, score: Number(feedback.learningValue) || 8 },
+      ];
+    }
+    if (feedback.mode === 'Startup') {
+      return [
+        { type: 'originality' as MetricType, score: Number(feedback.originality) || 8 },
+        { type: 'marketSize' as MetricType, score: Number(feedback.marketSize) || 8 },
+        { type: 'monetization' as MetricType, score: Number(feedback.monetization) || 8 },
+      ];
+    }
+    return [];
+  };
+
+  const metrics = getMetrics();
+
   return (
     <PageTransition className="min-h-screen bg-background text-foreground relative">
       {/* Background blobs */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-500/5 blur-[100px] rounded-full pointer-events-none -z-10" />
 
       <header className="flex items-center gap-4 px-6 py-4 border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <Button variant="ghost" size="icon" onClick={onBack} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex items-center gap-2">
-          <div className="bg-primary rounded-lg p-1.5">
-            <BrainCircuit className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.png" alt="IdeaFrame" className="w-7 h-7" />
           <span className="font-bold tracking-tight text-lg">Ideation Engine</span>
         </div>
       </header>
 
       <main className={cn("mx-auto px-6 py-12 space-y-12 transition-all duration-500", feedback ? "max-w-7xl" : "max-w-4xl")}>
         {!feedback ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8"
@@ -160,39 +190,46 @@ export function IdeationPage() {
 
             <div className="relative bg-card/80 border border-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-xl">
               <div className="flex flex-wrap gap-4 mb-6">
-                <ModeButton 
-                  active={mode === 'Learning'} 
-                  onClick={() => setMode('Learning')} 
-                  icon={<BrainCircuit className="w-4 h-4" />} 
-                  label="Learning" 
+                <ModeButton
+                  active={mode === 'Learning'}
+                  onClick={() => setMode('Learning')}
+                  icon={<BrainCircuit className="w-4 h-4" />}
+                  label="Learning"
                   color="blue"
                 />
-                <ModeButton 
-                  active={mode === 'Hackathon'} 
-                  onClick={() => setMode('Hackathon')} 
-                  icon={<Zap className="w-4 h-4" />} 
-                  label="Hackathon" 
+                <ModeButton
+                  active={mode === 'Hackathon'}
+                  onClick={() => setMode('Hackathon')}
+                  icon={<Zap className="w-4 h-4" />}
+                  label="Hackathon"
                   color="orange"
                 />
-                <ModeButton 
-                  active={mode === 'Startup'} 
-                  onClick={() => setMode('Startup')} 
-                  icon={<Target className="w-4 h-4" />} 
-                  label="Startup" 
+                <ModeButton
+                  active={mode === 'Startup'}
+                  onClick={() => setMode('Startup')}
+                  icon={<Target className="w-4 h-4" />}
+                  label="Startup"
                   color="emerald"
                 />
               </div>
 
-              <Textarea 
+              <Textarea
                 placeholder="Describe your project idea... (e.g. A real-time collaborative code editor for technical interviews with built-in AI debugging)"
                 className="min-h-[200px] bg-background/50 border-border focus:border-primary/50 text-lg p-6 rounded-xl resize-none"
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAnalyze();
+                  }
+                }}
               />
 
-              <div className="mt-8 flex justify-end">
-                <Button 
-                  size="lg" 
+              <div className="mt-8 flex justify-end gap-3">
+                <p className="text-xs text-muted-foreground self-center">Press Enter to analyze, Shift+Enter for new line</p>
+                <Button
+                  size="lg"
                   className="bg-primary hover:bg-primary/90 text-white gap-2 px-8 rounded-xl font-bold h-12"
                   onClick={handleAnalyze}
                   disabled={analyzing}
@@ -213,14 +250,17 @@ export function IdeationPage() {
             </div>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
           >
-            <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-6">
-                <Card className="bg-card border-border p-8 rounded-2xl space-y-6">
-                  <div className="space-y-2">
+            {/* Results panel - 7/12 */}
+            <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-6">
+                {/* Strategic Summary */}
+                <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card/80 to-card/60 border-border/60 p-8 rounded-2xl space-y-6">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
+                  <div className="space-y-2 relative z-10">
                     <h3 className="text-xl font-bold flex items-center gap-2">
                       <BrainCircuit className="w-5 h-5 text-primary" />
                       Strategic Summary
@@ -229,42 +269,62 @@ export function IdeationPage() {
                     <p className="text-muted-foreground mt-2">{feedback.refinedIdea?.problem}</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-6 pt-4 border-t border-border/50">
+                  <div className="grid grid-cols-2 gap-6 pt-4 border-t border-border/50 relative z-10">
                     <div className="space-y-3">
                       <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Tech Stack</h4>
                       <div className="flex flex-wrap gap-2">
-                        {techList.slice(0, 10).map((t, i) => (
-                           <Badge key={i} variant="outline" className={`h-auto whitespace-normal break-words text-left py-1 text-xs max-w-full ${i % 3 === 0 ? 'bg-blue-500/5 border-blue-500/20 text-blue-400' : i % 3 === 1 ? 'bg-purple-500/5 border-purple-500/20 text-purple-400' : 'bg-brand-secondary/5 border-emerald-500/20 text-success'}`}>{t}</Badge>
-                        ))}
+                        {techCategories.length > 0 ? techCategories.map((cat, ci) => (
+                          <div key={ci} className="space-y-1.5 w-full">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 block">{cat.category}</span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cat.items.map((item, ii) => (
+                                <Badge key={ii} variant="outline" className={cn('h-auto whitespace-normal break-words text-left py-1 text-[11px] max-w-full', cat.color)}>
+                                  {item}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )) : (
+                          <span className="text-xs text-muted-foreground">No tech stack specified</span>
+                        )}
                       </div>
                     </div>
                     <div className="space-y-3">
                       <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Next Steps</h4>
-                      <ul className="text-sm text-muted-foreground space-y-2">
+                      <ul className="text-sm text-muted-foreground space-y-3">
                         {nextSteps.map((step, i) => (
-                          <li key={i} className="flex gap-3">
-                            <span className="text-primary font-bold">0{i+1}.</span>
+                          <motion.li
+                            key={i}
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 + i * 0.08 }}
+                            className="flex gap-3 items-start"
+                          >
+                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold mt-0.5">0{i+1}</span>
                             <span className="leading-tight">{step}</span>
-                          </li>
+                          </motion.li>
                         ))}
                       </ul>
                     </div>
                   </div>
-
-                  <TechJustification text={feedback.techJustification} delay={0.45} />
                 </Card>
 
                 <PitchQuote text={feedback.pitchDeck} delay={0.15} />
                 <DifficultyBadge difficultyLevel={feedback.difficultyLevel} timeEstimateHours={feedback.timeEstimateHours} delay={0.2} />
 
-                <Card className="bg-card border-border p-8 rounded-2xl flex flex-col h-fit">
-                  <h3 className="text-xl font-bold mb-6">Key Insights</h3>
-                  <div className="space-y-6">
+                {/* Key Insights */}
+                <Card className="bg-card/50 border-border p-8 rounded-2xl flex flex-col h-fit">
+                  <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Key Insights
+                  </h3>
+                  <div className="space-y-4">
+                    {metrics.map((metric, i) => (
+                      <MetricCard key={metric.type} type={metric.type} score={metric.score} index={i} />
+                    ))}
+
                     {feedback.mode === 'Hackathon' && (
                       <>
-                        <ScoreItem label="Originality" score={Number(feedback.originality) || Number(feedback.hackathonAnalysis?.originalityScore) || 8} color="orange" />
-                        <ScoreItem label="Buildability" score={Number(feedback.buildability) || 8} color="blue" />
-                        <ScoreItem label="Impact" score={Number(feedback.impact) || 8} color="emerald" />
                         <div className="mt-4 text-sm text-muted-foreground">
                           <span className="font-bold text-foreground/80">Time estimate:</span> {feedback.timeEstimateHours || feedback.hackathonAnalysis?.timeEstimate}
                         </div>
@@ -273,22 +333,22 @@ export function IdeationPage() {
                     )}
                     {feedback.mode === 'Learning' && (
                       <>
-                        <ScoreItem label="Originality" score={Number(feedback.originality) || 8} color="orange" />
-                        <ScoreItem label="Feasibility" score={Number(feedback.feasibility) || 8} color="blue" />
-                        <ScoreItem label="Learning Value" score={Number(feedback.learningValue) || 8} color="emerald" />
-                        <div className="mt-4 text-sm text-muted-foreground space-y-2">
-                           <div><span className="font-bold text-foreground/80">Time Estimate:</span> {feedback.timeEstimateHours || feedback.learningAnalysis?.timeEstimate}</div>
-                           <div><span className="font-bold text-foreground/80">Complexity:</span> {feedback.difficultyLevel || feedback.learningAnalysis?.complexityLevel}</div>
+                        <div className="mt-4 text-sm text-muted-foreground space-y-2 p-4 rounded-xl bg-background/50 border border-border/60">
+                           <div className="flex items-center gap-2">
+                             <Bot className="w-4 h-4 text-muted-foreground" />
+                             <span><span className="font-bold text-foreground/80">Time Estimate:</span> {feedback.timeEstimateHours || feedback.learningAnalysis?.timeEstimate}</span>
+                           </div>
+                           <div className="flex items-center gap-2">
+                             <Bot className="w-4 h-4 text-muted-foreground" />
+                             <span><span className="font-bold text-foreground/80">Complexity:</span> {feedback.difficultyLevel || feedback.learningAnalysis?.complexityLevel}</span>
+                           </div>
                            <div><span className="font-bold text-foreground/80">Complexity Reason:</span> {feedback.learningAnalysis?.complexityReason}</div>
                         </div>
                       </>
                     )}
                     {feedback.mode === 'Startup' && (
                       <>
-                        <ScoreItem label="Originality" score={Number(feedback.originality) || 8} color="orange" />
-                        <ScoreItem label="Market Size" score={Number(feedback.marketSize) || 8} color="blue" />
-                        <ScoreItem label="Monetization" score={Number(feedback.monetization) || 8} color="emerald" />
-                        <div className="mt-4 text-sm text-muted-foreground space-y-3">
+                        <div className="mt-4 text-sm text-muted-foreground space-y-3 p-4 rounded-xl bg-background/50 border border-border/60">
                            <div><span className="font-bold text-foreground/80 block mb-1">Market Size</span> {feedback.marketAnalysis?.marketSize}</div>
                            <div><span className="font-bold text-foreground/80 block mb-1">Growth Trend</span> {feedback.marketAnalysis?.growthTrend}</div>
                            <div><span className="font-bold text-foreground/80 block mb-1">Target Segment</span> {feedback.marketAnalysis?.targetSegment}</div>
@@ -306,7 +366,8 @@ export function IdeationPage() {
                 <CopyAnalysisButton feedback={feedback as unknown as Record<string, unknown>} />
             </div>
 
-            <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 sticky top-24 h-[100vh] max-h-[85vh]">
+            {/* Chat panel - 5/12 */}
+            <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-6 sticky top-24 h-[100vh] max-h-[85vh]">
                 <div className="flex-1 min-h-0 bg-card/80 border border-border rounded-3xl overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative w-full">
                    <div className="p-4 border-b border-border bg-background/50 flex flex-col gap-1 z-10 shrink-0">
                       <div className="flex flex-row gap-3 items-center">
@@ -318,7 +379,7 @@ export function IdeationPage() {
                       <p className="text-xs text-muted-foreground pl-[44px]">Refine features, MVP scope or architecture</p>
                    </div>
                    <div className="flex-1 overflow-hidden">
-                       <AnimatedAIChat 
+                       <AnimatedAIChat
                           onSendMessage={handleSendChat}
                           isTyping={chatting}
                           messages={[
@@ -330,8 +391,8 @@ export function IdeationPage() {
                    </div>
                 </div>
 
-                <Button 
-                    onClick={handleCreateProject} 
+                <Button
+                    onClick={handleCreateProject}
                     disabled={isStructuring}
                     className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-xl shadow-lg shrink-0"
                 >
@@ -363,50 +424,12 @@ function ModeButton({ active, onClick, icon, label, color }: { active: boolean, 
   };
 
   return (
-    <button 
+    <button
       onClick={onClick}
       className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border transition-all duration-200 text-sm font-bold ${colorMap[color]}`}
     >
       {icon}
       {label}
     </button>
-  );
-}
-
-function ScoreItem({ label, score, color }: { label: string, score: number, color: 'orange' | 'blue' | 'emerald' }) {
-  const colorMap = {
-    orange: 'bg-primary',
-    blue: 'bg-blue-500',
-    emerald: 'bg-brand-secondary'
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground">
-        <span>{label}</span>
-        <span className="text-foreground/90">{score}/10</span>
-      </div>
-      <div className="h-2.5 bg-background border border-border rounded-full overflow-hidden">
-        <motion.div 
-          initial={{ width: 0 }}
-          animate={{ width: `${score * 10}%` }}
-          className={`h-full ${colorMap[color]}`} 
-        />
-      </div>
-    </div>
-  );
-}
-
-function StatItem({ label, text, color }: { label: string, text?: string, color: 'orange' | 'blue' | 'emerald' }) {
-  const textMap = {
-    orange: 'text-primary/80',
-    blue: 'text-blue-400',
-    emerald: 'text-success'
-  };
-  return (
-    <div className="flex justify-between items-center bg-background/50 p-3 rounded-lg border border-border/80">
-      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <span className={`text-sm font-bold ${textMap[color]}`}>{text || '-'}</span>
-    </div>
   );
 }

@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabase/supabase';
 import { createProject } from '@/lib/supabase/supabase-projects';
 import { Mode, IdeaFeedback } from '@/lib/types';
 import { toast } from 'sonner';
-import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, TechJustification, MonetizationModel, CopyAnalysisButton } from '@/components/ui/ideation-cards';
+import { PitchQuote, RiskCards, DifficultyBadge, CompetitorInsight, MonetizationModel, CopyAnalysisButton } from '@/components/ui/ideation-cards';
 import { useNavigate } from 'react-router-dom';
 
 import { HeroDecoration } from '@/components/ui/illustrations';
@@ -705,8 +705,6 @@ export function LandingPage() {
                         </ul>
                       </motion.div>
                     </div>
-
-                    <TechJustification text={feedback.techJustification} delay={0.6} />
 
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}

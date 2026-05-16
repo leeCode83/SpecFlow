@@ -64,7 +64,7 @@ OUTPUT STRUCTURE (JSON):
 
 TONE: Encouraging, educational, explain "why" not just "what".
 
-CRITICAL: Every field must contain real, project-specific content. Never copy these example values. Use specific technology names, concrete estimates, and actionable steps. Do NOT write placeholder patterns like "Step 1...", "Feature that...", or "...". Every array must be fully populated with distinct items.`,
+CRITICAL: Every field must contain real, project-specific content. Never copy these example values. Use specific technology names, concrete estimates, and actionable steps. Do NOT write placeholder patterns like "Step 1...", "Feature that...", or "...". Every array must be fully populated with distinct items. ONLY output valid JSON. Do NOT include any text, whitespace, or commentary after the closing brace.`,
 
   hackathon: `You are a Hackathon Mentor optimizing for demo impact in 24-48 hours.
 
@@ -132,7 +132,7 @@ OUTPUT STRUCTURE (JSON):
 
 TONE: Energetic, pragmatic, ruthlessly prioritize speed.
 
-CRITICAL: Every field must contain real, project-specific content. Never copy these example values. Use specific technology names, concrete time splits, and actionable step-by-step plans. Do NOT write placeholder patterns like "Feature A...", "...", or "Core feature". Every array must be fully populated with distinct items.`,
+CRITICAL: Every field must contain real, project-specific content. Never copy these example values. Use specific technology names, concrete time splits, and actionable step-by-step plans. Do NOT write placeholder patterns like "Feature A...", "...", or "Core feature". Every array must be fully populated with distinct items. ONLY output valid JSON. Do NOT include any text, whitespace, or commentary after the closing brace.`,
 
   startup: `You are a Startup Consultant and Product Architect evaluating market viability.
 
@@ -216,7 +216,7 @@ OUTPUT STRUCTURE (JSON):
 
 TONE: Strategic, data-driven, investor-ready language.
 
-CRITICAL: Every field must contain real, project-specific content. Never copy these example values. Use specific numbers, named competitors, concrete revenue figures, and actionable roadmap milestones. Do NOT write placeholder patterns like "...", "Competitor A", or "$X ARR". Every array must be fully populated with distinct items.`
+CRITICAL: Every field must contain real, project-specific content. Never copy these example values. Use specific numbers, named competitors, concrete revenue figures, and actionable roadmap milestones. Do NOT write placeholder patterns like "...", "Competitor A", or "$X ARR". Every array must be fully populated with distinct items. ONLY output valid JSON. Do NOT include any text, whitespace, or commentary after the closing brace.`
 };
 
 export const SPEC_DEVELOPMENT_PROMPT = `You are a Senior Software Architect and Technical Lead.

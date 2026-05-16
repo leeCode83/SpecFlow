@@ -29,7 +29,13 @@ export class GeminiService {
   private safeParseJSON<T>(text: string, fallback: T): T {
     try {
       // Remove potential markdown code blocks
-      const cleanText = text.replace(/```json\n?|```/g, '').trim();
+      let cleanText = text.replace(/```json\n?|```/g, '').trim();
+      // Extract JSON substring in case model appends extra text after the JSON
+      const firstBrace = cleanText.indexOf('{');
+      const lastBrace = cleanText.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        cleanText = cleanText.slice(firstBrace, lastBrace + 1);
+      }
       return JSON.parse(cleanText) as T;
     } catch (e) {
       console.error("Failed to parse AI JSON response:", e, "Text:", text);
